@@ -1,36 +1,144 @@
+// Header styling copied from create-shipment.component.scss
+.chaos-control-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  padding: 2rem 3rem;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+  border-radius: 32px 32px 0 0;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      linear-gradient(30deg, transparent 40%, rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.02) 60%, transparent 60%),
+      linear-gradient(-30deg, transparent 40%, rgba(255,255,255,0.01) 40%, rgba(255,255,255,0.01) 60%, transparent 60%);
+    background-size: 60px 60px;
+    animation: aiPattern 20s linear infinite;
+    z-index: 1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #64748b 20%, #3b82f6 50%, #64748b 80%, transparent 100%);
+    background-size: 200% 100%;
+    animation: deliveryFlow 4s ease-in-out infinite;
+  }
+}
+
+.chaos-control-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  position: relative;
+  z-index: 3;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-align: right;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chaos-control-subtitle {
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.7);
+  position: relative;
+  z-index: 3;
+  line-height: 1.4;
+  text-align: right;
+  margin-top: 0.25rem;
+  letter-spacing: 0.01em;
+}
+
+@keyframes aiPattern {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+@keyframes deliveryFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+// Modern chaos control screen styling
 :host {
   display: block;
   width: 100%;
 }
 
-.chaos-form {
+.chaos-control-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding-top: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 60vh;
+  background: #f8fafc;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2rem 1.5rem;
+  margin: 2rem auto;
+  max-width: 480px;
+}
+
+.chaos-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
+.chaos-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .toggle-group {
-  padding: 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  transition: background-color 0.3s ease;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border: none;
+  transition: box-shadow 0.2s;
+}
+.toggle-group:hover {
+  box-shadow: 0 4px 20px rgba(56,189,248,0.10);
+}
 
-  mat-slide-toggle {
-    font-weight: 500;
-  }
+mat-slide-toggle {
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: #0ea5e9;
+}
 
-  .toggle-description {
-    font-size: 0.875rem;
-    color: #666;
-    margin-top: 0.5rem;
-    padding-right: 20px; // Align with toggle text
-  }
+.toggle-description {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+  padding-right: 20px;
 }
 
 .nested-toggle {
   margin-top: 1rem;
-  margin-right: 1.5rem; // Indent nested toggle
-  border-left: 3px solid #3f51b5; // Accent for nesting
+  margin-right: 1.5rem;
+  border-left: 3px solid #38bdf8;
+  padding-left: 1rem;
+  background: #f1f5f9;
+  border-radius: 8px;
 }

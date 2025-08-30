@@ -1,8 +1,14 @@
+
 <mat-card>
-  <mat-card-header>
-    <mat-card-title>בקרת כאוס</mat-card-title>
-    <mat-card-subtitle>שליטה על התנהגות מנגנון ה-Idempotency</mat-card-subtitle>
-  </mat-card-header>
+  <div class="chaos-control-header">
+    <div class="chaos-control-title">
+      בקרת כאוס
+      <span style="font-size:1.7rem;vertical-align:middle;">🧪</span>
+    </div>
+    <div class="chaos-control-subtitle">
+      שליטה על התנהגות מנגנון ה-Idempotency
+    </div>
+  </div>
   <mat-card-content>
     <form [formGroup]="chaosForm" class="chaos-form">
       <div class="toggle-group">

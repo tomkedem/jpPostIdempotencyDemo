@@ -52,7 +52,7 @@ export class ShipmentLookupComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {
     this.lookupForm = this.fb.group({
-      barcode: ['', [Validators.required, Validators.maxLength(50)]]
+      barcode: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9]{13}$/)]]
     });
   }
 

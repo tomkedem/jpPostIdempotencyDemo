@@ -1,3 +1,78 @@
+// Header styling copied from create-shipment.component.scss
+.shipment-lookup-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  padding: 2rem 3rem;
+  margin: 0;
+  position: relative;
+  z-index: 2;
+  border-radius: 32px 32px 0 0;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      linear-gradient(30deg, transparent 40%, rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.02) 60%, transparent 60%),
+      linear-gradient(-30deg, transparent 40%, rgba(255,255,255,0.01) 40%, rgba(255,255,255,0.01) 60%, transparent 60%);
+    background-size: 60px 60px;
+    animation: aiPattern 20s linear infinite;
+    z-index: 1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #64748b 20%, #3b82f6 50%, #64748b 80%, transparent 100%);
+    background-size: 200% 100%;
+    animation: deliveryFlow 4s ease-in-out infinite;
+  }
+}
+
+.shipment-lookup-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  position: relative;
+  z-index: 3;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-align: right;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shipment-lookup-subtitle {
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.7);
+  position: relative;
+  z-index: 3;
+  line-height: 1.4;
+  text-align: right;
+  margin-top: 0.25rem;
+  letter-spacing: 0.01em;
+}
+
+@keyframes aiPattern {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+@keyframes deliveryFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
 button.status-card:not(:disabled):hover .status-icon::after {
   content: '\1F69A'; /* אייקון Unicode של משאית שליחויות */
   position: absolute;
@@ -9,7 +84,84 @@ button.status-card:not(:disabled):hover .status-icon::after {
   animation: truckMove 1.2s infinite linear;
   pointer-events: none;
 }
+// Modern shipment lookup screen styling
+.shipment-lookup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 60vh;
+  background: #f8fafc;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2rem 1.5rem;
+  margin: 2rem auto;
+  max-width: 480px;
+}
 
+.shipment-lookup-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
+.shipment-lookup-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.shipment-lookup-input {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 1rem;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+.shipment-lookup-input:focus {
+  border-color: #38bdf8;
+  outline: none;
+}
+
+.shipment-lookup-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(90deg, #38bdf8 0%, #0ea5e9 100%);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(56,189,248,0.12);
+  transition: background 0.2s;
+}
+.shipment-lookup-btn:hover {
+  background: linear-gradient(90deg, #0ea5e9 0%, #38bdf8 100%);
+}
+
+.shipment-lookup-result {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  width: 100%;
+  color: #334155;
+}
+
+.shipment-lookup-error {
+  color: #ef4444;
+  background: #fee2e2;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+  text-align: center;
+}
 @keyframes truckMove {
   0% { right: -28px; opacity: 0.85; }
   50% { right: 8px; opacity: 1; }

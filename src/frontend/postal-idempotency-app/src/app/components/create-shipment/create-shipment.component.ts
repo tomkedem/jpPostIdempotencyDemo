@@ -54,7 +54,7 @@ export class CreateShipmentComponent implements OnInit {
 
   private initializeForm(): void {
     this.shipmentForm = this.fb.group({
-      barcode: ['', [Validators.required, Validators.minLength(5)]],
+      barcode: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9]{13}$/)]],
       employeeId: ['', [Validators.required, Validators.minLength(2)]],
       locationLat: ['', [Validators.pattern(/^-?\d+\.?\d*$/)]],
       locationLng: ['', [Validators.pattern(/^-?\d+\.?\d*$/)]],

@@ -11,14 +11,17 @@
         <div class="form-row">
           <mat-form-field appearance="outline">
             <mat-label>📦 ברקוד</mat-label>
-            <input matInput formControlName="barcode" placeholder="הכנס ברקוד">
+            <input matInput formControlName="barcode" placeholder="הכנס ברקוד" maxlength="13">
             <mat-icon matSuffix>qr_code</mat-icon>
-            <mat-error *ngIf="shipmentForm.get('barcode')?.hasError('required')">
-              ברקוד הוא שדה חובה
-            </mat-error>
-            <mat-error *ngIf="shipmentForm.get('barcode')?.hasError('minlength')">
-              ברקוד חייב להכיל לפחות 3 תווים
-            </mat-error>
+              <mat-error *ngIf="shipmentForm.get('barcode')?.hasError('required')">
+                ברקוד הוא שדה חובה
+              </mat-error>
+              <mat-error *ngIf="shipmentForm.get('barcode')?.hasError('pattern') && (shipmentForm.get('barcode')?.touched || shipmentForm.get('barcode')?.dirty)">
+                ברקוד חייב להיות בדיוק 13 תווים (אותיות או ספרות)
+              </mat-error>
+              <mat-error *ngIf="shipmentForm.get('barcode')?.value?.length > 13">
+                ברקוד לא יכול להכיל יותר מ-13 תווים
+              </mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">

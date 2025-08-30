@@ -10,7 +10,7 @@
           <div class="search-row">
             <mat-form-field appearance="outline" class="search-field">
               <mat-label>ברקוד</mat-label>
-              <input matInput formControlName="barcode" placeholder="הזן ברקוד לחיפוש">
+              <input matInput formControlName="barcode" placeholder="הזן ברקוד לחיפוש" maxlength="13">
               <mat-icon matSuffix class="search-icon" 
                         [class.loading]="isLoading()"
                         (click)="onLookup()"
@@ -24,6 +24,11 @@
               @if (lookupForm.get('barcode')?.hasError('required')) {
                 <mat-error>
                   ברקוד הוא שדה חובה
+                </mat-error>
+              }
+              @if (lookupForm.get('barcode')?.hasError('pattern') && (lookupForm.get('barcode')?.touched || lookupForm.get('barcode')?.dirty)) {
+                <mat-error>
+                  ברקוד חייב להיות בדיוק 13 תווים (אותיות או ספרות)
                 </mat-error>
               }
             </mat-form-field>
@@ -46,7 +51,7 @@
             <div class="search-row">
               <mat-form-field appearance="outline" class="search-field">
                 <mat-label>ברקוד</mat-label>
-                <input matInput formControlName="barcode" placeholder="הזן ברקוד לחיפוש">
+                <input matInput formControlName="barcode" placeholder="הזן ברקוד לחיפוש" maxlength="13">
                 <mat-icon matSuffix class="search-icon" 
                           [class.loading]="isLoading()"
                           (click)="onLookup()"
@@ -60,6 +65,11 @@
                 @if (lookupForm.get('barcode')?.hasError('required')) {
                   <mat-error>
                     ברקוד הוא שדה חובה
+                  </mat-error>
+                }
+                @if (lookupForm.get('barcode')?.hasError('pattern') && (lookupForm.get('barcode')?.touched || lookupForm.get('barcode')?.dirty)) {
+                  <mat-error>
+                    ברקוד חייב להיות בדיוק 13 ספרות
                   </mat-error>
                 }
               </mat-form-field>
