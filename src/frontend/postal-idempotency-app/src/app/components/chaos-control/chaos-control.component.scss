@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.chaos-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 1rem;
+}
+
+.toggle-group {
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease;
+
+  mat-slide-toggle {
+    font-weight: 500;
+  }
+
+  .toggle-description {
+    font-size: 0.875rem;
+    color: #666;
+    margin-top: 0.5rem;
+    padding-right: 20px; // Align with toggle text
+  }
+}
+
+.nested-toggle {
+  margin-top: 1rem;
+  margin-right: 1.5rem; // Indent nested toggle
+  border-left: 3px solid #3f51b5; // Accent for nesting
+}

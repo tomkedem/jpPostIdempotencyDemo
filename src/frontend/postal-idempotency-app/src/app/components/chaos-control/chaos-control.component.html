@@ -1,0 +1,29 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>בקרת כאוס</mat-card-title>
+    <mat-card-subtitle>שליטה על התנהגות מנגנון ה-Idempotency</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="chaosForm" class="chaos-form">
+      <div class="toggle-group">
+        <mat-slide-toggle formControlName="useIdempotencyKey">
+          הפעל מפתחות Idempotency
+        </mat-slide-toggle>
+        <div class="toggle-description">
+          כאשר מופעל, כל בקשה קריטית (POST, PATCH) תישלח עם מפתח ייחודי למניעת כפילויות.
+        </div>
+      </div>
+
+      @if (chaosForm.get('useIdempotencyKey')?.value) {
+        <div class="toggle-group nested-toggle">
+          <mat-slide-toggle formControlName="forceError">
+            כפה שגיאה (מפתח שגוי)
+          </mat-slide-toggle>
+          <div class="toggle-description">
+            שולח מפתח Idempotency בפורמט לא תקין כדי לבדוק את הטיפול בשגיאות בשרת.
+          </div>
+        </div>
+      }
+    </form>
+  </mat-card-content>
+</mat-card>
