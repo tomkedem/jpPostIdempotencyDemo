@@ -135,25 +135,13 @@ public class IdempotencyDemoController : ControllerBase
         var stopwatch = Stopwatch.StartNew();
         try
         {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            using var connection = new SqlConnection(connectionString);
-            await connection.OpenAsync();
+            var updatedShipment = await _deliveryRepository.UpdateDeliveryStatusAsync(barcode, request.StatusId);
+            stopwatch.Stop();
 
-            const string sql = "UPDATE deliveries SET status_id = @statusId WHERE barcode = @barcode";
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@statusId", request.StatusId);
-            command.Parameters.AddWithValue("@barcode", barcode);
-
-            int rowsAffected = await command.ExecuteNonQueryAsync();
-
-            if (rowsAffected == 0)
+            if (updatedShipment == null)
             {
                 return NotFound(new IdempotencyDemoResponse<object> { Success = false, Message = $"Shipment with barcode {barcode} not found." });
             }
-
-            var updatedShipment = await GetShipmentByBarcode(barcode, connection);
-
-            stopwatch.Stop();
 
             var response = new IdempotencyDemoResponse<Shipment>
             {
@@ -164,7 +152,6 @@ public class IdempotencyDemoController : ControllerBase
             };
 
             await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
-
             await LogMetrics("update_status", HttpContext.Request.Path, stopwatch.ElapsedMilliseconds, false, idempotencyKey);
             return Ok(response);
         }
