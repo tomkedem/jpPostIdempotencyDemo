@@ -40,33 +40,34 @@ public class IdempotencyDemoController : ControllerBase
         }
 
         var (cachedResponse, entry) = await _idempotencyService.GetCachedResponseAsync(idempotencyKey);
-        if (cachedResponse is IActionResult actionResult)
+        // בדיקת תוקף הרשומה
+        if (entry != null && entry.ExpiresAt > DateTime.UtcNow)
         {
-            return actionResult;
-        }
-        else if (cachedResponse != null)
-        {
-            return Ok(cachedResponse);
+            if (cachedResponse is IActionResult actionResult)
+            {
+                return actionResult;
+            }
+            else if (cachedResponse != null)
+            {
+                return Ok(cachedResponse);
+            }
         }
 
-        // שמירה לטבלת idempotency_entries בפעם הראשונה
-        if (entry == null)
+        // אם אין רשומה או פג תוקף, יוצרים חדשה
+        var newEntry = new IdempotencyEntry
         {
-            var newEntry = new IdempotencyEntry
-            {
-                IdempotencyKey = idempotencyKey,
-                RequestHash = ComputeSha256Hash(JsonSerializer.Serialize(request)),
-                Endpoint = HttpContext.Request.Path,
-                HttpMethod = HttpContext.Request.Method,
-                StatusCode = 0,
-                CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddHours(24),
-                Operation = "create_delivery",
-                CorrelationId = HttpContext.TraceIdentifier,
-                RelatedEntityId = null // אפשר להוסיף מזהה משלוח אם יש
-            };
-            await _idempotencyService.StoreIdempotencyEntryAsync(newEntry);
-        }
+            IdempotencyKey = idempotencyKey,
+            RequestHash = ComputeSha256Hash(JsonSerializer.Serialize(request)),
+            Endpoint = HttpContext.Request.Path,
+            HttpMethod = HttpContext.Request.Method,
+            StatusCode = 0,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddHours(24),
+            Operation = "create_delivery",
+            CorrelationId = HttpContext.TraceIdentifier,
+            RelatedEntityId = null // אפשר להוסיף מזהה משלוח אם יש
+        };
+        await _idempotencyService.StoreIdempotencyEntryAsync(newEntry);
         // יצירת משלוח חדש בלבד
         var response = await _deliveryService.CreateDeliveryAsync(request);
         await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
@@ -86,33 +87,34 @@ public class IdempotencyDemoController : ControllerBase
         }
 
         var (cachedResponse, entry) = await _idempotencyService.GetCachedResponseAsync(idempotencyKey);
-        if (cachedResponse is IActionResult actionResult)
+        // בדיקת תוקף הרשומה
+        if (entry != null && entry.ExpiresAt > DateTime.UtcNow)
         {
-            return actionResult;
-        }
-        else if (cachedResponse != null)
-        {
-            return Ok(cachedResponse);
-        }
-     
-        // שמירה לטבלת idempotency_entries בפעם הראשונה
-        if (entry == null)
-        {
-            var newEntry = new IdempotencyEntry
+            if (cachedResponse is IActionResult actionResult)
             {
-                IdempotencyKey = idempotencyKey,
-                RequestHash = ComputeSha256Hash(JsonSerializer.Serialize(request)),
-                Endpoint = HttpContext.Request.Path,
-                HttpMethod = HttpContext.Request.Method,
-                StatusCode = 0,
-                CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddHours(24),
-                Operation = "update_delivery_status",
-                CorrelationId = HttpContext.TraceIdentifier,
-                RelatedEntityId = null // אפשר להוסיף מזהה משלוח אם יש
-            };
-            await _idempotencyService.StoreIdempotencyEntryAsync(newEntry);
+                return actionResult;
+            }
+            else if (cachedResponse != null)
+            {
+                return Ok(cachedResponse);
+            }
         }
+
+        // אם אין רשומה או פג תוקף, יוצרים חדשה
+        var newEntry = new IdempotencyEntry
+        {
+            IdempotencyKey = idempotencyKey,
+            RequestHash = ComputeSha256Hash(JsonSerializer.Serialize(request)),
+            Endpoint = HttpContext.Request.Path,
+            HttpMethod = HttpContext.Request.Method,
+            StatusCode = 0,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddHours(24),
+            Operation = "update_delivery_status",
+            CorrelationId = HttpContext.TraceIdentifier,
+            RelatedEntityId = null // אפשר להוסיף מזהה משלוח אם יש
+        };
+        await _idempotencyService.StoreIdempotencyEntryAsync(newEntry);
         // עדכון סטטוס בלבד
         var response = await _deliveryService.UpdateDeliveryStatusAsync(barcode, request.StatusId);
         await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
