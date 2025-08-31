@@ -43,13 +43,11 @@ namespace PostalIdempotencyDemo.Api.Repositories
             {
                 const string query = @"
                     SELECT 
-                        s.id, s.barcode, s.customer_name, s.address, s.weight, s.price, s.notes, s.created_at, s.updated_at,
-                        d.status_id, st.status_name, st.status_name_he
+                        s.id, s.barcode, s.kod_peula, s.perut_peula, s.atar, s.customer_name, s.address, s.weight, s.price, s.status_id, s.created_at, s.updated_at, s.notes,
+                        d.employee_id, d.delivery_date, d.location_lat, d.location_lng, d.recipient_name, d.status_id AS delivery_status_id, d.notes AS delivery_notes, d.created_at AS delivery_created_at
                     FROM shipments s
                     LEFT JOIN deliveries d ON s.barcode = d.barcode
-                    LEFT JOIN shipment_statuses st ON d.status_id = st.id
-                    WHERE s.barcode = @barcode
-                    ORDER BY d.delivery_date DESC";
+                    WHERE s.barcode = @barcode";
 
                 using var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@barcode", barcode);
@@ -69,8 +67,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
                         UpdatedAt = reader.IsDBNull(reader.GetOrdinal("updated_at")) ? null : reader.GetDateTime(reader.GetOrdinal("updated_at")),
                         StatusId = reader.IsDBNull(reader.GetOrdinal("status_id")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("status_id")),
-                        StatusName = reader.IsDBNull(reader.GetOrdinal("status_name")) ? null : reader.GetString(reader.GetOrdinal("status_name")),
-                        StatusNameHe = reader.IsDBNull(reader.GetOrdinal("status_name_he")) ? null : reader.GetString(reader.GetOrdinal("status_name_he"))
+                        // ניתן להוסיף כאן שדות נוספים ממסירת המשלוח (deliveries) אם נדרש
                     };
                 }
                 return null;

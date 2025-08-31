@@ -93,14 +93,14 @@
               <span class="status-icon">
                 <mat-icon style="font-size:3.2rem;">cancel</mat-icon>
               </span>
-              <span class="status-label">נכשל</span>
-              <span class="status-desc">כישלון</span>
+              <span class="status-label">לא נמסר</span>
+              <span class="status-desc">כישלון בשליחה</span>
             </button>
             <button type="button" class="status-card status-partial" [class.selected]="shipment()!.deliveryStatus === 4" (click)="onUpdateStatus(shipment()!.barcode, 4)" [disabled]="isLoading() || shipment()!.deliveryStatus === 4">
               <span class="status-icon">
                 <mat-icon style="font-size:3.2rem;">hourglass_bottom</mat-icon>
               </span>
-              <span class="status-label">חלקי</span>
+              <span class="status-label">נמסר חלקי</span>
               <span class="status-desc">מסירה חלקית</span>
             </button>
         </div>

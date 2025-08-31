@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using PostalIdempotencyDemo.Api.Repositories;
 using PostalIdempotencyDemo.Api.Services.Interfaces;
+using PostalIdempotencyDemo.Api.Services;
+using System.Text.Json;
 
 namespace PostalIdempotencyDemo.Api.Controllers;
 
@@ -16,8 +18,8 @@ public class IdempotencyDemoController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly ILogger<IdempotencyDemoController> _logger;
     private readonly IIdempotencyService _idempotencyService;
-    private readonly IDeliveryRepository _deliveryRepository;
     private readonly IMetricsRepository _metricsRepository;
+    private readonly IDeliveryService _deliveryService;
     private static readonly Random _random = new();
 
     public IdempotencyDemoController(IConfiguration configuration, ILogger<IdempotencyDemoController> logger, IIdempotencyService idempotencyService, IDeliveryRepository deliveryRepository, IMetricsRepository metricsRepository)
@@ -25,8 +27,8 @@ public class IdempotencyDemoController : ControllerBase
         _configuration = configuration;
         _logger = logger;
         _idempotencyService = idempotencyService;
-        _deliveryRepository = deliveryRepository;
         _metricsRepository = metricsRepository;
+        _deliveryService = new DeliveryService(deliveryRepository);
     }
 
     [HttpPost("delivery")]
@@ -47,24 +49,28 @@ public class IdempotencyDemoController : ControllerBase
             return Ok(cachedResponse);
         }
 
-        var delivery = new Delivery
+        // שמירה לטבלת idempotency_entries בפעם הראשונה
+        if (entry == null)
         {
-            Id = Guid.NewGuid(),
-            Barcode = request.Barcode,
-            EmployeeId = request.EmployeeId,
-            DeliveryDate = DateTime.UtcNow,
-            LocationLat = request.LocationLat,
-            LocationLng = request.LocationLng,
-            RecipientName = request.RecipientName,
-            StatusId = request.DeliveryStatus,
-            Notes = request.Notes,
-            CreatedAt = DateTime.UtcNow
-        };
-
-    await _deliveryRepository.CreateDeliveryAsync(delivery);
-    var response = new IdempotencyDemoResponse<Delivery> { Success = true, Data = delivery };
-    await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
-    return Ok(response);
+            var newEntry = new IdempotencyEntry
+            {
+                IdempotencyKey = idempotencyKey,
+                RequestHash = ComputeSha256Hash(JsonSerializer.Serialize(request)),
+                Endpoint = HttpContext.Request.Path,
+                HttpMethod = HttpContext.Request.Method,
+                StatusCode = 0,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddHours(24),
+                Operation = "create_delivery",
+                CorrelationId = HttpContext.TraceIdentifier,
+                RelatedEntityId = null // אפשר להוסיף מזהה משלוח אם יש
+            };
+            await _idempotencyService.StoreIdempotencyEntryAsync(newEntry);
+        }
+        // יצירת משלוח חדש בלבד
+        var response = await _deliveryService.CreateDeliveryAsync(request);
+        await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
+        return Ok(response);
     }
 
 
@@ -88,26 +94,33 @@ public class IdempotencyDemoController : ControllerBase
         {
             return Ok(cachedResponse);
         }
-
-        var stopwatch = Stopwatch.StartNew();
-        var updatedShipment = await _deliveryRepository.UpdateDeliveryStatusAsync(barcode, request.StatusId);
-        stopwatch.Stop();
-
-        if (updatedShipment == null)
+     
+        // שמירה לטבלת idempotency_entries בפעם הראשונה
+        if (entry == null)
         {
-            return NotFound(new IdempotencyDemoResponse<object> { Success = false, Message = $"Shipment with barcode {barcode} not found." });
+            var newEntry = new IdempotencyEntry
+            {
+                IdempotencyKey = idempotencyKey,
+                RequestHash = ComputeSha256Hash(JsonSerializer.Serialize(request)),
+                Endpoint = HttpContext.Request.Path,
+                HttpMethod = HttpContext.Request.Method,
+                StatusCode = 0,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddHours(24),
+                Operation = "update_delivery_status",
+                CorrelationId = HttpContext.TraceIdentifier,
+                RelatedEntityId = null // אפשר להוסיף מזהה משלוח אם יש
+            };
+            await _idempotencyService.StoreIdempotencyEntryAsync(newEntry);
         }
-
-        var response = new IdempotencyDemoResponse<Shipment>
-        {
-            Success = true,
-            Data = updatedShipment,
-            Message = "סטטוס משלוח עודכן בהצלחה",
-            ExecutionTimeMs = (int)stopwatch.ElapsedMilliseconds
-        };
-
+        // עדכון סטטוס בלבד
+        var response = await _deliveryService.UpdateDeliveryStatusAsync(barcode, request.StatusId);
         await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
-        await _metricsRepository.LogMetricsAsync("update_status", HttpContext.Request.Path, stopwatch.ElapsedMilliseconds, false, idempotencyKey);
+        await _metricsRepository.LogMetricsAsync("update_status", HttpContext.Request.Path, response.ExecutionTimeMs != 0 ? response.ExecutionTimeMs : 0, false, idempotencyKey);
+        if (!response.Success)
+        {
+            return NotFound(response);
+        }
         return Ok(response);
     }
 

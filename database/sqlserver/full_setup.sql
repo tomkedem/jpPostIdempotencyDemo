@@ -86,7 +86,7 @@ CREATE TABLE shipments (
     address NVARCHAR(200),
     weight DECIMAL(8,3),
     price DECIMAL(10,2),
-    status INT DEFAULT 1,
+    status_id INT DEFAULT 1,
     created_at DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
     updated_at DATETIME2,
     notes NVARCHAR(500)
@@ -118,52 +118,13 @@ CREATE TABLE operation_metrics (
 );
 GO
 
--- Other auxiliary tables for demo
-CREATE TABLE signatures (
-    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-    barcode NVARCHAR(50) NOT NULL,
-    employee_id NVARCHAR(20) NOT NULL,
-    signature_data NVARCHAR(MAX),
-    signature_type INT NOT NULL DEFAULT 1 CHECK (signature_type IN (1,2,3)),
-    signer_name NVARCHAR(100),
-    signed_at DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-    created_at DATETIME2 NOT NULL DEFAULT GETUTCDATE()
-);
-GO
 
-CREATE TABLE delivery_checks (
-    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-    barcode NVARCHAR(50) NOT NULL,
-    employee_id NVARCHAR(20) NOT NULL,
-    check_type INT NOT NULL CHECK (check_type IN (1,2,3,4)),
-    check_result NVARCHAR(200),
-    is_successful BIT NOT NULL DEFAULT 1,
-    checked_at DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-    created_at DATETIME2 NOT NULL DEFAULT GETUTCDATE()
-);
-GO
-
-CREATE TABLE delivery_with_date (
-    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-    barcode NVARCHAR(50) NOT NULL,
-    employee_id NVARCHAR(20) NOT NULL,
-    scheduled_date DATE NOT NULL,
-    actual_delivery_date DATETIME2,
-    delivery_window_start TIME,
-    delivery_window_end TIME,
-    customer_phone NVARCHAR(20),
-    special_instructions NVARCHAR(300),
-    status INT NOT NULL DEFAULT 1 CHECK (status IN (1,2,3,4)),
-    created_at DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-    updated_at DATETIME2
-);
-GO
 
 -- Step 3: Create Indexes and Triggers
 
 CREATE INDEX idx_deliveries_barcode ON deliveries(barcode);
 CREATE INDEX idx_shipments_barcode ON shipments(barcode);
-CREATE INDEX idx_idempotency_signature ON idempotency_entries(RequestSignature);
+
 CREATE INDEX idx_operation_metrics_created_at ON operation_metrics(created_at);
 GO
 
@@ -177,19 +138,6 @@ BEGIN
     SET updated_at = GETUTCDATE()
     FROM shipments s
     INNER JOIN inserted i ON s.id = i.id;
-END;
-GO
-
-CREATE TRIGGER trg_delivery_with_date_updated_at
-ON delivery_with_date
-AFTER UPDATE
-AS
-BEGIN
-    SET NOCOUNT ON;
-    UPDATE delivery_with_date
-    SET updated_at = GETUTCDATE()
-    FROM delivery_with_date d
-    INNER JOIN inserted i ON d.id = i.id;
 END;
 GO
 

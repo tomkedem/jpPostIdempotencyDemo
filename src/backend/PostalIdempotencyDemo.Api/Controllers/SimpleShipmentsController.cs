@@ -26,20 +26,20 @@ public class SimpleShipmentsController : ControllerBase
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             _logger.LogInformation("SimpleShipments using connection string: {ConnectionString}", connectionString);
-            
+
             // Debug: Show all configuration sources
             var allConnectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
             foreach (var cs in allConnectionStrings)
             {
                 _logger.LogInformation("Config key: {Key}, Value: {Value}", cs.Key, cs.Value);
             }
-            
+
             using var connection = new SqlConnection(connectionString);
             await connection.OpenAsync();
 
             const string sql = @"
                 SELECT id, barcode, kod_peula, perut_peula, atar, customer_name, 
-                       address, weight, price, status, created_at, updated_at, notes
+                       address, weight, price, status_id, created_at, updated_at, notes
                 FROM shipments 
                 ORDER BY created_at DESC";
 
@@ -60,7 +60,7 @@ public class SimpleShipmentsController : ControllerBase
                     address = reader.IsDBNull(6) ? null : reader.GetString(6),
                     weight = reader.GetDecimal(7),
                     price = reader.GetDecimal(8),
-                    status = reader.GetInt32(9),
+                    statusId = reader.GetInt32(9),
                     createdAt = reader.GetDateTime(10),
                     updatedAt = reader.IsDBNull(11) ? (DateTime?)null : reader.GetDateTime(11),
                     notes = reader.IsDBNull(12) ? null : reader.GetString(12)
@@ -84,20 +84,20 @@ public class SimpleShipmentsController : ControllerBase
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             _logger.LogInformation("SimpleShipments using connection string: {ConnectionString}", connectionString);
-            
+
             // Debug: Show all configuration sources
             var allConnectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
             foreach (var cs in allConnectionStrings)
             {
                 _logger.LogInformation("Config key: {Key}, Value: {Value}", cs.Key, cs.Value);
             }
-            
+
             using var connection = new SqlConnection(connectionString);
             await connection.OpenAsync();
 
             const string sql = @"
                 SELECT id, barcode, kod_peula, perut_peula, atar, customer_name, 
-                       address, weight, price, status, created_at, updated_at, notes
+                       address, weight, price, status_id, created_at, updated_at, notes
                 FROM shipments 
                 WHERE barcode = @barcode";
 
@@ -105,7 +105,7 @@ public class SimpleShipmentsController : ControllerBase
             command.Parameters.AddWithValue("@barcode", barcode);
 
             using var reader = await command.ExecuteReaderAsync();
-            
+
             if (await reader.ReadAsync())
             {
                 var shipment = new
@@ -119,7 +119,7 @@ public class SimpleShipmentsController : ControllerBase
                     address = reader.IsDBNull(6) ? null : reader.GetString(6),
                     weight = reader.GetDecimal(7),
                     price = reader.GetDecimal(8),
-                    status = reader.GetInt32(9),
+                    statusId = reader.GetInt32(9),
                     createdAt = reader.GetDateTime(10),
                     updatedAt = reader.IsDBNull(11) ? (DateTime?)null : reader.GetDateTime(11),
                     notes = reader.IsDBNull(12) ? null : reader.GetString(12)
@@ -145,14 +145,14 @@ public class SimpleShipmentsController : ControllerBase
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             _logger.LogInformation("SimpleShipments using connection string: {ConnectionString}", connectionString);
-            
+
             // Debug: Show all configuration sources
             var allConnectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
             foreach (var cs in allConnectionStrings)
             {
                 _logger.LogInformation("Config key: {Key}, Value: {Value}", cs.Key, cs.Value);
             }
-            
+
             using var connection = new SqlConnection(connectionString);
             await connection.OpenAsync();
 
@@ -160,7 +160,7 @@ public class SimpleShipmentsController : ControllerBase
             const string checkSql = "SELECT COUNT(1) FROM shipments WHERE barcode = @barcode";
             using var checkCommand = new SqlCommand(checkSql, connection);
             checkCommand.Parameters.AddWithValue("@barcode", request.Barcode);
-            
+
             var exists = Convert.ToInt32(await checkCommand.ExecuteScalarAsync()) > 0;
             if (exists)
             {
@@ -170,9 +170,9 @@ public class SimpleShipmentsController : ControllerBase
             var newId = Guid.NewGuid();
             const string sql = @"
                 INSERT INTO shipments (id, barcode, kod_peula, perut_peula, atar, customer_name, 
-                                     address, weight, price, status, notes, created_at)
+                                     address, weight, price, status_id, notes, created_at)
                 VALUES (@id, @barcode, @kod_peula, @perut_peula, @atar, @customer_name, 
-                        @address, @weight, @price, @status, @notes, @created_at);
+                        @address, @weight, @price, @status_id, @notes, @created_at);
                 
                 SELECT id, created_at FROM shipments WHERE id = @id";
 
@@ -186,7 +186,7 @@ public class SimpleShipmentsController : ControllerBase
             command.Parameters.AddWithValue("@address", request.Address ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@weight", request.Weight);
             command.Parameters.AddWithValue("@price", request.Price);
-            command.Parameters.AddWithValue("@status", 1); // Created
+            command.Parameters.AddWithValue("@status_id", 1); // Created
             command.Parameters.AddWithValue("@notes", request.Notes ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@created_at", DateTime.UtcNow);
 
@@ -204,7 +204,7 @@ public class SimpleShipmentsController : ControllerBase
                     address = request.Address,
                     weight = request.Weight,
                     price = request.Price,
-                    status = 1,
+                    statusId = 1,
                     createdAt = reader.GetDateTime(1),
                     notes = request.Notes
                 };
