@@ -31,7 +31,6 @@ public class DatabaseSetupController : ControllerBase
             await ExecuteNonQuery(connection, "DELETE FROM operation_metrics");
             await ExecuteNonQuery(connection, "DELETE FROM delivery_with_date");
             await ExecuteNonQuery(connection, "DELETE FROM delivery_checks");
-            await ExecuteNonQuery(connection, "DELETE FROM signatures");
             await ExecuteNonQuery(connection, "DELETE FROM deliveries");
             await ExecuteNonQuery(connection, "DELETE FROM shipments");
             await ExecuteNonQuery(connection, "DELETE FROM idempotency_entries");
@@ -39,7 +38,6 @@ public class DatabaseSetupController : ControllerBase
             // Generate sample data
             await GenerateShipments(connection);
             await GenerateDeliveries(connection);
-            await GenerateSignatures(connection);
             await GenerateDeliveryChecks(connection);
             await GenerateDeliveryWithDate(connection);
             await GenerateOperationMetrics(connection);
@@ -130,27 +128,6 @@ public class DatabaseSetupController : ControllerBase
         _logger.LogInformation("Generated 200 deliveries");
     }
 
-    private async Task GenerateSignatures(SqlConnection connection)
-    {
-        var random = new Random();
-
-        for (int i = 1; i <= 180; i++)
-        {
-            const string sql = @"
-                INSERT INTO signatures (barcode, employee_id, signature_data, signature_type, signer_name, signed_at)
-                VALUES (@barcode, @employee_id, @signature_data, @signature_type, @signer_name, GETUTCDATE())";
-
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@barcode", $"DEMO{random.Next(1, 151):D6}");
-            command.Parameters.AddWithValue("@employee_id", $"EMP{random.Next(1, 51):D3}");
-            command.Parameters.AddWithValue("@signature_data", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=");
-            command.Parameters.AddWithValue("@signature_type", random.Next(1, 4));
-            command.Parameters.AddWithValue("@signer_name", "חותם לדוגמה");
-
-            await command.ExecuteNonQueryAsync();
-        }
-        _logger.LogInformation("Generated 180 signatures");
-    }
 
     private async Task GenerateDeliveryChecks(SqlConnection connection)
     {
@@ -199,7 +176,7 @@ public class DatabaseSetupController : ControllerBase
     private async Task GenerateOperationMetrics(SqlConnection connection)
     {
         var random = new Random();
-        var operations = new[] { "delivery", "signature", "shipment" };
+    var operations = new[] { "delivery", "shipment" };
 
         for (int i = 1; i <= 500; i++)
         {
@@ -252,7 +229,7 @@ public class DatabaseSetupController : ControllerBase
             UNION ALL
             SELECT 'deliveries', COUNT(*) FROM deliveries
             UNION ALL
-            SELECT 'signatures', COUNT(*) FROM signatures  
+            -- Removed signatures table summary
             UNION ALL
             SELECT 'delivery_checks', COUNT(*) FROM delivery_checks
             UNION ALL
