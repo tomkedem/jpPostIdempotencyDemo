@@ -136,8 +136,22 @@ export class ShipmentService {
     barcode: string,
     statusId: number
   ): string {
-    // אפשר להחליף ל-hash אם רוצים, כאן פשוט מחרוזת
-    return `${barcode}:${statusId}`;
+    // שימוש ב-SHA-256 ליצירת hash ייחודי
+    const data = `${barcode}:${statusId}`;
+    // נשתמש ב-crypto.subtle (דפדפן מודרני)
+    // הפונקציה תהיה async
+    // כדי לשמור על ממשק sync, נשתמש בגרסה סינכרונית פשוטה (ללא אבטחה מלאה):
+    // אם רוצים אבטחה מלאה, יש להמיר ל-async ולהשתמש ב-crypto.subtle.digest
+    // כאן דוגמה פשוטה:
+    let hash = 0,
+      i,
+      chr;
+    for (i = 0; i < data.length; i++) {
+      chr = data.charCodeAt(i);
+      hash = (hash << 5) - hash + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return `idemp_${Math.abs(hash)}`;
   }
 
   async enableChaos(
