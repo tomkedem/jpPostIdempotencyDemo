@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using PostalIdempotencyDemo.Api.Models;
-using PostalIdempotencyDemo.Api.Services;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using PostalIdempotencyDemo.Api.Repositories;
 using PostalIdempotencyDemo.Api.Services.Interfaces;
 
@@ -20,15 +18,17 @@ public class IdempotencyDemoController : ControllerBase
     private readonly IIdempotencyService _idempotencyService;
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly ISignatureRepository _signatureRepository;
+    private readonly IMetricsRepository _metricsRepository;
     private static readonly Random _random = new();
 
-    public IdempotencyDemoController(IConfiguration configuration, ILogger<IdempotencyDemoController> logger, IIdempotencyService idempotencyService, IDeliveryRepository deliveryRepository, ISignatureRepository signatureRepository)
+    public IdempotencyDemoController(IConfiguration configuration, ILogger<IdempotencyDemoController> logger, IIdempotencyService idempotencyService, IDeliveryRepository deliveryRepository, ISignatureRepository signatureRepository, IMetricsRepository metricsRepository)
     {
         _configuration = configuration;
         _logger = logger;
         _idempotencyService = idempotencyService;
         _deliveryRepository = deliveryRepository;
         _signatureRepository = signatureRepository;
+        _metricsRepository = metricsRepository;
     }
 
     [HttpPost("delivery")]
@@ -63,18 +63,10 @@ public class IdempotencyDemoController : ControllerBase
             CreatedAt = DateTime.UtcNow
         };
 
-        try
-        {
-            await _deliveryRepository.CreateDeliveryAsync(delivery);
-            var response = new IdempotencyDemoResponse<Delivery> { Success = true, Data = delivery };
-            await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating delivery");
-            return StatusCode(500, new IdempotencyDemoResponse<object> { Success = false, Message = "An error occurred while creating the delivery." });
-        }
+    await _deliveryRepository.CreateDeliveryAsync(delivery);
+    var response = new IdempotencyDemoResponse<Delivery> { Success = true, Data = delivery };
+    await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
+    return Ok(response);
     }
 
     [HttpPost("signature")]
@@ -95,20 +87,12 @@ public class IdempotencyDemoController : ControllerBase
             return Ok(cachedResponse);
         }
 
-        try
-        {
-            signature.Id = Guid.NewGuid();
-            signature.CreatedAt = DateTime.UtcNow;
-            await _signatureRepository.CreateSignatureAsync(signature);
-            var response = new IdempotencyDemoResponse<Signature> { Success = true, Data = signature };
-            await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error registering signature");
-            return StatusCode(500, new IdempotencyDemoResponse<object> { Success = false, Message = "An error occurred while registering the signature." });
-        }
+    signature.Id = Guid.NewGuid();
+    signature.CreatedAt = DateTime.UtcNow;
+    await _signatureRepository.CreateSignatureAsync(signature);
+    var response = new IdempotencyDemoResponse<Signature> { Success = true, Data = signature };
+    await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
+    return Ok(response);
     }
 
     [HttpPatch("delivery/{barcode}/status")]
@@ -133,35 +117,25 @@ public class IdempotencyDemoController : ControllerBase
         }
 
         var stopwatch = Stopwatch.StartNew();
-        try
+        var updatedShipment = await _deliveryRepository.UpdateDeliveryStatusAsync(barcode, request.StatusId);
+        stopwatch.Stop();
+
+        if (updatedShipment == null)
         {
-            var updatedShipment = await _deliveryRepository.UpdateDeliveryStatusAsync(barcode, request.StatusId);
-            stopwatch.Stop();
-
-            if (updatedShipment == null)
-            {
-                return NotFound(new IdempotencyDemoResponse<object> { Success = false, Message = $"Shipment with barcode {barcode} not found." });
-            }
-
-            var response = new IdempotencyDemoResponse<Shipment>
-            {
-                Success = true,
-                Data = updatedShipment,
-                Message = "סטטוס משלוח עודכן בהצלחה",
-                ExecutionTimeMs = (int)stopwatch.ElapsedMilliseconds
-            };
-
-            await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
-            await LogMetrics("update_status", HttpContext.Request.Path, stopwatch.ElapsedMilliseconds, false, idempotencyKey);
-            return Ok(response);
+            return NotFound(new IdempotencyDemoResponse<object> { Success = false, Message = $"Shipment with barcode {barcode} not found." });
         }
-        catch (Exception ex)
+
+        var response = new IdempotencyDemoResponse<Shipment>
         {
-            stopwatch.Stop();
-            _logger.LogError(ex, "Error updating status for barcode {Barcode}", barcode);
-            await LogMetrics("update_status", HttpContext.Request.Path, stopwatch.ElapsedMilliseconds, false, idempotencyKey, true);
-            return StatusCode(500, new IdempotencyDemoResponse<object> { Success = false, Message = $"Error updating status: {ex.Message}" });
-        }
+            Success = true,
+            Data = updatedShipment,
+            Message = "סטטוס משלוח עודכן בהצלחה",
+            ExecutionTimeMs = (int)stopwatch.ElapsedMilliseconds
+        };
+
+        await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
+        await _metricsRepository.LogMetricsAsync("update_status", HttpContext.Request.Path, stopwatch.ElapsedMilliseconds, false, idempotencyKey);
+        return Ok(response);
     }
 
     private async Task SimulateNetworkIssues()
@@ -184,79 +158,10 @@ public class IdempotencyDemoController : ControllerBase
         }
     }
 
-    private async Task<Shipment?> GetShipmentByBarcode(string barcode, SqlConnection connection)
-    {
-        const string query = @"
-            SELECT 
-                s.id, s.barcode, s.customer_name, s.address, s.weight, s.price, s.notes, s.created_at, s.updated_at,
-                d.status_id, st.status_name, st.status_name_he
-            FROM shipments s
-            LEFT JOIN deliveries d ON s.barcode = d.barcode
-            LEFT JOIN shipment_statuses st ON d.status_id = st.id
-            WHERE s.barcode = @barcode
-            ORDER BY d.delivery_date DESC";
-
-        using var command = new SqlCommand(query, connection);
-        command.Parameters.AddWithValue("@barcode", barcode);
-
-        using var reader = await command.ExecuteReaderAsync();
-        if (await reader.ReadAsync())
-        {
-            return new Shipment
-            {
-                Id = reader.GetGuid(reader.GetOrdinal("id")),
-                Barcode = reader.GetString(reader.GetOrdinal("barcode")),
-                CustomerName = reader.IsDBNull(reader.GetOrdinal("customer_name")) ? null : reader.GetString(reader.GetOrdinal("customer_name")),
-                Address = reader.IsDBNull(reader.GetOrdinal("address")) ? null : reader.GetString(reader.GetOrdinal("address")),
-                Weight = reader.IsDBNull(reader.GetOrdinal("weight")) ? null : reader.GetDecimal(reader.GetOrdinal("weight")),
-                Price = reader.IsDBNull(reader.GetOrdinal("price")) ? null : reader.GetDecimal(reader.GetOrdinal("price")),
-                Notes = reader.IsDBNull(reader.GetOrdinal("notes")) ? null : reader.GetString(reader.GetOrdinal("notes")),
-                CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
-                UpdatedAt = reader.IsDBNull(reader.GetOrdinal("updated_at")) ? null : reader.GetDateTime(reader.GetOrdinal("updated_at")),
-                StatusId = reader.IsDBNull(reader.GetOrdinal("status_id")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("status_id")),
-                StatusName = reader.IsDBNull(reader.GetOrdinal("status_name")) ? null : reader.GetString(reader.GetOrdinal("status_name")),
-                StatusNameHe = reader.IsDBNull(reader.GetOrdinal("status_name_he")) ? null : reader.GetString(reader.GetOrdinal("status_name_he"))
-            };
-        }
-        return null;
-    }
-
     private string ComputeSha256Hash(string input)
     {
         using var sha256 = SHA256.Create();
         var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
         return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-    }
-
-    private async Task LogMetrics(string operationType, string endpoint, long executionTimeMs, bool isIdempotentHit, string? idempotencyKey, bool isError = false)
-    {
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            using var connection = new SqlConnection(connectionString);
-            await connection.OpenAsync();
-
-            const string sql = @"
-                INSERT INTO operation_metrics (id, operation_type, endpoint, execution_time_ms, 
-                                             is_idempotent_hit, idempotency_key, is_error, created_at)
-                VALUES (@id, @operation_type, @endpoint, @execution_time_ms, 
-                        @is_idempotent_hit, @idempotency_key, @is_error, @created_at)";
-
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@id", Guid.NewGuid());
-            command.Parameters.AddWithValue("@operation_type", operationType);
-            command.Parameters.AddWithValue("@endpoint", endpoint);
-            command.Parameters.AddWithValue("@execution_time_ms", executionTimeMs);
-            command.Parameters.AddWithValue("@is_idempotent_hit", isIdempotentHit);
-            command.Parameters.AddWithValue("@idempotency_key", idempotencyKey ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@is_error", isError);
-            command.Parameters.AddWithValue("@created_at", DateTime.UtcNow);
-
-            await command.ExecuteNonQueryAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error logging metrics");
-        }
     }
 }

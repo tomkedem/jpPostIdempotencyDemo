@@ -24,6 +24,7 @@ builder.Services.AddScoped<IDbConnectionFactory, SqlServerConnectionFactory>();
 builder.Services.AddScoped<IShipmentRepository, ShipmentRepository>();
 builder.Services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
 builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
+builder.Services.AddScoped<IMetricsRepository, MetricsRepository>();
 
 // Register services
 builder.Services.AddScoped<PostalIdempotencyDemo.Api.Services.Interfaces.IShipmentService, PostalIdempotencyDemo.Api.Services.ShipmentService>();
@@ -44,6 +45,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
+app.UseMiddleware<PostalIdempotencyDemo.Api.Middleware.GlobalExceptionMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI();
 
