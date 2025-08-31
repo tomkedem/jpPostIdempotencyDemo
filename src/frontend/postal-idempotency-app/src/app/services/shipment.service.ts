@@ -28,6 +28,7 @@ export class ShipmentService {
     this._error.set(null);
     
     try {
+
       const response = await firstValueFrom(this.http.post<IdempotencyDemoResponse<any>>(`${this.apiUrl}/idempotency-demo/delivery`, request));
       this._lastResponse.set(response);
       return response;
@@ -45,28 +46,7 @@ export class ShipmentService {
     return this.createDelivery(request);
   }
 
-  async createSignature(request: any, idempotencyKey?: string): Promise<any> {
-    this._loading.set(true);
-    this._error.set(null);
-    
-    try {
-      const headers = new HttpHeaders({
-        'Content-Type': 'application/json',
-        ...(idempotencyKey && { 'Idempotency-Key': idempotencyKey })
-      });
-
-      const response = await firstValueFrom(this.http.post<any>(`${this.apiUrl}/signature`, request, { headers }));
-      this._lastResponse.set(response);
-      return response;
-    } catch (error) {
-      const errorMessage = this.handleError(error);
-      this._error.set(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      this._loading.set(false);
-    }
-  }
-
+  
   async getShipmentByBarcode(barcode: string): Promise<Shipment> {
     this._loading.set(true);
     this._error.set(null);
@@ -102,10 +82,12 @@ export class ShipmentService {
   }
 
   async updateDeliveryStatus(barcode: string, statusId: number): Promise<IdempotencyDemoResponse<Shipment>> {
+    console.log('Updating delivery status for barcode:', barcode);
     const url = `${this.apiUrl}/delivery/${barcode}/status`;
     const body = { statusId };
+    console.log('Updating delivery status with body:', body);
     const idempotencyKey = await this.chaosService.generateIdempotencyKey(JSON.stringify(body));
-
+    console.log('Generated Idempotency Key:', idempotencyKey);
     const headers = new HttpHeaders({ 'Idempotency-Key': idempotencyKey });
 
     const response$ = this.http.patch<IdempotencyDemoResponse<Shipment>>(url, body, { headers });

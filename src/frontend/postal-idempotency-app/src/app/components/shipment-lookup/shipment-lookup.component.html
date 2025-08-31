@@ -82,21 +82,21 @@
     <div class="action-buttons">
         <h4 style="text-align:center;font-size:1.3rem;font-weight:600;margin-bottom:1rem;">נא לעדכן סטטוס משלוח</h4>
         <div class="status-card-group">
-            <button type="button" class="status-card status-delivered" [class.selected]="shipment()!.deliveryStatus === 1" (click)="onUpdateStatus(shipment()!.barcode, 1)" [disabled]="isLoading() || shipment()!.deliveryStatus === 1">
+            <button type="button" class="status-card status-delivered" [class.selected]="shipment()!.deliveryStatus === 2" (click)="onUpdateStatus(shipment()!.barcode, 2)" [disabled]="isLoading() || shipment()!.deliveryStatus === 2">
               <span class="status-icon">
                 <mat-icon style="font-size:3.2rem;">check_circle</mat-icon>
               </span>
               <span class="status-label">נמסר</span>
               <span class="status-desc">הצלחה</span>
             </button>
-            <button type="button" class="status-card status-failed" [class.selected]="shipment()!.deliveryStatus === 2" (click)="onUpdateStatus(shipment()!.barcode, 2)" [disabled]="isLoading() || shipment()!.deliveryStatus === 2">
+            <button type="button" class="status-card status-failed" [class.selected]="shipment()!.deliveryStatus === 3" (click)="onUpdateStatus(shipment()!.barcode, 3)" [disabled]="isLoading() || shipment()!.deliveryStatus === 3">
               <span class="status-icon">
                 <mat-icon style="font-size:3.2rem;">cancel</mat-icon>
               </span>
               <span class="status-label">נכשל</span>
               <span class="status-desc">כישלון</span>
             </button>
-            <button type="button" class="status-card status-partial" [class.selected]="shipment()!.deliveryStatus === 3" (click)="onUpdateStatus(shipment()!.barcode, 3)" [disabled]="isLoading() || shipment()!.deliveryStatus === 3">
+            <button type="button" class="status-card status-partial" [class.selected]="shipment()!.deliveryStatus === 4" (click)="onUpdateStatus(shipment()!.barcode, 4)" [disabled]="isLoading() || shipment()!.deliveryStatus === 4">
               <span class="status-icon">
                 <mat-icon style="font-size:3.2rem;">hourglass_bottom</mat-icon>
               </span>
