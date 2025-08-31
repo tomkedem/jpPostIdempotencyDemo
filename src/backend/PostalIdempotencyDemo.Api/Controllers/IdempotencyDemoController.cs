@@ -17,17 +17,15 @@ public class IdempotencyDemoController : ControllerBase
     private readonly ILogger<IdempotencyDemoController> _logger;
     private readonly IIdempotencyService _idempotencyService;
     private readonly IDeliveryRepository _deliveryRepository;
-    private readonly ISignatureRepository _signatureRepository;
     private readonly IMetricsRepository _metricsRepository;
     private static readonly Random _random = new();
 
-    public IdempotencyDemoController(IConfiguration configuration, ILogger<IdempotencyDemoController> logger, IIdempotencyService idempotencyService, IDeliveryRepository deliveryRepository, ISignatureRepository signatureRepository, IMetricsRepository metricsRepository)
+    public IdempotencyDemoController(IConfiguration configuration, ILogger<IdempotencyDemoController> logger, IIdempotencyService idempotencyService, IDeliveryRepository deliveryRepository, IMetricsRepository metricsRepository)
     {
         _configuration = configuration;
         _logger = logger;
         _idempotencyService = idempotencyService;
         _deliveryRepository = deliveryRepository;
-        _signatureRepository = signatureRepository;
         _metricsRepository = metricsRepository;
     }
 
@@ -69,31 +67,6 @@ public class IdempotencyDemoController : ControllerBase
     return Ok(response);
     }
 
-    [HttpPost("signature")]
-    public async Task<IActionResult> RegisterSignature([FromBody] Signature signature, [FromHeader(Name = "Idempotency-Key")] string idempotencyKey)
-    {
-        if (string.IsNullOrEmpty(idempotencyKey))
-        {
-            return BadRequest(new IdempotencyDemoResponse<object> { Success = false, Message = "Idempotency-Key header is required." });
-        }
-
-        var (cachedResponse, entry) = await _idempotencyService.GetCachedResponseAsync(idempotencyKey);
-        if (cachedResponse is IActionResult actionResult)
-        {
-            return actionResult;
-        }
-        else if (cachedResponse != null)
-        {
-            return Ok(cachedResponse);
-        }
-
-    signature.Id = Guid.NewGuid();
-    signature.CreatedAt = DateTime.UtcNow;
-    await _signatureRepository.CreateSignatureAsync(signature);
-    var response = new IdempotencyDemoResponse<Signature> { Success = true, Data = signature };
-    await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
-    return Ok(response);
-    }
 
     [HttpPatch("delivery/{barcode}/status")]
     public async Task<IActionResult> UpdateDeliveryStatus(

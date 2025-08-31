@@ -25,6 +25,7 @@ builder.Services.AddScoped<IShipmentRepository, ShipmentRepository>();
 builder.Services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
 builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
 builder.Services.AddScoped<IMetricsRepository, MetricsRepository>();
+builder.Services.AddScoped<PostalIdempotencyDemo.Api.Data.ISqlExecutor, PostalIdempotencyDemo.Api.Data.SqlExecutor>();
 
 // Register services
 builder.Services.AddScoped<PostalIdempotencyDemo.Api.Services.Interfaces.IShipmentService, PostalIdempotencyDemo.Api.Services.ShipmentService>();
