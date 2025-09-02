@@ -99,7 +99,13 @@ public class IdempotencyDemoController : ControllerBase
             {
                 // log metrics for idempotent hit
                 await _deliveryService.LogIdempotentHitAsync(barcode, idempotencyKey, HttpContext.Request.Path);
-                return Ok(JsonSerializer.Deserialize<object>(latestEntry.ResponseData));
+                // always return a consistent response object for idempotent block
+                return Ok(new IdempotencyDemoResponse<Shipment>
+                {
+                    Success = true,
+                    Data = null,
+                    Message = "העדכון נחסם בגלל מפתח אידמפונטנטי, סטטוס לא שונה."
+                });
             }
         }
 

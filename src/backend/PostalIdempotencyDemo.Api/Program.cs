@@ -30,6 +30,7 @@ builder.Services.AddScoped<PostalIdempotencyDemo.Api.Data.ISqlExecutor, PostalId
 // Register services
 builder.Services.AddScoped<PostalIdempotencyDemo.Api.Services.Interfaces.IShipmentService, PostalIdempotencyDemo.Api.Services.ShipmentService>();
 builder.Services.AddScoped<IIdempotencyService, IdempotencyService>();
+builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 
 // CORS configuration
 builder.Services.AddCors(options =>

@@ -55,6 +55,16 @@ namespace PostalIdempotencyDemo.Api.Repositories
                 using var reader = await command.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
                 {
+                    var statusId = reader.IsDBNull(reader.GetOrdinal("status_id")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("status_id"));
+                    string? statusNameHe = statusId switch
+                    {
+                        1 => "נוצר",
+                        2 => "בתהליך משלוח",
+                        3 => "נמסר",
+                        4 => "בוטל",
+                        5 => "נכשל",
+                        _ => null
+                    };
                     return new Models.Shipment
                     {
                         Id = reader.GetGuid(reader.GetOrdinal("id")),
@@ -66,7 +76,8 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         Notes = reader.IsDBNull(reader.GetOrdinal("notes")) ? null : reader.GetString(reader.GetOrdinal("notes")),
                         CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
                         UpdatedAt = reader.IsDBNull(reader.GetOrdinal("updated_at")) ? null : reader.GetDateTime(reader.GetOrdinal("updated_at")),
-                        StatusId = reader.IsDBNull(reader.GetOrdinal("status_id")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("status_id")),
+                        StatusId = statusId,
+                        StatusNameHe = statusNameHe,
                         // ניתן להוסיף כאן שדות נוספים ממסירת המשלוח (deliveries) אם נדרש
                     };
                 }
