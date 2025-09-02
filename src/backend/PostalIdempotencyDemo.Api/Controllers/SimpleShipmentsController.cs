@@ -3,172 +3,113 @@ using Microsoft.Data.SqlClient;
 using PostalIdempotencyDemo.Api.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using PostalIdempotencyDemo.Api.Services.Interfaces;
 
-namespace PostalIdempotencyDemo.Api.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class SimpleShipmentsController : ControllerBase
+namespace PostalIdempotencyDemo.Api.Controllers
 {
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<SimpleShipmentsController> _logger;
-
-    public SimpleShipmentsController(IConfiguration configuration, ILogger<SimpleShipmentsController> logger)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SimpleShipmentsController : ControllerBase
     {
-        _configuration = configuration;
-        _logger = logger;
-    }
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<SimpleShipmentsController> _logger;
+        private readonly IShipmentService _shipmentService;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<object>>> GetAllShipments()
-    {
-        try
+        public SimpleShipmentsController(IConfiguration configuration, ILogger<SimpleShipmentsController> logger, IShipmentService shipmentService)
         {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            _logger.LogInformation("SimpleShipments using connection string: {ConnectionString}", connectionString);
+            _configuration = configuration;
+            _logger = logger;
+            _shipmentService = shipmentService;
+        }
 
-            // Debug: Show all configuration sources
-            var allConnectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
-            foreach (var cs in allConnectionStrings)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<object>>> GetAllShipments()
+        {
+            var result = await _shipmentService.GetAllShipmentsAsync();
+            if (!result.IsSuccess || result.Data == null)
             {
-                _logger.LogInformation("Config key: {Key}, Value: {Value}", cs.Key, cs.Value);
+                return StatusCode(500, new { error = result.ErrorMessage ?? "Failed to retrieve shipments" });
             }
-
-            using var connection = new SqlConnection(connectionString);
-            await connection.OpenAsync();
-
-            const string sql = @"
-                SELECT id, barcode, kod_peula, perut_peula, atar, customer_name, 
-                       address, weight, price, status_id, created_at, updated_at, notes
-                FROM shipments 
-                ORDER BY created_at DESC";
-
-            using var command = new SqlCommand(sql, connection);
-            using var reader = await command.ExecuteReaderAsync();
-
-            var shipments = new List<object>();
-            while (await reader.ReadAsync())
+            var shipments = result.Data.Select(shipment => new
             {
-                shipments.Add(new
-                {
-                    id = reader.GetGuid(0),
-                    barcode = reader.GetString(1),
-                    kodPeula = reader.GetInt32(2),
-                    perutPeula = reader.GetInt32(3),
-                    atar = reader.GetInt32(4),
-                    customerName = reader.IsDBNull(5) ? null : reader.GetString(5),
-                    address = reader.IsDBNull(6) ? null : reader.GetString(6),
-                    weight = reader.GetDecimal(7),
-                    price = reader.GetDecimal(8),
-                    statusId = reader.GetInt32(9),
-                    createdAt = reader.GetDateTime(10),
-                    updatedAt = reader.IsDBNull(11) ? (DateTime?)null : reader.GetDateTime(11),
-                    notes = reader.IsDBNull(12) ? null : reader.GetString(12)
-                });
-            }
-
-            _logger.LogInformation("Retrieved {Count} shipments", shipments.Count);
+                id = shipment.Id,
+                barcode = shipment.Barcode,
+                kodPeula = shipment.KodPeula,
+                perutPeula = shipment.PerutPeula,
+                atar = shipment.Atar,
+                customerName = shipment.CustomerName,
+                address = shipment.Address,
+                weight = shipment.Weight,
+                price = shipment.Price,
+                statusId = shipment.StatusId,
+                statusNameHe = shipment.StatusNameHe ?? "לא עודכן",
+                createdAt = shipment.CreatedAt,
+                updatedAt = shipment.UpdatedAt,
+                notes = shipment.Notes
+            });
             return Ok(shipments);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving shipments");
-            return StatusCode(500, new { error = "Failed to retrieve shipments", details = ex.Message });
-        }
-    }
 
-    [HttpGet("{barcode}")]
-    public async Task<ActionResult<object>> GetShipmentByBarcode(string barcode)
-    {
-        try
+        [HttpGet("{barcode}")]
+        public async Task<ActionResult<object>> GetShipmentByBarcode(string barcode)
         {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            _logger.LogInformation("SimpleShipments using connection string: {ConnectionString}", connectionString);
-
-            // Debug: Show all configuration sources
-            var allConnectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
-            foreach (var cs in allConnectionStrings)
+            var result = await _shipmentService.GetShipmentByBarcodeAsync(barcode);
+            if (!result.IsSuccess || result.Data == null)
             {
-                _logger.LogInformation("Config key: {Key}, Value: {Value}", cs.Key, cs.Value);
+                return NotFound(new { error = $"Shipment with barcode {barcode} not found" });
             }
-
-            using var connection = new SqlConnection(connectionString);
-            await connection.OpenAsync();
-
-            const string sql = @"
-                SELECT id, barcode, kod_peula, perut_peula, atar, customer_name, 
-                       address, weight, price, status_id, created_at, updated_at, notes
-                FROM shipments 
-                WHERE barcode = @barcode";
-
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@barcode", barcode);
-
-            using var reader = await command.ExecuteReaderAsync();
-
-            if (await reader.ReadAsync())
+            var shipment = result.Data;
+            // ניתן להחזיר אובייקט אנונימי עם השדות הנדרשים בלבד
+            return Ok(new
             {
-                var shipment = new
+                id = shipment.Id,
+                barcode = shipment.Barcode,
+                kodPeula = shipment.KodPeula,
+                perutPeula = shipment.PerutPeula,
+                atar = shipment.Atar,
+                customerName = shipment.CustomerName,
+                address = shipment.Address,
+                weight = shipment.Weight,
+                price = shipment.Price,
+                statusId = shipment.StatusId,
+                statusNameHe = shipment.StatusNameHe ?? "לא עודכן",
+                createdAt = shipment.CreatedAt,
+                updatedAt = shipment.UpdatedAt,
+                notes = shipment.Notes
+            });
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<object>> CreateShipment([FromBody] CreateShipmentRequest request)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                _logger.LogInformation("SimpleShipments using connection string: {ConnectionString}", connectionString);
+
+                // Debug: Show all configuration sources
+                var allConnectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
+                foreach (var cs in allConnectionStrings)
                 {
-                    id = reader.GetGuid(0),
-                    barcode = reader.GetString(1),
-                    kodPeula = reader.GetInt32(2),
-                    perutPeula = reader.GetInt32(3),
-                    atar = reader.GetInt32(4),
-                    customerName = reader.IsDBNull(5) ? null : reader.GetString(5),
-                    address = reader.IsDBNull(6) ? null : reader.GetString(6),
-                    weight = reader.GetDecimal(7),
-                    price = reader.GetDecimal(8),
-                    statusId = reader.GetInt32(9),
-                    createdAt = reader.GetDateTime(10),
-                    updatedAt = reader.IsDBNull(11) ? (DateTime?)null : reader.GetDateTime(11),
-                    notes = reader.IsDBNull(12) ? null : reader.GetString(12)
-                };
+                    _logger.LogInformation("Config key: {Key}, Value: {Value}", cs.Key, cs.Value);
+                }
 
-                _logger.LogInformation("Retrieved shipment with barcode {Barcode}", barcode);
-                return Ok(shipment);
-            }
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
 
-            return NotFound(new { error = $"Shipment with barcode {barcode} not found" });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving shipment with barcode {Barcode}", barcode);
-            return StatusCode(500, new { error = "Failed to retrieve shipment", details = ex.Message });
-        }
-    }
+                // Check if barcode exists
+                const string checkSql = "SELECT COUNT(1) FROM shipments WHERE barcode = @barcode";
+                using var checkCommand = new SqlCommand(checkSql, connection);
+                checkCommand.Parameters.AddWithValue("@barcode", request.Barcode);
 
-    [HttpPost]
-    public async Task<ActionResult<object>> CreateShipment([FromBody] CreateShipmentRequest request)
-    {
-        try
-        {
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-            _logger.LogInformation("SimpleShipments using connection string: {ConnectionString}", connectionString);
+                var exists = Convert.ToInt32(await checkCommand.ExecuteScalarAsync()) > 0;
+                if (exists)
+                {
+                    return Conflict(new { error = $"Shipment with barcode {request.Barcode} already exists" });
+                }
 
-            // Debug: Show all configuration sources
-            var allConnectionStrings = _configuration.GetSection("ConnectionStrings").GetChildren();
-            foreach (var cs in allConnectionStrings)
-            {
-                _logger.LogInformation("Config key: {Key}, Value: {Value}", cs.Key, cs.Value);
-            }
-
-            using var connection = new SqlConnection(connectionString);
-            await connection.OpenAsync();
-
-            // Check if barcode exists
-            const string checkSql = "SELECT COUNT(1) FROM shipments WHERE barcode = @barcode";
-            using var checkCommand = new SqlCommand(checkSql, connection);
-            checkCommand.Parameters.AddWithValue("@barcode", request.Barcode);
-
-            var exists = Convert.ToInt32(await checkCommand.ExecuteScalarAsync()) > 0;
-            if (exists)
-            {
-                return Conflict(new { error = $"Shipment with barcode {request.Barcode} already exists" });
-            }
-
-            var newId = Guid.NewGuid();
-            const string sql = @"
+                var newId = Guid.NewGuid();
+                const string sql = @"
                 INSERT INTO shipments (id, barcode, kod_peula, perut_peula, atar, customer_name, 
                                      address, weight, price, status_id, notes, created_at)
                 VALUES (@id, @barcode, @kod_peula, @perut_peula, @atar, @customer_name, 
@@ -176,49 +117,50 @@ public class SimpleShipmentsController : ControllerBase
                 
                 SELECT id, created_at FROM shipments WHERE id = @id";
 
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@id", newId);
-            command.Parameters.AddWithValue("@barcode", request.Barcode);
-            command.Parameters.AddWithValue("@kod_peula", request.KodPeula);
-            command.Parameters.AddWithValue("@perut_peula", request.PerutPeula);
-            command.Parameters.AddWithValue("@atar", request.Atar);
-            command.Parameters.AddWithValue("@customer_name", request.CustomerName ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@address", request.Address ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@weight", request.Weight);
-            command.Parameters.AddWithValue("@price", request.Price);
-            command.Parameters.AddWithValue("@status_id", 1); // Created
-            command.Parameters.AddWithValue("@notes", request.Notes ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@created_at", DateTime.UtcNow);
+                using var command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@id", newId);
+                command.Parameters.AddWithValue("@barcode", request.Barcode);
+                command.Parameters.AddWithValue("@kod_peula", request.KodPeula);
+                command.Parameters.AddWithValue("@perut_peula", request.PerutPeula);
+                command.Parameters.AddWithValue("@atar", request.Atar);
+                command.Parameters.AddWithValue("@customer_name", request.CustomerName ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@address", request.Address ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@weight", request.Weight);
+                command.Parameters.AddWithValue("@price", request.Price);
+                command.Parameters.AddWithValue("@status_id", 1); // Created
+                command.Parameters.AddWithValue("@notes", request.Notes ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@created_at", DateTime.UtcNow);
 
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            {
-                var result = new
+                using var reader = await command.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
                 {
-                    id = reader.GetGuid(0),
-                    barcode = request.Barcode,
-                    kodPeula = request.KodPeula,
-                    perutPeula = request.PerutPeula,
-                    atar = request.Atar,
-                    customerName = request.CustomerName,
-                    address = request.Address,
-                    weight = request.Weight,
-                    price = request.Price,
-                    statusId = 1,
-                    createdAt = reader.GetDateTime(1),
-                    notes = request.Notes
-                };
+                    var result = new
+                    {
+                        id = reader.GetGuid(0),
+                        barcode = request.Barcode,
+                        kodPeula = request.KodPeula,
+                        perutPeula = request.PerutPeula,
+                        atar = request.Atar,
+                        customerName = request.CustomerName,
+                        address = request.Address,
+                        weight = request.Weight,
+                        price = request.Price,
+                        statusId = 1,
+                        createdAt = reader.GetDateTime(1),
+                        notes = request.Notes
+                    };
 
-                _logger.LogInformation("Created shipment with barcode {Barcode}", request.Barcode);
-                return CreatedAtAction(nameof(GetShipmentByBarcode), new { barcode = request.Barcode }, result);
+                    _logger.LogInformation("Created shipment with barcode {Barcode}", request.Barcode);
+                    return CreatedAtAction(nameof(GetShipmentByBarcode), new { barcode = request.Barcode }, result);
+                }
+
+                return StatusCode(500, new { error = "Failed to create shipment" });
             }
-
-            return StatusCode(500, new { error = "Failed to create shipment" });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating shipment with barcode {Barcode}", request.Barcode);
-            return StatusCode(500, new { error = "Failed to create shipment", details = ex.Message });
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating shipment with barcode {Barcode}", request.Barcode);
+                return StatusCode(500, new { error = "Failed to create shipment", details = ex.Message });
+            }
         }
     }
 }
