@@ -1,11 +1,13 @@
 using PostalIdempotencyDemo.Api.Models;
 
-namespace PostalIdempotencyDemo.Api.Repositories;
-
-public interface IIdempotencyRepository
+namespace PostalIdempotencyDemo.Api.Repositories
 {
-    Task<IdempotencyEntry?> GetByKeyAsync(string key);
-    Task<bool> CreateAsync(IdempotencyEntry entry);
-    Task<bool> UpdateResponseAsync(string key, string responseData, int statusCode);
-    Task<bool> DeleteExpiredAsync();
+    public interface IIdempotencyRepository
+    {
+        Task<IdempotencyEntry?> GetLatestByCorrelationIdAsync(string correlationId);
+        Task<IdempotencyEntry?> GetByKeyAsync(string key);
+        Task<bool> CreateAsync(IdempotencyEntry entry);
+        Task<bool> UpdateResponseAsync(string key, string responseData, int statusCode);
+        Task<bool> DeleteExpiredAsync();
+    }
 }

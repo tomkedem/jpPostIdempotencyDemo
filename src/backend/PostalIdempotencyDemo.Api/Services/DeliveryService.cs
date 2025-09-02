@@ -9,14 +9,18 @@ namespace PostalIdempotencyDemo.Api.Services
     {
         Task<IdempotencyDemoResponse<Delivery>> CreateDeliveryAsync(CreateDeliveryRequest request);
         Task<IdempotencyDemoResponse<Shipment>> UpdateDeliveryStatusAsync(string barcode, int statusId);
+        Task LogIdempotentHitAsync(string barcode, string idempotencyKey, string endpoint);
     }
 
     public class DeliveryService : IDeliveryService
     {
         private readonly IDeliveryRepository _deliveryRepository;
-        public DeliveryService(IDeliveryRepository deliveryRepository)
+        private readonly IMetricsRepository _metricsRepository;
+
+        public DeliveryService(IDeliveryRepository deliveryRepository, IMetricsRepository metricsRepository)
         {
             _deliveryRepository = deliveryRepository;
+            _metricsRepository = metricsRepository;
         }
 
         public async Task<IdempotencyDemoResponse<Delivery>> CreateDeliveryAsync(CreateDeliveryRequest request)
@@ -35,6 +39,7 @@ namespace PostalIdempotencyDemo.Api.Services
                 CreatedAt = DateTime.UtcNow
             };
             await _deliveryRepository.CreateDeliveryAsync(delivery);
+            await _metricsRepository.LogMetricsAsync("create_delivery", $"/api/idempotency-demo/delivery", 0, false, null);
             return new IdempotencyDemoResponse<Delivery> { Success = true, Data = delivery };
         }
 
@@ -43,17 +48,25 @@ namespace PostalIdempotencyDemo.Api.Services
             var stopwatch = Stopwatch.StartNew();
             var updatedShipment = await _deliveryRepository.UpdateDeliveryStatusAsync(barcode, statusId);
             stopwatch.Stop();
+            var executionTime = (int)stopwatch.ElapsedMilliseconds;
             if (updatedShipment == null)
             {
+                await _metricsRepository.LogMetricsAsync("update_status", $"/api/idempotency-demo/delivery/{barcode}/status", executionTime, false, null);
                 return new IdempotencyDemoResponse<Shipment> { Success = false, Message = $"Shipment with barcode {barcode} not found." };
             }
+            await _metricsRepository.LogMetricsAsync("update_status", $"/api/idempotency-demo/delivery/{barcode}/status", executionTime, false, null);
             return new IdempotencyDemoResponse<Shipment>
             {
                 Success = true,
                 Data = updatedShipment,
                 Message = "סטטוס משלוח עודכן בהצלחה",
-                ExecutionTimeMs = (int)stopwatch.ElapsedMilliseconds
+                ExecutionTimeMs = executionTime
             };
+        }
+
+        public async Task LogIdempotentHitAsync(string barcode, string idempotencyKey, string endpoint)
+        {
+            await _metricsRepository.LogMetricsAsync("update_status", endpoint, 0, true, idempotencyKey);
         }
     }
 }

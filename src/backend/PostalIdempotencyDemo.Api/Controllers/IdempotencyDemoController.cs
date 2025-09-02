@@ -11,6 +11,7 @@ using System.Text.Json;
 
 namespace PostalIdempotencyDemo.Api.Controllers;
 
+
 [ApiController]
 [Route("api/idempotency-demo")]
 public class IdempotencyDemoController : ControllerBase
@@ -22,13 +23,18 @@ public class IdempotencyDemoController : ControllerBase
     private readonly IDeliveryService _deliveryService;
     private static readonly Random _random = new();
 
-    public IdempotencyDemoController(IConfiguration configuration, ILogger<IdempotencyDemoController> logger, IIdempotencyService idempotencyService, IDeliveryRepository deliveryRepository, IMetricsRepository metricsRepository)
+    public IdempotencyDemoController(
+        IConfiguration configuration,
+        ILogger<IdempotencyDemoController> logger,
+        IIdempotencyService idempotencyService,
+        IMetricsRepository metricsRepository,
+        IDeliveryService deliveryService)
     {
         _configuration = configuration;
         _logger = logger;
         _idempotencyService = idempotencyService;
         _metricsRepository = metricsRepository;
-        _deliveryService = new DeliveryService(deliveryRepository);
+        _deliveryService = deliveryService;
     }
 
     [HttpPost("delivery")]
@@ -39,21 +45,18 @@ public class IdempotencyDemoController : ControllerBase
             return BadRequest(new IdempotencyDemoResponse<object> { Success = false, Message = "Idempotency-Key header is required." });
         }
 
-        var (cachedResponse, entry) = await _idempotencyService.GetCachedResponseAsync(idempotencyKey);
-        // בדיקת תוקף הרשומה
-        if (entry != null && entry.ExpiresAt > DateTime.UtcNow)
+        // שליפת הרשומה האחרונה לפי correlation_id
+        var latestEntry = await _idempotencyService.GetLatestEntryByCorrelationIdAsync(HttpContext.TraceIdentifier);
+        if (latestEntry != null && latestEntry.IdempotencyKey == idempotencyKey && latestEntry.ExpiresAt > DateTime.UtcNow)
         {
-            if (cachedResponse is IActionResult actionResult)
+            // אם הרשומה האחרונה תואמת את המפתח, מחזירים תשובה שמורה
+            if (latestEntry.ResponseData != null)
             {
-                return actionResult;
-            }
-            else if (cachedResponse != null)
-            {
-                return Ok(cachedResponse);
+                return Ok(JsonSerializer.Deserialize<object>(latestEntry.ResponseData));
             }
         }
 
-        // אם אין רשומה או פג תוקף, יוצרים חדשה
+        // אם אין רשומה או המפתח שונה, יוצרים חדשה
         var newEntry = new IdempotencyEntry
         {
             IdempotencyKey = idempotencyKey,
@@ -86,21 +89,21 @@ public class IdempotencyDemoController : ControllerBase
             return BadRequest(new IdempotencyDemoResponse<object> { Success = false, Message = "Idempotency-Key header is required." });
         }
 
-        var (cachedResponse, entry) = await _idempotencyService.GetCachedResponseAsync(idempotencyKey);
-        // בדיקת תוקף הרשומה
-        if (entry != null && entry.ExpiresAt > DateTime.UtcNow)
+        // Use logical correlation id for delivery status
+        var correlationId = $"/api/idempotency-demo/delivery/{barcode}/status";
+        var latestEntry = await _idempotencyService.GetLatestEntryByCorrelationIdAsync(correlationId);
+        if (latestEntry != null && latestEntry.IdempotencyKey == idempotencyKey && latestEntry.ExpiresAt > DateTime.UtcNow)
         {
-            if (cachedResponse is IActionResult actionResult)
+            // אם הרשומה האחרונה תואמת את המפתח, מחזירים תשובה שמורה
+            if (latestEntry.ResponseData != null)
             {
-                return actionResult;
-            }
-            else if (cachedResponse != null)
-            {
-                return Ok(cachedResponse);
+                // log metrics for idempotent hit
+                await _deliveryService.LogIdempotentHitAsync(barcode, idempotencyKey, HttpContext.Request.Path);
+                return Ok(JsonSerializer.Deserialize<object>(latestEntry.ResponseData));
             }
         }
 
-        // אם אין רשומה או פג תוקף, יוצרים חדשה
+        // אם אין רשומה או המפתח שונה, יוצרים חדשה
         var newEntry = new IdempotencyEntry
         {
             IdempotencyKey = idempotencyKey,
@@ -111,14 +114,13 @@ public class IdempotencyDemoController : ControllerBase
             CreatedAt = DateTime.UtcNow,
             ExpiresAt = DateTime.UtcNow.AddHours(24),
             Operation = "update_delivery_status",
-            CorrelationId = HttpContext.TraceIdentifier,
+            CorrelationId = correlationId,
             RelatedEntityId = null // אפשר להוסיף מזהה משלוח אם יש
         };
         await _idempotencyService.StoreIdempotencyEntryAsync(newEntry);
         // עדכון סטטוס בלבד
         var response = await _deliveryService.UpdateDeliveryStatusAsync(barcode, request.StatusId);
         await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
-        await _metricsRepository.LogMetricsAsync("update_status", HttpContext.Request.Path, response.ExecutionTimeMs != 0 ? response.ExecutionTimeMs : 0, false, idempotencyKey);
         if (!response.Success)
         {
             return NotFound(response);

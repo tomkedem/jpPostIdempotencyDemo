@@ -3,106 +3,141 @@ using Microsoft.Data.SqlClient;
 using PostalIdempotencyDemo.Api.Data;
 using PostalIdempotencyDemo.Api.Models;
 
-namespace PostalIdempotencyDemo.Api.Repositories;
-
-
-public class IdempotencyRepository : IIdempotencyRepository
+namespace PostalIdempotencyDemo.Api.Repositories
 {
-    private readonly ISqlExecutor _sqlExecutor;
-
-    public IdempotencyRepository(ISqlExecutor sqlExecutor)
+    public class IdempotencyRepository : IIdempotencyRepository
     {
-        _sqlExecutor = sqlExecutor;
-    }
+        private readonly ISqlExecutor _sqlExecutor;
 
-    public async Task<IdempotencyEntry?> GetByKeyAsync(string key)
-    {
-        const string sql = @"
-            SELECT idempotency_key, request_hash, response_body, status_code, 
-                   created_at, expires_at, correlation_id, operation, related_entity_id 
-            FROM idempotency_entries 
-            WHERE idempotency_key = @key AND expires_at > @now";
-
-        return await _sqlExecutor.ExecuteAsync(async connection =>
+        public IdempotencyRepository(ISqlExecutor sqlExecutor)
         {
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@key", key);
-            command.Parameters.AddWithValue("@now", DateTime.UtcNow);
+            _sqlExecutor = sqlExecutor;
+        }
 
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+        // מחזיר את הרשומה האחרונה לפי correlation_id
+        public async Task<IdempotencyEntry?> GetLatestByCorrelationIdAsync(string correlationId)
+        {
+            const string sql = @"
+                SELECT TOP 1 idempotency_key, request_hash, response_body, status_code, 
+                       created_at, expires_at, correlation_id, operation, related_entity_id 
+                FROM idempotency_entries 
+                WHERE correlation_id = @correlationId
+                ORDER BY created_at DESC";
+
+            return await _sqlExecutor.ExecuteAsync(async connection =>
             {
-                return new IdempotencyEntry
+                using var command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@correlationId", correlationId);
+
+                using var reader = await command.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
                 {
-                    IdempotencyKey = reader.GetString(reader.GetOrdinal("idempotency_key")),
-                    RequestHash = reader.GetString(reader.GetOrdinal("request_hash")),
-                    ResponseData = reader.IsDBNull(reader.GetOrdinal("response_body")) ? null : reader.GetString(reader.GetOrdinal("response_body")),
-                    StatusCode = reader.GetInt32(reader.GetOrdinal("status_code")),
-                    CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
-                    ExpiresAt = reader.GetDateTime(reader.GetOrdinal("expires_at")),
-                    Endpoint = reader.IsDBNull(reader.GetOrdinal("correlation_id")) ? string.Empty : reader.GetString(reader.GetOrdinal("correlation_id")),
-                    HttpMethod = reader.GetString(reader.GetOrdinal("operation"))
-                };
-            }
-            return null;
-        });
-    }
+                    return new IdempotencyEntry
+                    {
+                        IdempotencyKey = reader.GetString(reader.GetOrdinal("idempotency_key")),
+                        RequestHash = reader.GetString(reader.GetOrdinal("request_hash")),
+                        ResponseData = reader.IsDBNull(reader.GetOrdinal("response_body")) ? null : reader.GetString(reader.GetOrdinal("response_body")),
+                        StatusCode = reader.GetInt32(reader.GetOrdinal("status_code")),
+                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
+                        ExpiresAt = reader.GetDateTime(reader.GetOrdinal("expires_at")),
+                        Endpoint = reader.IsDBNull(reader.GetOrdinal("correlation_id")) ? string.Empty : reader.GetString(reader.GetOrdinal("correlation_id")),
+                        HttpMethod = reader.GetString(reader.GetOrdinal("operation"))
+                    };
+                }
+                return null;
+            });
+        }
 
-    public async Task<bool> CreateAsync(IdempotencyEntry entry)
-    {
-        const string sql = @"
-            INSERT INTO idempotency_entries 
-            (idempotency_key, request_hash, response_body, status_code, 
-             created_at, expires_at, correlation_id, operation)
-            VALUES (@key, @hash, @response, @statusCode, @createdAt, @expiresAt, @correlationId, @operation)";
-
-        return await _sqlExecutor.ExecuteAsync(async connection =>
+        public async Task<IdempotencyEntry?> GetByKeyAsync(string key)
         {
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@key", entry.IdempotencyKey);
-            command.Parameters.AddWithValue("@hash", entry.RequestHash);
-            command.Parameters.AddWithValue("@response", (object?)entry.ResponseData ?? DBNull.Value);
-            command.Parameters.AddWithValue("@statusCode", entry.StatusCode);
-            command.Parameters.AddWithValue("@createdAt", entry.CreatedAt);
-            command.Parameters.AddWithValue("@expiresAt", entry.ExpiresAt);
-            command.Parameters.AddWithValue("@correlationId", (object?)entry.Endpoint ?? DBNull.Value);
-            command.Parameters.AddWithValue("@operation", entry.HttpMethod);
+            const string sql = @"
+                SELECT idempotency_key, request_hash, response_body, status_code, 
+                       created_at, expires_at, correlation_id, operation, related_entity_id 
+                FROM idempotency_entries 
+                WHERE idempotency_key = @key AND expires_at > @now";
 
-            var result = await command.ExecuteNonQueryAsync();
-            return result > 0;
-        });
-    }
+            return await _sqlExecutor.ExecuteAsync(async connection =>
+            {
+                using var command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@key", key);
+                command.Parameters.AddWithValue("@now", DateTime.UtcNow);
 
-    public async Task<bool> UpdateResponseAsync(string key, string responseData, int statusCode)
-    {
-        const string sql = @"
-            UPDATE idempotency_entries 
-            SET response_body = @response, status_code = @statusCode 
-            WHERE idempotency_key = @key";
+                using var reader = await command.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    return new IdempotencyEntry
+                    {
+                        IdempotencyKey = reader.GetString(reader.GetOrdinal("idempotency_key")),
+                        RequestHash = reader.GetString(reader.GetOrdinal("request_hash")),
+                        ResponseData = reader.IsDBNull(reader.GetOrdinal("response_body")) ? null : reader.GetString(reader.GetOrdinal("response_body")),
+                        StatusCode = reader.GetInt32(reader.GetOrdinal("status_code")),
+                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
+                        ExpiresAt = reader.GetDateTime(reader.GetOrdinal("expires_at")),
+                        Endpoint = reader.IsDBNull(reader.GetOrdinal("correlation_id")) ? string.Empty : reader.GetString(reader.GetOrdinal("correlation_id")),
+                        HttpMethod = reader.GetString(reader.GetOrdinal("operation"))
+                    };
+                }
+                return null;
+            });
+        }
 
-        return await _sqlExecutor.ExecuteAsync(async connection =>
+        public async Task<bool> CreateAsync(IdempotencyEntry entry)
         {
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@response", responseData);
-            command.Parameters.AddWithValue("@statusCode", statusCode);
-            command.Parameters.AddWithValue("@key", key);
+            const string sql = @"
+                INSERT INTO idempotency_entries 
+                (idempotency_key, request_hash, response_body, status_code, 
+                 created_at, expires_at, correlation_id, operation)
+                VALUES (@key, @hash, @response, @statusCode, @createdAt, @expiresAt, @correlationId, @operation)";
 
-            var result = await command.ExecuteNonQueryAsync();
-            return result > 0;
-        });
-    }
+            return await _sqlExecutor.ExecuteAsync(async connection =>
+            {
+                using var command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@key", entry.IdempotencyKey);
+                command.Parameters.AddWithValue("@hash", entry.RequestHash);
+                command.Parameters.AddWithValue("@response", (object?)entry.ResponseData ?? DBNull.Value);
+                command.Parameters.AddWithValue("@statusCode", entry.StatusCode);
+                command.Parameters.AddWithValue("@createdAt", entry.CreatedAt);
+                command.Parameters.AddWithValue("@expiresAt", entry.ExpiresAt);
+                command.Parameters.AddWithValue("@correlationId", (object?)entry.Endpoint ?? DBNull.Value);
+                command.Parameters.AddWithValue("@operation", entry.HttpMethod);
 
-    public async Task<bool> DeleteExpiredAsync()
-    {
-        const string sql = "DELETE FROM idempotency_entries WHERE expires_at <= @now";
+                var result = await command.ExecuteNonQueryAsync();
+                
+                return result > 0;
+            });
+        }
 
-        return await _sqlExecutor.ExecuteAsync(async connection =>
+        public async Task<bool> UpdateResponseAsync(string key, string responseData, int statusCode)
         {
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@now", DateTime.UtcNow);
+            const string sql = @"
+                UPDATE idempotency_entries 
+                SET response_body = @response, status_code = @statusCode 
+                WHERE idempotency_key = @key";
 
-            var result = await command.ExecuteNonQueryAsync();
-            return result > 0;
-        });
+            return await _sqlExecutor.ExecuteAsync(async connection =>
+            {
+                using var command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@response", responseData);
+                command.Parameters.AddWithValue("@statusCode", statusCode);
+                command.Parameters.AddWithValue("@key", key);
+
+                var result = await command.ExecuteNonQueryAsync();
+                return result > 0;
+            });
+        }
+
+        public async Task<bool> DeleteExpiredAsync()
+        {
+            const string sql = "DELETE FROM idempotency_entries WHERE expires_at <= @now";
+
+            return await _sqlExecutor.ExecuteAsync(async connection =>
+            {
+                using var command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@now", DateTime.UtcNow);
+
+                var result = await command.ExecuteNonQueryAsync();
+                return result > 0;
+            });
+        }
     }
 }
