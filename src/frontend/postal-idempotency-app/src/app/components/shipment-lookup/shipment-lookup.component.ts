@@ -38,6 +38,7 @@ export class ShipmentLookupComponent implements OnInit {
   lookupForm: FormGroup;
   isLoading = signal(false);
   shipment = signal<Shipment | null>(null);
+  delivery = signal<any | null>(null);
   lastSearchedBarcode: string | null = null;
 
   private shipmentStatuses: Map<number, string> = new Map([
@@ -69,16 +70,18 @@ export class ShipmentLookupComponent implements OnInit {
     if (this.lookupForm.valid && !this.isLoading()) {
       this.isLoading.set(true);
       this.shipment.set(null);
+      this.delivery.set(null);
 
       const barcode = this.lookupForm.value.barcode;
       this.lastSearchedBarcode = barcode;
 
       try {
-        const shipment = await this.shipmentService.getShipmentByBarcode(
-          barcode
-        );
-        console.log("Shipment found:", shipment);
-        this.shipment.set(shipment);
+        const result =
+          await this.shipmentService.getShipmentAndDeliveryByBarcode(barcode);
+        console.log("Shipment found:", result.shipment);
+        console.log("Delivery found:", result.delivery);
+        this.shipment.set(result.shipment);
+        this.delivery.set(result.delivery);
       } catch (error: any) {
         this.snackBar.open(`שגיאה: ${error.message}`, "סגור", {
           duration: 5000,

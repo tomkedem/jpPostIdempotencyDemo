@@ -270,6 +270,22 @@
             >
             <span>{{ shipment()!.notes }}</span>
           </div>
+          <!-- פרטי שליח/מסירה -->
+          @if (delivery()) {
+          <div class="detail-item full-width" style="margin-top: 2rem">
+            <h3 style="margin-bottom: 0.5rem">פרטי השליח / מסירה</h3>
+            <div><strong>מזהה מסירה:</strong> {{ delivery().id }}</div>
+            <div><strong>ברקוד:</strong> {{ delivery().barcode }}</div>
+            <div><strong>מזהה עובד:</strong> {{ delivery().employeeId }}</div>
+            <div>
+              <strong>תאריך מסירה:</strong>
+              {{ delivery().deliveryDate | date : "dd/MM/yyyy HH:mm" }}
+            </div>
+            <div><strong>שם מקבל:</strong> {{ delivery().recipientName }}</div>
+            <div><strong>סטטוס מסירה:</strong> {{ delivery().statusId }}</div>
+            <div><strong>הערות:</strong> {{ delivery().notes }}</div>
+          </div>
+          }
         </div>
       </mat-card-content>
     </mat-card>

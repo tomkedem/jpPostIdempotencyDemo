@@ -5,6 +5,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
         Task CreateDeliveryAsync(object delivery);
         Task<Models.Shipment?> UpdateDeliveryStatusAsync(string barcode, int statusId);
         Task<Models.Shipment?> GetShipmentByBarcodeAsync(string barcode);
+        Task<Models.Delivery?> GetDeliveryByBarcodeAsync(string barcode);
     }
 
     // ...existing code...

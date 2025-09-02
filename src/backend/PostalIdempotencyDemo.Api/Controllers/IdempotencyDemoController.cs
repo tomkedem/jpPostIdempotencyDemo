@@ -6,7 +6,6 @@ using System.Security.Cryptography;
 using System.Text;
 using PostalIdempotencyDemo.Api.Repositories;
 using PostalIdempotencyDemo.Api.Services.Interfaces;
-using PostalIdempotencyDemo.Api.Services;
 using System.Text.Json;
 
 namespace PostalIdempotencyDemo.Api.Controllers;

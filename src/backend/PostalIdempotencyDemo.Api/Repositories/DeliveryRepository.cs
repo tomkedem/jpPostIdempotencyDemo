@@ -12,6 +12,34 @@ namespace PostalIdempotencyDemo.Api.Repositories
             _sqlExecutor = sqlExecutor;
         }
 
+        public async Task<Models.Delivery?> GetDeliveryByBarcodeAsync(string barcode)
+        {
+            return await _sqlExecutor.ExecuteAsync(async connection =>
+            {
+                const string query = @"SELECT TOP 1 id, barcode, employee_id, delivery_date, location_lat, location_lng, recipient_name, status_id, notes, created_at FROM deliveries WHERE barcode = @barcode ORDER BY delivery_date DESC";
+                using var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@barcode", barcode);
+                using var reader = await command.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    return new Models.Delivery
+                    {
+                        Id = reader.GetGuid(reader.GetOrdinal("id")),
+                        Barcode = reader.GetString(reader.GetOrdinal("barcode")),
+                        EmployeeId = reader.IsDBNull(reader.GetOrdinal("employee_id")) ? null : reader.GetString(reader.GetOrdinal("employee_id")),
+                        DeliveryDate = reader.GetDateTime(reader.GetOrdinal("delivery_date")),
+                        LocationLat = reader.IsDBNull(reader.GetOrdinal("location_lat")) ? null : (double)reader.GetDecimal(reader.GetOrdinal("location_lat")),
+                        LocationLng = reader.IsDBNull(reader.GetOrdinal("location_lng")) ? null : (double)reader.GetDecimal(reader.GetOrdinal("location_lng")),
+                        RecipientName = reader.IsDBNull(reader.GetOrdinal("recipient_name")) ? null : reader.GetString(reader.GetOrdinal("recipient_name")),
+                        StatusId = reader.GetInt32(reader.GetOrdinal("status_id")),
+                        Notes = reader.IsDBNull(reader.GetOrdinal("notes")) ? null : reader.GetString(reader.GetOrdinal("notes")),
+                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at"))
+                    };
+                }
+                return null;
+            });
+        }
+
         public async Task CreateDeliveryAsync(object delivery)
         {
             // TODO: Implement actual data access logic here

@@ -14,12 +14,18 @@ namespace PostalIdempotencyDemo.Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly ILogger<SimpleShipmentsController> _logger;
         private readonly IShipmentService _shipmentService;
+        private readonly IDeliveryService _deliveryService;
 
-        public SimpleShipmentsController(IConfiguration configuration, ILogger<SimpleShipmentsController> logger, IShipmentService shipmentService)
+        public SimpleShipmentsController(
+            IConfiguration configuration,
+            ILogger<SimpleShipmentsController> logger,
+            IShipmentService shipmentService,
+            IDeliveryService deliveryService)
         {
             _configuration = configuration;
             _logger = logger;
             _shipmentService = shipmentService;
+            _deliveryService = deliveryService;
         }
 
         [HttpGet]
@@ -50,6 +56,48 @@ namespace PostalIdempotencyDemo.Api.Controllers
             return Ok(shipments);
         }
 
+        [HttpGet("{barcode}/full")]
+        public async Task<ActionResult<object>> GetShipmentAndDeliveryByBarcode(string barcode)
+        {
+            var (shipment, delivery) = await _deliveryService.GetShipmentAndDeliveryByBarcodeAsync(barcode);
+            if (shipment == null && delivery == null)
+            {
+                return NotFound(new { error = $"Shipment or delivery with barcode {barcode} not found" });
+            }
+            return Ok(new
+            {
+                shipment = shipment == null ? null : new
+                {
+                    id = shipment.Id,
+                    barcode = shipment.Barcode,
+                    kodPeula = shipment.KodPeula,
+                    perutPeula = shipment.PerutPeula,
+                    atar = shipment.Atar,
+                    customerName = shipment.CustomerName,
+                    address = shipment.Address,
+                    weight = shipment.Weight,
+                    price = shipment.Price,
+                    statusId = shipment.StatusId,
+                    statusNameHe = shipment.StatusNameHe ?? "לא עודכן",
+                    createdAt = shipment.CreatedAt,
+                    updatedAt = shipment.UpdatedAt,
+                    notes = shipment.Notes
+                },
+                delivery = delivery == null ? null : new
+                {
+                    id = delivery.Id,
+                    barcode = delivery.Barcode,
+                    employeeId = delivery.EmployeeId,
+                    deliveryDate = delivery.DeliveryDate,
+                    locationLat = delivery.LocationLat,
+                    locationLng = delivery.LocationLng,
+                    recipientName = delivery.RecipientName,
+                    statusId = delivery.StatusId,
+                    notes = delivery.Notes,
+                    createdAt = delivery.CreatedAt
+                }
+            });
+        }
         [HttpGet("{barcode}")]
         public async Task<ActionResult<object>> GetShipmentByBarcode(string barcode)
         {

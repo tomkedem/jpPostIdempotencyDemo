@@ -2,15 +2,10 @@ using PostalIdempotencyDemo.Api.Models;
 using PostalIdempotencyDemo.Api.Repositories;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using PostalIdempotencyDemo.Api.Services.Interfaces;
 
 namespace PostalIdempotencyDemo.Api.Services
 {
-    public interface IDeliveryService
-    {
-        Task<IdempotencyDemoResponse<Delivery>> CreateDeliveryAsync(CreateDeliveryRequest request);
-        Task<IdempotencyDemoResponse<Shipment>> UpdateDeliveryStatusAsync(string barcode, int statusId);
-        Task LogIdempotentHitAsync(string barcode, string idempotencyKey, string endpoint);
-    }
 
     public class DeliveryService : IDeliveryService
     {
@@ -21,6 +16,13 @@ namespace PostalIdempotencyDemo.Api.Services
         {
             _deliveryRepository = deliveryRepository;
             _metricsRepository = metricsRepository;
+        }
+
+        public async Task<(Shipment? Shipment, Delivery? Delivery)> GetShipmentAndDeliveryByBarcodeAsync(string barcode)
+        {
+            var Shipment = await _deliveryRepository.GetShipmentByBarcodeAsync(barcode);
+            var Delivery = await _deliveryRepository.GetDeliveryByBarcodeAsync(barcode);
+            return (Shipment, Delivery);
         }
 
         public async Task<IdempotencyDemoResponse<Delivery>> CreateDeliveryAsync(CreateDeliveryRequest request)

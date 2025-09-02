@@ -58,6 +58,31 @@ export class ShipmentService {
     }
   }
 
+  /**
+   * Get both shipment and delivery details by barcode
+   */
+  async getShipmentAndDeliveryByBarcode(
+    barcode: string
+  ): Promise<{ shipment: Shipment | null; delivery: any | null }> {
+    this._loading.set(true);
+    this._error.set(null);
+    try {
+      const response = await firstValueFrom(
+        this.http.get<{ shipment: Shipment | null; delivery: any | null }>(
+          `${environment.apiUrl}/SimpleShipments/${barcode}/full`
+        )
+      );
+      this._lastResponse.set(response);
+      return response;
+    } catch (error) {
+      const errorMessage = this.handleError(error);
+      this._error.set(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
   async createShipment(request: CreateDeliveryRequest): Promise<any> {
     // Redirect to createDelivery for now
     return this.createDelivery(request);
