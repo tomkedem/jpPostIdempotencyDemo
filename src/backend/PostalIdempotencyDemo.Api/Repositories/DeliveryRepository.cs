@@ -22,13 +22,21 @@ namespace PostalIdempotencyDemo.Api.Repositories
         {
             return await _sqlExecutor.ExecuteAsync(async connection =>
             {
-                const string sql = "UPDATE deliveries SET status_id = @statusId WHERE barcode = @barcode";
-                using var command = new Microsoft.Data.SqlClient.SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@statusId", statusId);
-                command.Parameters.AddWithValue("@barcode", barcode);
+                // Update status in both deliveries and shipments tables
+                const string sqlDeliveries = "UPDATE deliveries SET status_id = @statusId WHERE barcode = @barcode";
+                const string sqlShipments = "UPDATE shipments SET status_id = @statusId WHERE barcode = @barcode";
 
-                int rowsAffected = await command.ExecuteNonQueryAsync();
-                if (rowsAffected == 0)
+                using var cmdDeliveries = new Microsoft.Data.SqlClient.SqlCommand(sqlDeliveries, connection);
+                cmdDeliveries.Parameters.AddWithValue("@statusId", statusId);
+                cmdDeliveries.Parameters.AddWithValue("@barcode", barcode);
+                int rowsDeliveries = await cmdDeliveries.ExecuteNonQueryAsync();
+
+                using var cmdShipments = new Microsoft.Data.SqlClient.SqlCommand(sqlShipments, connection);
+                cmdShipments.Parameters.AddWithValue("@statusId", statusId);
+                cmdShipments.Parameters.AddWithValue("@barcode", barcode);
+                int rowsShipments = await cmdShipments.ExecuteNonQueryAsync();
+
+                if (rowsDeliveries == 0 && rowsShipments == 0)
                 {
                     return null;
                 }
@@ -59,10 +67,12 @@ namespace PostalIdempotencyDemo.Api.Repositories
                     string? statusNameHe = statusId switch
                     {
                         1 => "נוצר",
-                        2 => "בתהליך משלוח",
-                        3 => "נמסר",
-                        4 => "בוטל",
-                        5 => "נכשל",
+                        2 => "נמסר",
+                        3 => "נכשל",
+                        4 => "נמסר חלקית",
+                        5 => "בדרך",
+                        6 => "בדרך לחלוקה",
+                        7 => "חריגה",
                         _ => null
                     };
                     return new Models.Shipment
