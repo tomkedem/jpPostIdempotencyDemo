@@ -152,8 +152,7 @@
         <mat-card-title>פרטי המסירה</mat-card-title>
         <mat-card-subtitle>ברקוד: {{ shipment()?.barcode }}</mat-card-subtitle>
         <mat-card-subtitle>
-
-           <div class="detail-item">
+          <div class="detail-item">
             <strong
               ><mat-icon
                 style="
@@ -166,15 +165,21 @@
               >
               סטטוס מסירה:</strong
             >
-            <span [class]="'status-chip status-' + shipment()?.status">
+            <span
+              [ngClass]="{
+                'status-chip': true,
+                'status-delivered': shipment()?.status === 2,
+                'status-failed': shipment()?.status === 3,
+                'status-partial': shipment()?.status === 4
+              }"
+            >
               {{
                 shipment()?.statusNameHe ||
                   getStatusText(shipment()?.status ?? 0)
               }}
             </span>
           </div>
-        </mat-card-subtitle>  
-        
+        </mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div class="details-grid">
@@ -239,8 +244,7 @@
             >
             <span>{{ shipment()?.price }}</span>
           </div>
-         
-         
+
           <!-- kodPeula, perutPeula, atar הוסרו לפי דרישת המשתמש -->
           <div class="detail-item">
             <strong
@@ -271,7 +275,7 @@
               תאריך עדכון סטטוס:
             </strong>
             <span>{{
-              delivery()?.updatedAt | date : "dd/MM/yyyy HH:mm"
+              delivery()?.updatedAt | date : "dd/MM/yyyy HH:mm:ss"
             }}</span>
           </div>
           <div class="detail-item full-width">

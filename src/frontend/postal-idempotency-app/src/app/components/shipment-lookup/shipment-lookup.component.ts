@@ -136,7 +136,11 @@ export class ShipmentLookupComponent implements OnInit {
           "סגור",
           { duration: 3000 }
         );
-        this.shipment.set(response.data);
+        // רענון מלא של המשלוח מהשרת כדי להציג תאריך עדכון
+        const result =
+          await this.shipmentService.getShipmentAndDeliveryByBarcode(barcode);
+        this.shipment.set(result.shipment);
+        this.delivery.set(result.delivery);
       } else if (response.success && !response.data) {
         // חסימה אידמפונטנטית
         this.snackBar.open(
