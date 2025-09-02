@@ -38,7 +38,9 @@ export class ShipmentLookupComponent implements OnInit {
   lookupForm: FormGroup;
   isLoading = signal(false);
   shipment = signal<Shipment | null>(null);
-  delivery = signal<any | null>(null);
+  delivery = signal<import("../../models/delivery.model").Delivery | null>(
+    null
+  );
   lastSearchedBarcode: string | null = null;
 
   private shipmentStatuses: Map<number, string> = new Map([
@@ -90,6 +92,7 @@ export class ShipmentLookupComponent implements OnInit {
       } finally {
         this.isLoading.set(false);
       }
+      console.log("Last delivery:", this.delivery());
     }
   }
 
@@ -158,6 +161,7 @@ export class ShipmentLookupComponent implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
+    console.log("Last delivery on status update:", this.delivery());
   }
 
   getStatusText(statusId: number): string {

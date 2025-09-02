@@ -71,6 +71,7 @@ CREATE TABLE deliveries (
     status_id INT NOT NULL,
     notes NVARCHAR(500),
     created_at DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+    updated_at DATETIME2,
     CONSTRAINT FK_deliveries_status FOREIGN KEY (status_id) REFERENCES shipment_statuses(id)
 );
 GO

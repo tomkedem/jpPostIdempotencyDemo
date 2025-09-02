@@ -94,7 +94,8 @@ namespace PostalIdempotencyDemo.Api.Controllers
                     recipientName = delivery.RecipientName,
                     statusId = delivery.StatusId,
                     notes = delivery.Notes,
-                    createdAt = delivery.CreatedAt
+                    createdAt = delivery.CreatedAt,
+                    updatedAt = delivery.UpdatedAt
                 }
             });
         }

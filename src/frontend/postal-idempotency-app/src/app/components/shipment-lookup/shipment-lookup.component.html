@@ -97,9 +97,15 @@
         <button
           type="button"
           class="status-card status-delivered"
-          [class.selected]="shipment()!.deliveryStatus === 2"
-          (click)="onUpdateStatus(shipment()!.barcode, 2)"
-          [disabled]="isLoading() || shipment()!.deliveryStatus === 2"
+          [class.selected]="shipment()?.deliveryStatus === 2"
+          (click)="
+            shipment()?.barcode
+              ? shipment()?.barcode
+                ? onUpdateStatus(shipment()!.barcode!, 2)
+                : null
+              : null
+          "
+          [disabled]="isLoading() || shipment()?.deliveryStatus === 2"
         >
           <span class="status-icon">
             <mat-icon style="font-size: 3.2rem">check_circle</mat-icon>
@@ -110,9 +116,11 @@
         <button
           type="button"
           class="status-card status-failed"
-          [class.selected]="shipment()!.deliveryStatus === 3"
-          (click)="onUpdateStatus(shipment()!.barcode, 3)"
-          [disabled]="isLoading() || shipment()!.deliveryStatus === 3"
+          [class.selected]="shipment()?.deliveryStatus === 3"
+          (click)="
+            shipment()?.barcode ? onUpdateStatus(shipment()!.barcode, 3) : null
+          "
+          [disabled]="isLoading() || shipment()?.deliveryStatus === 3"
         >
           <span class="status-icon">
             <mat-icon style="font-size: 3.2rem">cancel</mat-icon>
@@ -123,9 +131,13 @@
         <button
           type="button"
           class="status-card status-partial"
-          [class.selected]="shipment()!.deliveryStatus === 4"
-          (click)="onUpdateStatus(shipment()!.barcode, 4)"
-          [disabled]="isLoading() || shipment()!.deliveryStatus === 4"
+          [class.selected]="shipment()?.deliveryStatus === 4"
+          (click)="
+            shipment() && shipment()?.barcode
+              ? onUpdateStatus(shipment()!.barcode, 4)
+              : null
+          "
+          [disabled]="isLoading() || shipment()?.deliveryStatus === 4"
         >
           <span class="status-icon">
             <mat-icon style="font-size: 3.2rem">hourglass_bottom</mat-icon>
@@ -138,72 +150,10 @@
     <mat-card class="shipment-details">
       <mat-card-header>
         <mat-card-title>פרטי המסירה</mat-card-title>
-        <mat-card-subtitle>ברקוד: {{ shipment()!.barcode }}</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="details-grid">
-          <!-- מזהה (id) הוסר לפי דרישת המשתמש -->
-          <div class="detail-item">
-            <strong
-              ><mat-icon
-                style="
-                  font-size: 1.3rem;
-                  vertical-align: middle;
-                  color: #c31432;
-                  margin-left: 6px;
-                "
-                >person</mat-icon
-              >
-              שם לקוח:</strong
-            >
-            <span>{{ shipment()!.customerName }}</span>
-          </div>
-          <div class="detail-item">
-            <strong
-              ><mat-icon
-                style="
-                  font-size: 1.3rem;
-                  vertical-align: middle;
-                  color: #f59e42;
-                  margin-left: 6px;
-                "
-                >home</mat-icon
-              >
-              כתובת:</strong
-            >
-            <span>{{ shipment()!.address }}</span>
-          </div>
-          <div class="detail-item">
-            <strong
-              ><mat-icon
-                style="
-                  font-size: 1.3rem;
-                  vertical-align: middle;
-                  color: #ffd200;
-                  margin-left: 6px;
-                "
-                >scale</mat-icon
-              >
-              משקל (ק"ג):</strong
-            >
-            <span>{{ shipment()!.weight }}</span>
-          </div>
-          <div class="detail-item">
-            <strong
-              ><mat-icon
-                style="
-                  font-size: 1.3rem;
-                  vertical-align: middle;
-                  color: #4caf50;
-                  margin-left: 6px;
-                "
-                >attach_money</mat-icon
-              >
-              מחיר (₪):</strong
-            >
-            <span>{{ shipment()!.price }}</span>
-          </div>
-          <div class="detail-item">
+        <mat-card-subtitle>ברקוד: {{ shipment()?.barcode }}</mat-card-subtitle>
+        <mat-card-subtitle>
+
+           <div class="detail-item">
             <strong
               ><mat-icon
                 style="
@@ -223,6 +173,74 @@
               }}
             </span>
           </div>
+        </mat-card-subtitle>  
+        
+      </mat-card-header>
+      <mat-card-content>
+        <div class="details-grid">
+          <!-- מזהה (id) הוסר לפי דרישת המשתמש -->
+          <div class="detail-item">
+            <strong
+              ><mat-icon
+                style="
+                  font-size: 1.3rem;
+                  vertical-align: middle;
+                  color: #c31432;
+                  margin-left: 6px;
+                "
+                >person</mat-icon
+              >
+              שם לקוח:</strong
+            >
+            <span>{{ shipment()?.customerName }}</span>
+          </div>
+          <div class="detail-item">
+            <strong
+              ><mat-icon
+                style="
+                  font-size: 1.3rem;
+                  vertical-align: middle;
+                  color: #f59e42;
+                  margin-left: 6px;
+                "
+                >home</mat-icon
+              >
+              כתובת:</strong
+            >
+            <span>{{ shipment()?.address }}</span>
+          </div>
+          <div class="detail-item">
+            <strong
+              ><mat-icon
+                style="
+                  font-size: 1.3rem;
+                  vertical-align: middle;
+                  color: #ffd200;
+                  margin-left: 6px;
+                "
+                >scale</mat-icon
+              >
+              משקל (ק"ג):</strong
+            >
+            <span>{{ shipment()?.weight }}</span>
+          </div>
+          <div class="detail-item">
+            <strong
+              ><mat-icon
+                style="
+                  font-size: 1.3rem;
+                  vertical-align: middle;
+                  color: #4caf50;
+                  margin-left: 6px;
+                "
+                >attach_money</mat-icon
+              >
+              מחיר (₪):</strong
+            >
+            <span>{{ shipment()?.price }}</span>
+          </div>
+         
+         
           <!-- kodPeula, perutPeula, atar הוסרו לפי דרישת המשתמש -->
           <div class="detail-item">
             <strong
@@ -237,9 +255,25 @@
               >
               נוצר בתאריך:</strong
             >
-            <span>{{ shipment()!.createdAt | date : "dd/MM/yyyy HH:mm" }}</span>
+            <span>{{ shipment()?.createdAt | date : "dd/MM/yyyy HH:mm" }}</span>
           </div>
-          <!-- updatedAt הוסר לפי דרישת המשתמש -->
+          <div class="detail-item">
+            <strong>
+              <mat-icon
+                style="
+                  font-size: 1.3rem;
+                  vertical-align: middle;
+                  color: #2196f3;
+                  margin-left: 6px;
+                "
+                >update</mat-icon
+              >
+              תאריך עדכון סטטוס:
+            </strong>
+            <span>{{
+              delivery()?.updatedAt | date : "dd/MM/yyyy HH:mm"
+            }}</span>
+          </div>
           <div class="detail-item full-width">
             <strong
               ><mat-icon
@@ -253,22 +287,26 @@
               >
               הערות:</strong
             >
-            <span>{{ shipment()!.notes }}</span>
+            <span>{{ shipment()?.notes }}</span>
           </div>
           <!-- פרטי שליח/מסירה -->
           @if (delivery()) {
           <div class="detail-item full-width" style="margin-top: 2rem">
             <h3 style="margin-bottom: 0.5rem">פרטי השליח / מסירה</h3>
-            <div><strong>מזהה מסירה:</strong> {{ delivery().id }}</div>
-            <div><strong>ברקוד:</strong> {{ delivery().barcode }}</div>
-            <div><strong>מזהה עובד:</strong> {{ delivery().employeeId }}</div>
+            <div><strong>מזהה מסירה:</strong> {{ delivery()?.id }}</div>
+            <div><strong>ברקוד:</strong> {{ delivery()?.barcode }}</div>
+            <div><strong>מזהה עובד:</strong> {{ delivery()?.employeeId }}</div>
             <div>
               <strong>תאריך מסירה:</strong>
-              {{ delivery().deliveryDate | date : "dd/MM/yyyy HH:mm" }}
+              {{ delivery()?.deliveryDate | date : "dd/MM/yyyy HH:mm" }}
             </div>
-            <div><strong>שם מקבל:</strong> {{ delivery().recipientName }}</div>
-            <div><strong>סטטוס מסירה:</strong> {{ delivery().statusId }}</div>
-            <div><strong>הערות:</strong> {{ delivery().notes }}</div>
+            <div>
+              <strong>תאריך עדכון סטטוס:</strong>
+              {{ delivery()?.updatedAt | date : "dd/MM/yyyy HH:mm" }}
+            </div>
+            <div><strong>שם מקבל:</strong> {{ delivery()?.recipientName }}</div>
+            <div><strong>סטטוס מסירה:</strong> {{ delivery()?.statusId }}</div>
+            <div><strong>הערות:</strong> {{ delivery()?.notes }}</div>
           </div>
           }
         </div>

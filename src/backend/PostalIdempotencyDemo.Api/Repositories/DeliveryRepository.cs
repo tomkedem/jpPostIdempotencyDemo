@@ -16,7 +16,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
         {
             return await _sqlExecutor.ExecuteAsync(async connection =>
             {
-                const string query = @"SELECT TOP 1 id, barcode, employee_id, delivery_date, location_lat, location_lng, recipient_name, status_id, notes, created_at FROM deliveries WHERE barcode = @barcode ORDER BY delivery_date DESC";
+                const string query = @"SELECT TOP 1 id, barcode, employee_id, delivery_date, location_lat, location_lng, recipient_name, status_id, notes, created_at, updated_at FROM deliveries WHERE barcode = @barcode ORDER BY delivery_date DESC";
                 using var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@barcode", barcode);
                 using var reader = await command.ExecuteReaderAsync();
@@ -33,7 +33,8 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         RecipientName = reader.IsDBNull(reader.GetOrdinal("recipient_name")) ? null : reader.GetString(reader.GetOrdinal("recipient_name")),
                         StatusId = reader.GetInt32(reader.GetOrdinal("status_id")),
                         Notes = reader.IsDBNull(reader.GetOrdinal("notes")) ? null : reader.GetString(reader.GetOrdinal("notes")),
-                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at"))
+                        CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
+                        UpdatedAt = reader.GetDateTime(reader.GetOrdinal("updated_at")),
                     };
                 }
                 return null;
@@ -50,17 +51,19 @@ namespace PostalIdempotencyDemo.Api.Repositories
         {
             return await _sqlExecutor.ExecuteAsync(async connection =>
             {
-                // Update status in both deliveries and shipments tables
-                const string sqlDeliveries = "UPDATE deliveries SET status_id = @statusId WHERE barcode = @barcode";
-                const string sqlShipments = "UPDATE shipments SET status_id = @statusId WHERE barcode = @barcode";
+                // Update status in both deliveries and shipments tables, and update updated_at in shipments
+                const string sqlDeliveries = "UPDATE deliveries SET status_id = @statusId, updated_at = @updatedAt WHERE barcode = @barcode";
+                const string sqlShipments = "UPDATE shipments SET status_id = @statusId, updated_at = @updatedAt WHERE barcode = @barcode";
 
                 using var cmdDeliveries = new Microsoft.Data.SqlClient.SqlCommand(sqlDeliveries, connection);
                 cmdDeliveries.Parameters.AddWithValue("@statusId", statusId);
+                cmdDeliveries.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow);
                 cmdDeliveries.Parameters.AddWithValue("@barcode", barcode);
                 int rowsDeliveries = await cmdDeliveries.ExecuteNonQueryAsync();
 
                 using var cmdShipments = new Microsoft.Data.SqlClient.SqlCommand(sqlShipments, connection);
                 cmdShipments.Parameters.AddWithValue("@statusId", statusId);
+                cmdShipments.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow);
                 cmdShipments.Parameters.AddWithValue("@barcode", barcode);
                 int rowsShipments = await cmdShipments.ExecuteNonQueryAsync();
 
