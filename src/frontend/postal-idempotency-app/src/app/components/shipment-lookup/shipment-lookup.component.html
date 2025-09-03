@@ -151,6 +151,7 @@
                   font-size: 1.3rem;
                   vertical-align: middle;
                   margin-left: 6px;
+                   transform: scaleX(-1);
                 "
                 [style.color]="
                   del?.statusId === 2
@@ -173,7 +174,6 @@
                 'status-failed': del?.statusId === 3,
                 'status-partial': del?.statusId === 4
               }"
-                
             >
               {{ sh?.statusNameHe || getStatusText(sh?.status ?? 0) }}
             </span>
