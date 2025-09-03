@@ -300,26 +300,7 @@
             >
             <span>{{ sh?.notes }}</span>
           </div>
-          <!-- פרטי שליח/מסירה -->
-          @if (del) {
-          <div class="detail-item full-width" style="margin-top: 2rem">
-            <h3 style="margin-bottom: 0.5rem">פרטי השליח / מסירה</h3>
-            <div><strong>מזהה מסירה:</strong> {{ del?.id }}</div>
-            <div><strong>ברקוד:</strong> {{ del?.barcode }}</div>
-            <div><strong>מזהה עובד:</strong> {{ del?.employeeId }}</div>
-            <div>
-              <strong>תאריך מסירה:</strong>
-              {{ del?.deliveryDate | date : "dd/MM/yyyy HH:mm" }}
-            </div>
-            <div>
-              <strong>תאריך עדכון סטטוס:</strong>
-              {{ del?.updatedAt | date : "dd/MM/yyyy HH:mm" }}
-            </div>
-            <div><strong>שם מקבל:</strong> {{ del?.recipientName }}</div>
-            <div><strong>סטטוס מסירה:</strong> {{ del?.statusId }}</div>
-            <div><strong>הערות:</strong> {{ del?.notes }}</div>
-          </div>
-          }
+          
         </div>
       </mat-card-content>
     </mat-card>
