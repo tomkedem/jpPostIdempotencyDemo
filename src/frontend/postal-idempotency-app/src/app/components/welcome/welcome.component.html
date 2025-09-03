@@ -1,86 +1,106 @@
 <div
-  class="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in-up font-hebrew"
+  class="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200/80"
 >
-  <!-- Main Content Card -->
-  <div
-    class="bg-white/90 rounded-xl shadow-lg backdrop-blur-lg border border-gray-200 overflow-hidden"
-  >
-    <div class="p-8 sm:p-12">
-      <!-- Header Section -->
-      <header class="text-center mb-12">
-        <h1
-          class="text-4xl sm:text-5xl font-extrabold text-gray-800 tracking-tight"
-        >
-          הבטחת אמינות בעידן הדיגיטלי: יישום אידמפוטנטיות
-        </h1>
-        <h2 class="mt-4 text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
-          מערכת זו מדגימה תבנית קריטית בארכיטקטורת מערכות מבוזרות, המבטיחה
-          שפעולות חוזרות אינן גורמות לתופעות לוואי בלתי רצויות.
-        </h2>
-      </header>
+  <div class="p-8 sm:p-12">
+    <!-- Header Section -->
+    <header class="text-center mb-12">
+      <h1
+        class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight flex items-center justify-center gap-3"
+      >
+        <span class="material-icons text-blue-600 text-5xl">verified_user</span>
+        <span>הבטחת אמינות בעידן הדיגיטלי: יישום אידמפוטנטיות</span>
+      </h1>
+      <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">
+        הדגמה חיה של טיפול בבקשות רשת באופן עמיד, בטוח וצפוי, גם בתנאים של חוסר
+        ודאות.
+      </p>
+    </header>
 
-      <!-- Main Grid Layout -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-        <!-- Left Column: Explanation -->
-        <div class="text-right">
-          <h3 class="text-2xl font-bold text-gray-700 mb-4">
-            מהי אידמפוטנטיות?
-          </h3>
-          <p class="text-gray-800 text-lg leading-relaxed mb-6">
-            במערכות תוכנה, פעולה אידמפוטנטית היא פעולה שניתן לבצע אותה שוב ושוב
-            ולקבל תמיד את אותה התוצאה, מבלי לשנות את מצב המערכת מעבר לפעם
-            הראשונה. תכונה זו חיונית במיוחד בתקשורת רשת, שבה בקשות עלולות להיכשל
-            ולהישלח מחדש. ללא אידמפוטנטיות, שליחה חוזרת של בקשת "צור משלוח"
-            עלולה ליצור בטעות מספר משלוחים.
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+      <!-- Left Column: Textual Content -->
+      <div class="lg:col-span-3 rtl:pl-8">
+        <section>
+          <h2
+            class="text-3xl font-bold text-gray-800 border-r-4 border-blue-500 pr-4 mb-6"
+          >
+            מהי אידמפוטנטיות (Idempotency)?
+          </h2>
+          <p class="text-lg text-gray-700 leading-relaxed">
+            במחשוב, פעולה אידמפוטנטית היא פעולה שאם תתבצע פעם אחת או מספר פעמים,
+            התוצאה הסופית של המערכת תהיה זהה. תכונה זו חיונית במערכות מבוזרות,
+            בהן תקלות רשת עלולות לגרום לשליחה כפולה של בקשות. שרת המיישם
+            אידמפוטנטיות מבטיח שפעולה קריטית (כמו חיוב לקוח או יצירת משלוח)
+            תתבצע פעם אחת בלבד, לא משנה כמה פעמים הבקשה הגיעה.
           </p>
+        </section>
 
-          <h3 class="text-2xl font-bold text-gray-700 mb-4">
-            תהליך הטיפול בבקשה
-          </h3>
-          <p class="text-gray-800 text-lg leading-relaxed">
-            הדיאגרמה משמאל ממחישה תהליך אמין לטיפול בבקשות באופן אידמפוטנטי:
+        <section class="mt-12">
+          <h2
+            class="text-3xl font-bold text-gray-800 border-r-4 border-blue-500 pr-4 mb-6"
+          >
+            איך זה עובד? אלגוריתם הטיפול בבקשה
+          </h2>
+          <p class="text-lg text-gray-700 leading-relaxed mb-6">
+            כדי להבטיח טיפול אידמפוטנטי, כל בקשה ליצירת משלוח חייבת לכלול מפתח
+            ייחודי הנקרא <code>Idempotency-Key</code>. השרת משתמש במפתח זה כדי
+            לזהות בקשות כפולות ולמנוע ביצוע חוזר של אותה פעולה. התהליך מתבצע לפי
+            השלבים הבאים:
           </p>
-          <ul class="list-decimal pr-5 mt-4 space-y-3 text-gray-800 text-lg">
-            <li>
-              <span class="font-semibold">מפתח ייחודי:</span> הלקוח מייצר "מפתח
-              אידמפוטנטיות" ייחודי ודטרמיניסטי עבור כל פעולה עסקית.
+          <ul class="space-y-4 text-lg">
+            <li class="flex items-start">
+              <span class="material-icons text-green-500 mt-1 ml-3"
+                >vpn_key</span
+              >
+              <span
+                ><strong>בדיקת המפתח:</strong> השרת בודק אם כבר קיבל בקשה עם
+                מפתח זה.</span
+              >
             </li>
-            <li>
-              <span class="font-semibold">שליחת הבקשה:</span> המפתח נשלח לשרת
-              בכותרת (Header) של בקשת ה-HTTP.
+            <li class="flex items-start">
+              <span class="material-icons text-blue-500 mt-1 ml-3"
+                >sync_lock</span
+              >
+              <span
+                ><strong>נעילת המפתח:</strong> אם המפתח חדש, השרת נועל אותו כדי
+                למנוע טיפול מקבילי באותה בקשה על ידי תהליכים אחרים.</span
+              >
             </li>
-            <li>
-              <span class="font-semibold">בדיקה בשרת:</span> השרת בודק אם כבר
-              התקבלה בקשה עם מפתח זה.
+            <li class="flex items-start">
+              <span class="material-icons text-purple-500 mt-1 ml-3"
+                >hourglass_top</span
+              >
+              <span
+                ><strong>עיבוד הבקשה:</strong> השרת מבצע את הלוגיקה העסקית
+                (יצירת המשלוח) ושומר את תוצאת הפעולה (הצלחה או כישלון) יחד עם
+                המפתח.</span
+              >
             </li>
-            <li>
-              <span class="font-semibold">החזרת תגובה שמורה:</span> אם הבקשה כבר
-              בוצעה, השרת מחזיר את התגובה המקורית שנוצרה ונשמרה, מבלי לבצע את
-              הלוגיקה העסקית פעם נוספת.
-            </li>
-            <li>
-              <span class="font-semibold">ביצוע ושמירה:</span> אם זו בקשה חדשה,
-              השרת מבצע את הפעולה, שומר את התגובה, ורק אז מחזיר אותה ללקוח.
+            <li class="flex items-start">
+              <span class="material-icons text-red-500 mt-1 ml-3">replay</span>
+              <span
+                ><strong>טיפול בבקשות כפולות:</strong> אם המפתח כבר קיים, השרת
+                לא יבצע את הפעולה שוב, אלא יחזיר מיד את התוצאה השמורה.</span
+              >
             </li>
           </ul>
-        </div>
+        </section>
+      </div>
 
-        <!-- Right Column: Flowchart -->
-        <div
-          class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-inner"
-        >
-          <h4 class="text-xl font-bold text-gray-700 mb-4">
-            אלגוריתם לניהול אידמפוטנטיות
-          </h4>
+      <!-- Right Column: Flowchart -->
+      <div
+        class="lg:col-span-2 flex flex-col items-center justify-center bg-gray-50 p-6 rounded-lg border"
+      >
+        <figure>
           <img
             src="assets/images/idempotency-flow.png"
-            alt="תרשים זרימה של תהליך אידמפוטנטי"
-            class="w-full h-auto rounded-md shadow-md"
+            alt="תרשים זרימה של אלגוריתם אידמפוטנטיות"
+            class="w-full h-auto object-contain rounded-md shadow-md border"
           />
-          <p class="mt-4 text-sm text-gray-500 text-center">
-            תרשים זרימה המדגים את הלוגיקה בצד השרת לזיהוי וטיפול בבקשות כפולות.
-          </p>
-        </div>
+          <figcaption class="mt-4 text-center text-sm text-gray-600">
+            תרשים זרימה המתאר את תהליך הטיפול בבקשה בשרת
+          </figcaption>
+        </figure>
       </div>
     </div>
   </div>
