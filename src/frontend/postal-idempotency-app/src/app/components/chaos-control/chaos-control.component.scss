@@ -2,19 +2,15 @@
   display: block;
   width: 100%;
   height: 100%;
-  font-family: 'Rubik', sans-serif; /* Or any modern font you prefer */
+  font-family: 'Rubik', sans-serif;
 }
 
-/*
-  We're using TailwindCSS for the main layout,
-  but we can add some specific, non-utility styles here.
-*/
-
-.nested-toggle {
-  margin-right: 1.5rem;
-  padding-right: 1.5rem;
-  border-right: 3px solid #818cf8; /* Indigo-400 */
+/* Simple 3D text effect with black color */
+h1.font-black {
+  font-weight: 900;
+  letter-spacing: -0.025em;
 }
+
 
 /* Customizing Angular Material components for a 2026 feel */
 ::ng-deep .mat-mdc-slide-toggle {
