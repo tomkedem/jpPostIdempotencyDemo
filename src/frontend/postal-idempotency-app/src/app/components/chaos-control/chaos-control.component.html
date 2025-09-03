@@ -1,35 +1,94 @@
+<div class="bg-slate-100 min-h-full p-4 sm:p-6 md:p-8 font-sans">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1
+        class="text-5xl md:text-6xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600 pb-2"
+      >
+        סימולטור תנאי רשת
+      </h1>
+      <p class="mt-4 text-xl text-slate-600">
+        הדמיית תרחישים בעולם האמיתי לבחינת עמידות המערכת.
+      </p>
+    </div>
 
-<mat-card>
-  <div class="chaos-control-header">
-    <div class="chaos-control-title">
-      בקרת כאוס
-      <span style="font-size:1.7rem;vertical-align:middle;">🧪</span>
-    </div>
-    <div class="chaos-control-subtitle">
-      שליטה על התנהגות מנגנון ה-Idempotency
-    </div>
-  </div>
-  <mat-card-content>
-    <form [formGroup]="chaosForm" class="chaos-form">
-      <div class="toggle-group">
-        <mat-slide-toggle formControlName="useIdempotencyKey">
-          הפעל מפתחות Idempotency
-        </mat-slide-toggle>
-        <div class="toggle-description">
-          כאשר מופעל, כל בקשה קריטית (POST, PATCH) תישלח עם מפתח ייחודי למניעת כפילויות.
-        </div>
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+      <!-- Controls Column -->
+      <div
+        class="lg:col-span-3 bg-white/70 backdrop-blur-sm border border-slate-200 rounded-3xl p-8 shadow-lg"
+      >
+        <h2
+          class="text-3xl font-semibold mb-8 flex items-center gap-4 text-slate-800"
+        >
+          <mat-icon class="text-blue-500 scale-125">tune</mat-icon>
+          בקרת סימולציה
+        </h2>
+
+        <form [formGroup]="chaosForm" class="space-y-10">
+          <!-- Idempotency Toggle -->
+          <div
+            class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 transition-all duration-300 hover:shadow-md hover:border-blue-300"
+          >
+            <mat-slide-toggle
+              formControlName="useIdempotencyKey"
+              color="primary"
+              class="scale-110 origin-right"
+            >
+              <span class="font-semibold text-xl text-slate-700"
+                >הפעל הגנת Idempotency</span
+              >
+            </mat-slide-toggle>
+            <div class="text-slate-600 text-base mt-3 pr-10">
+              מונע יצירת משלוחים כפולים במקרה של תקלות רשת או קריאות חוזרות. כל
+              בקשה מסומנת במזהה ייחודי.
+            </div>
+          </div>
+
+          <!-- Force Error Toggle -->
+          @if (chaosForm.get('useIdempotencyKey')?.value) {
+          <div
+            class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 transition-all duration-300 hover:shadow-md hover:border-blue-300 nested-toggle"
+          >
+            <mat-slide-toggle
+              formControlName="forceError"
+              color="primary"
+              class="scale-110 origin-right"
+            >
+              <span class="font-semibold text-xl text-slate-700"
+                >דמה שגיאת רשת</span
+              >
+            </mat-slide-toggle>
+            <div class="text-slate-600 text-base mt-3 pr-10">
+              שולח בכוונה בקשה כפולה (עם אותו מזהה) כדי להדגים כיצד השרת מזהה
+              ומונע את הכפילות, ומחזיר את התוצאה המקורית.
+            </div>
+          </div>
+          }
+        </form>
       </div>
 
-      @if (chaosForm.get('useIdempotencyKey')?.value) {
-        <div class="toggle-group nested-toggle">
-          <mat-slide-toggle formControlName="forceError">
-            כפה שגיאה (מפתח שגוי)
-          </mat-slide-toggle>
-          <div class="toggle-description">
-            שולח מפתח Idempotency בפורמט לא תקין כדי לבדוק את הטיפול בשגיאות בשרת.
+      <!-- Guided Demo Column -->
+      <div
+        class="lg:col-span-2 bg-gradient-to-br from-blue-500 to-violet-600 text-white rounded-3xl p-8 shadow-xl shadow-blue-200"
+      >
+        <h2 class="text-3xl font-semibold mb-8 flex items-center gap-4">
+          <mat-icon class="scale-125">present_to_all</mat-icon>
+          הדגמה מודרכת
+        </h2>
+        <div class="space-y-6 text-blue-100">
+          <div
+            *ngFor="let step of demoSteps; let i = index"
+            class="flex items-start gap-4"
+          >
+            <div
+              class="flex-shrink-0 w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center font-bold text-lg border-2 border-white/50"
+            >
+              {{ i + 1 }}
+            </div>
+            <div class="pt-1 text-base" [innerHTML]="step.text"></div>
           </div>
         </div>
-      }
-    </form>
-  </mat-card-content>
-</mat-card>
+      </div>
+    </div>
+  </div>
+</div>
