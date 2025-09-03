@@ -676,6 +676,7 @@ body {
   text-shadow: 0 0 8px #ffd20088;
 }
 // צבעי רקע לצ'יפ סטטוס בפרטי משלוח
+// סטטוס 'נמסר'
 .status-chip.status-delivered {
   background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
   color: #fff !important;
@@ -683,17 +684,27 @@ body {
   font-weight: bolder !important ;
   border: 2px solid #38ef7d;
 }
+// סטטוס 'נכשל'
 .status-chip.status-failed {
   background: linear-gradient(135deg, #7b1f1f 0%, #c31432 60%, #ff512f 100%) !important;
   color: #fff !important;
   font-weight: bolder !important;
-   border: 2px solid #c31432;
+  border: 2px solid #c31432;
 }
+// סטטוס 'חלקי'
 .status-chip.status-partial {
   background: linear-gradient(135deg, #b99309 0%, #f7971e 60%, #ffd200 100%) !important;
   color: #fff !important;
   font-weight: bolder !important;
-   border: 2px solid #ffd200;
+  border: 2px solid #ffd200;
+}
+// סטטוס 'בדרך לחלוקה' (אפור מודרני)
+.status-chip.status-intransit {
+  background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%) !important;
+  color: #fff !important;
+  font-weight: bolder !important;
+  border: 2px solid #64748b;
+  text-shadow: 0 2px 8px rgba(100,116,139,0.18);
 }
 
 
