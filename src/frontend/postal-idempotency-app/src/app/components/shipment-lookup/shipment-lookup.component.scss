@@ -450,6 +450,29 @@ body {
   transition: box-shadow 0.2s;
 }
 
+  .status-chip {
+    display: inline-block;
+    padding: 0.3em 1em;
+    border-radius: 1em;
+    color: #fff !important;
+    font-weight: 600;
+    font-size: 1em;
+    background-color: #64748b !important;
+  }
+
+  .status-chip.status-delivered {
+    background-color: #38ef7d !important;
+    color: #222 !important;
+  }
+  .status-chip.status-failed {
+    background-color: #c31432 !important;
+    color: #fff !important;
+  }
+  .status-chip.status-partial {
+    background-color: #f59e42 !important;
+    color: #222 !important;
+  }
+
 .detail-item:hover {
   box-shadow: 0 4px 16px rgba(44,83,100,0.10);
   background: #f1f5f9;
@@ -474,14 +497,7 @@ body {
 }
 
 .shipment-details .status-chip {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 18px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  background: linear-gradient(45deg, #4caf50, #66bb6a);
-  color: white;
-  box-shadow: 0 2px 8px rgba(76,175,80,0.08);
+  /* מחק חוקים מתנגשים, השתמש רק ב-.status-chip הכללי והסטטוסים */
 }
 
 .shipment-details .status-chip.status-warn {
@@ -499,7 +515,7 @@ body {
 .status-chip {
   display: inline-block;
   padding: 4px 12px;
-  border-radius: 16px;
+  border-radius: 8px;
   font-weight: 500;
   color: #fff;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
@@ -637,7 +653,7 @@ body {
 
 // אייקון ירוק לסטטוס נמסר
 .status-card.status-delivered .status-icon mat-icon {
-  color: #38ef7d !important;
+  color: #058f3af1 !important;
   text-shadow: 0 0 8px #38ef7d88;
 }
 
@@ -651,6 +667,32 @@ body {
 .status-card.status-partial .status-icon mat-icon {
   color: #ffd200 !important;
   text-shadow: 0 0 8px #ffd20088;
+}
+// צבעי רקע לצ'יפ סטטוס בפרטי משלוח
+.status-chip.status-delivered {
+  background-color: #38ef7d !important;
+  color: #fff !important;
+}
+.status-chip.status-failed {
+  background-color: #c31432 !important;
+  color: #fff !important;
+}
+.status-chip.status-partial {
+  background-color: #f59e42 !important;
+  color: #fff !important;
+}
+// צבעי רקע למחלקות מספריות של סטטוס
+.status-chip.status-2 {
+  background-color: #2196F3 !important;
+  color: #fff !important;
+}
+.status-chip.status-3 {
+  background-color: #c31432 !important;
+  color: #fff !important;
+}
+.status-chip.status-4 {
+  background-color: #f59e42 !important;
+  color: #fff !important;
 }
 
 // עיצוב כרטיסי סטטוס מודרני
