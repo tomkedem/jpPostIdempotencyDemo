@@ -149,22 +149,19 @@
       </div>
     </div>
     <mat-card class="shipment-details">
-      <mat-card-header>
-        <mat-card-title>פרטי המסירה</mat-card-title>
-        <mat-card-subtitle>ברקוד: {{ sh?.barcode }}</mat-card-subtitle>
-        <mat-card-subtitle>
-          <div class="detail-item">
-            <strong
-              ><mat-icon
+       <mat-icon
+       class="truck-animate"
                 style="
-                  font-size: 1.3rem;
+                  font-size: 1.5rem;
+                 
+                  margin-top: -50px;
                   vertical-align: middle;
                   margin-left: 6px;
                   transform: scaleX(-1);
                 "
                 [style.color]="
                   del?.statusId === 2
-                    ? '#38ef7d'
+                    ? '#058f3af1'
                     : del?.statusId === 3
                     ? '#c31432'
                     : del?.statusId === 4
@@ -174,8 +171,14 @@
               >
                 local_shipping
               </mat-icon>
-              סטטוס מסירה:</strong
-            >
+      <mat-card-header>
+        <mat-card-title>פרטי המסירה</mat-card-title>
+       
+        
+        <mat-card-subtitle>ברקוד: {{ sh?.barcode }}</mat-card-subtitle>
+        <mat-card-subtitle>
+          <div class="detail-item">
+            <strong> סטטוס מסירה:</strong>
             <span
               [ngClass]="{
                 'status-chip': true,

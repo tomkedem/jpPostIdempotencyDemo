@@ -1,3 +1,6 @@
+.shipment-details {
+  margin-top: -60px !important;
+}
 .centered-chip {
   display: flex;
   justify-content: center;
@@ -645,7 +648,16 @@ body {
     font-size: 2.5rem !important;
   }
 }
+.truck-animate {
+  display: inline-block;
+  animation: truckMoveSlow 8.5s linear infinite;
+}
 
+@keyframes truckMoveSlow {
+  0%   { transform: scaleX(3) translateX(0); }
+  50%  { transform: scaleX(-1) translateX(-200px); }
+  100% { transform: scaleX(-3) translateY(0); }
+}
 // אייקון ירוק לסטטוס נמסר
 .status-card.status-delivered .status-icon mat-icon {
   color: #058f3af1 !important;
@@ -683,6 +695,7 @@ body {
   font-weight: bolder !important;
    border: 2px solid #ffd200;
 }
+
 
 
 // עיצוב כרטיסי סטטוס מודרני
