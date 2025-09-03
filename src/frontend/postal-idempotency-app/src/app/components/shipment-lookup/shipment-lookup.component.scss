@@ -1,3 +1,46 @@
+.centered-chip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px auto 0 auto !important;
+  text-align: center !important;
+  width: fit-content;
+}
+.status-card .status-chip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 16px auto 0 auto !important;
+  text-align: center !important;
+  width: fit-content;
+}
+.status-card.status-delivered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.status-card.status-delivered .status-chip {
+  margin: 16px auto 0 auto !important;
+  align-self: center !important;
+  text-align: center !important;
+  display: block !important;
+}
+.status-card.status-delivered .status-chip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px auto 0 auto;
+  text-align: center;
+  width: fit-content;
+}
+.status-card.status-delivered .status-label {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 100%;
+}
 // Header styling copied from create-shipment.component.scss
 .shipment-lookup-header {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
