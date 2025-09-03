@@ -20,15 +20,15 @@
               autocomplete="off"
               inputmode="text"
             />
-             <mat-icon
-                matSuffix
-                class="search-icon"
-                [class.loading]="loading"
-                (click)="onLookup()"
-                [style.cursor]="'pointer'"
-              >
-                @if (loading) { hourglass_empty } @else { search }
-              </mat-icon>
+            <mat-icon
+              matSuffix
+              class="search-icon"
+              [class.loading]="loading"
+              (click)="onLookup()"
+              [style.cursor]="'pointer'"
+            >
+              @if (loading) { hourglass_empty } @else { search }
+            </mat-icon>
             @if (lookupForm.get('barcode')?.hasError('required')) {
             <mat-error> ברקוד הוא שדה חובה </mat-error>
             } @if (lookupForm.get('barcode')?.hasError('pattern') && (
@@ -149,35 +149,41 @@
       </div>
     </div>
     <mat-card class="shipment-details">
-       <mat-icon
-       
-                style="
-                  font-size: 1.5rem;                 
-                  margin-top: -50px;
-                  vertical-align: middle;
-                  margin-left: 6px;
-                  transform: scaleX(-1);
-                "
-                [style.color]="
-                  del?.statusId === 2
-                    ? '#058f3af1'
-                    : del?.statusId === 3
-                    ? '#c31432'
-                    : del?.statusId === 4
-                    ? '#f59e42'
-                    : '#64748b'
-                "
-              >
-                local_shipping
-              </mat-icon>
+      <mat-icon
+        style="
+          font-size: 1.5rem;
+          margin-top: -50px;
+          vertical-align: middle;
+          margin-left: 6px;
+          transform: scaleX(-1);
+        "
+        [style.color]="
+          del?.statusId === 2
+            ? '#058f3af1'
+            : del?.statusId === 3
+            ? '#c31432'
+            : del?.statusId === 4
+            ? '#f59e42'
+            : '#64748b'
+        "
+      >
+        local_shipping
+      </mat-icon>
       <mat-card-header>
         <mat-card-title>פרטי המסירה</mat-card-title>
-       
-        
+
         <mat-card-subtitle>ברקוד: {{ sh?.barcode }}</mat-card-subtitle>
         <mat-card-subtitle>
-          <div class="detail-item">
-            <strong> סטטוס מסירה:</strong>
+          <div
+            class="detail-item"
+            style="
+              justify-content: center;
+              align-items: center;
+              display: flex;
+              flex-direction: column;
+            "
+          >
+            <strong style="text-align: center; width: 100%">סטטוס מסירה</strong>
             <span
               [ngClass]="{
                 'status-chip': true,
@@ -186,6 +192,7 @@
                 'status-partial': del?.statusId === 4,
                 'centered-chip': true
               }"
+              style="margin: 0 auto; text-align: center"
             >
               {{ sh?.statusNameHe || getStatusText(sh?.status ?? 0) }}
             </span>
@@ -302,7 +309,6 @@
             >
             <span>{{ sh?.notes }}</span>
           </div>
-          
         </div>
       </mat-card-content>
     </mat-card>
