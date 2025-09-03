@@ -493,15 +493,6 @@ body {
   transition: box-shadow 0.2s;
 }
 
-  .status-chip {
-    display: inline-block;
-    padding: 0.3em 1em;
-    border-radius: 1em;
-    color: #fff !important;
-    font-weight: 600;
-    font-size: 1em;
-    background-color: #64748b !important;
-  }
 
   .status-chip.status-delivered {
     background-color: #38ef7d !important;
@@ -539,9 +530,7 @@ body {
   grid-column: 1 / -1;
 }
 
-.shipment-details .status-chip {
-  /* מחק חוקים מתנגשים, השתמש רק ב-.status-chip הכללי והסטטוסים */
-}
+
 
 .shipment-details .status-chip.status-warn {
   background: linear-gradient(45deg, #f44336, #ef5350);

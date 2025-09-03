@@ -20,6 +20,15 @@
               autocomplete="off"
               inputmode="text"
             />
+             <mat-icon
+                matSuffix
+                class="search-icon"
+                [class.loading]="loading"
+                (click)="onLookup()"
+                [style.cursor]="'pointer'"
+              >
+                @if (loading) { hourglass_empty } @else { search }
+              </mat-icon>
             @if (lookupForm.get('barcode')?.hasError('required')) {
             <mat-error> ברקוד הוא שדה חובה </mat-error>
             } @if (lookupForm.get('barcode')?.hasError('pattern') && (
