@@ -1,13 +1,15 @@
 .shipment-details {
   margin-top: 0 !important;
-  max-width: 600px !important;
+  max-width: none !important;
   width: 100%;
   margin-right: auto !important;
-  margin-left: 0 !important;
+  margin-left: auto !important;
   border-radius: 0 !important;
   align-self: flex-start !important;
   padding-left: 0 !important;
+  margin-top: 2rem;
 }
+
 .centered-chip {
   display: flex;
   justify-content: center;
@@ -154,7 +156,7 @@ button.status-card:not(:disabled):hover .status-icon::after {
   box-shadow: 0 4px 24px rgba(0,0,0,0.08);
   padding: 2rem 1.5rem;
   margin: 2rem auto;
-  max-width: 480px;
+  max-width: none;
 }
 
 .shipment-lookup-title {
@@ -439,10 +441,10 @@ body {
   box-shadow: 0 8px 32px rgba(44,83,100,0.08), 0 2px 8px rgba(0,0,0,0.06);
   border: 1px solid #e2e8f0;
   padding: 32px 24px 24px 24px !important;
-  max-width: 520px;
   width: 100%;
   margin: 0 auto;
   font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
+  margin-top: 2rem;
   
   @media (max-width: 767px) {
     max-width: 100%;
@@ -585,7 +587,7 @@ body {
 }
 
 .search-form-card, .shipment-details, .action-buttons {
-  max-width: 600px;
+  max-width: none;
   width: 100%;
   margin: 0 auto 48px auto;
   box-sizing: border-box;
@@ -622,7 +624,7 @@ body {
 }
 
 .search-form-card, .shipment-details {
-  max-width: 600px;
+  max-width: none;
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
