@@ -1,5 +1,5 @@
 .shipment-details {
-  margin-top: -60px !important;
+  margin-top: 10px !important;
 }
 .centered-chip {
   display: flex;
@@ -208,11 +208,7 @@ button.status-card:not(:disabled):hover .status-icon::after {
   font-size: 1rem;
   text-align: center;
 }
-@keyframes truckMove {
-  0% { right: -28px; opacity: 0.85; }
-  50% { right: 8px; opacity: 1; }
-  100% { right: -28px; opacity: 0.85; }
-}
+
 @media (min-width: 900px) {
   .status-card {
     height: 160px;
@@ -650,13 +646,29 @@ body {
 }
 .truck-animate {
   display: inline-block;
-  animation: truckMoveSlow 8.5s linear infinite;
+  animation: truckMoveSlow 5.5s linear infinite;
 }
 
 @keyframes truckMoveSlow {
   0%   { transform: scaleX(0) translateX(0); }
   50%  { transform: scaleX(-1) translateX(-80px); }
-  100% { transform: scaleX(0) translateY(0); }
+  100% { transform: scaleX(-1) translateX(0); }
+}
+@keyframes truckMove {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(-60px); }
+  100% { transform: translateX(0); }
+}
+@keyframes truckMoveX {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(0); }
+  100% { transform: translateX(1000px); }
+}
+
+@keyframes truckMoveY {
+  0%   { transform: translateX(1000px); }
+  50%  { transform: translateX(0); }
+  100% { transform: translateX(0); }
 }
 // אייקון ירוק לסטטוס נמסר
 .status-card.status-delivered .status-icon mat-icon {
@@ -859,6 +871,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-size: 2.5rem;
   justify-content: flex-start;
   width: 100%;
 }
@@ -1268,4 +1281,38 @@ body {
 
 .shipment-details {
   animation: slideInFromBottom 0.4s ease-out;
+}
+
+
+.truck-animate {
+  top:100px !important;
+  font-size: 90px !important;
+  width: 110px !important;
+  height: 110px !important;
+  z-index: 10px;  
+  animation: truckMoveY 5.5s linear infinite;
+}
+
+.truck-barcode-overlay-wrapper {
+  position: absolute;
+  top: 42px;
+  right: 7px;
+  z-index: 2;
+  /* אין אנימציה ואין transform כאן */
+}
+
+.truck-barcode-overlay {
+  font-size: 0.67rem;
+  font-family: 'Consolas', 'Segoe UI', monospace, Arial, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: #fff;
+  color: #222;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 2px solid #64748b;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  white-space: nowrap;
+  text-align: center;
+  pointer-events: none;
 }

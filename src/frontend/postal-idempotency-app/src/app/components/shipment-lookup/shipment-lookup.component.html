@@ -1,12 +1,22 @@
-@let sh = shipment(); @let del = delivery(); @let loading = isLoading(); @if
-(!sh) {
+@let sh = shipment(); @let del = delivery(); @let loading = isLoading();
+<!-- truck animation and barcode at the very top -->
+<div
+  style="
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  "
+>  
+</div>
+@if (!sh) {
 <div>
   <mat-card class="search-form-card">
     <mat-card-header>
       <mat-card-title>חיפוש משלוח</mat-card-title>
       <mat-card-subtitle>הזן ברקוד לחיפוש משלוח קיים</mat-card-subtitle>
     </mat-card-header>
-
     <mat-card-content>
       <form [formGroup]="lookupForm" (ngSubmit)="onLookup()">
         <div class="search-row">
@@ -148,27 +158,52 @@
         </button>
       </div>
     </div>
-    <mat-card class="shipment-details">
+   <div
+   class="truck-animate"
+ 
+>    
       <mat-icon
-        style="
-          font-size: 1.5rem;
-          margin-top: -50px;
-          vertical-align: middle;
-          margin-left: 6px;
-          transform: scaleX(-1);
-        "
-        [style.color]="
+        [ngStyle]="{
+          color:
+            del?.statusId === 2
+              ? '#058f3af1'
+              : del?.statusId === 3
+              ? '#c31432'
+              : del?.statusId === 4
+              ? '#f59e42'
+              : del?.statusId === 6
+              ? '#64748b'
+              : '#64748b',
+              transform:
           del?.statusId === 2
-            ? '#058f3af1'
+            ? 'scaleX(-1)'
             : del?.statusId === 3
-            ? '#c31432'
+            ? 'scaleX(1)'
             : del?.statusId === 4
-            ? '#f59e42'
-            : '#64748b'
-        "
+            ? 'scaleX(-1)'
+            : 'none'
+        }"
+        style="font-size: 150px; width: 150px; height: 150px;top:100px; "
+        >local_shipping</mat-icon
       >
-        local_shipping
-      </mat-icon>
+      <div class="truck-barcode-overlay-wrapper"
+      [ngStyle]="{
+          right:
+            del?.statusId === 2
+              ? '7px'
+              : del?.statusId === 3
+              ? '45px'
+              : del?.statusId === 4
+              ? '7px'
+              : del?.statusId === 6
+              ? '7px'
+              : '7px'    
+        }"
+      >
+        <div class="truck-barcode-overlay">{{ sh?.barcode }}</div>
+      </div>
+    </div>
+    <mat-card class="shipment-details">
       <mat-card-header>
         <mat-card-title>פרטי המסירה</mat-card-title>
 
