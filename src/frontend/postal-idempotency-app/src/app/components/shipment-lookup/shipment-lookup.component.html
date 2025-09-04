@@ -107,7 +107,7 @@
             type="button"
             class="status-card status-delivered"
             [class.selected]="sh?.deliveryStatus === 2"
-            (click)="(sh?.barcode ? (sh?.barcode ? sh?.barcode : null) : null)"
+            (click)="sh?.barcode ? onUpdateStatus(sh!.barcode, 2) : null"
             [disabled]="loading || sh?.deliveryStatus === 2"
           >
             <span class="status-icon">
