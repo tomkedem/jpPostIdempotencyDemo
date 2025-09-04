@@ -1,5 +1,12 @@
 .shipment-details {
-  margin-top: 10px !important;
+  margin-top: 0 !important;
+  max-width: 600px !important;
+  width: 100%;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  border-radius: 0 !important;
+  align-self: flex-start !important;
+  padding-left: 0 !important;
 }
 .centered-chip {
   display: flex;
@@ -16,6 +23,11 @@
   margin: 16px auto 0 auto !important;
   text-align: center !important;
   width: fit-content;
+}
+.notes-section {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 16px;
 }
 .status-card.status-delivered {
   display: flex;
@@ -467,15 +479,23 @@ body {
 
 .details-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(6, 1fr);
   gap: 16px 24px;
   margin-bottom: 0;
-  
+  width: 100%;
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
   @media (max-width: 767px) {
     grid-template-columns: 1fr;
     gap: 12px;
   }
 }
+.detail-item.full-width {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+ 
 
 .detail-item {
   background: rgba(255,255,255,0.92);

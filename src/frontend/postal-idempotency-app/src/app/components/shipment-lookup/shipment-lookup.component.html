@@ -1,10 +1,6 @@
 @let sh = shipment(); @let del = delivery(); @let loading = isLoading();
 <!-- truck animation and barcode at the very top -->
-<div
-  
-  class="responsive-width"
->
-</div>
+<div class="responsive-width"></div>
 @if (!sh) {
 <div>
   <mat-card class="search-form-card">
@@ -214,9 +210,16 @@
           <mat-card-subtitle>
             <div
               class="detail-item"
-              style="justify-content: center; align-items: center; display: flex; flex-direction: column;"
+              style="
+                justify-content: center;
+                align-items: center;
+                display: flex;
+                flex-direction: column;
+              "
             >
-              <strong style="text-align: center; width: 100%">סטטוס מסירה</strong>
+              <strong style="text-align: center; width: 100%"
+                >סטטוס מסירה</strong
+              >
               <span
                 [ngClass]="{
                   'status-chip': true,
@@ -237,32 +240,109 @@
           <div class="details-grid">
             <!-- מזהה (id) הוסר לפי דרישת המשתמש -->
             <div class="detail-item">
-              <strong><mat-icon style="font-size: 1.3rem; vertical-align: middle; color: #c31432; margin-left: 6px;">person</mat-icon> שם לקוח:</strong>
+              <strong
+                ><mat-icon
+                  style="
+                    font-size: 1.3rem;
+                    vertical-align: middle;
+                    color: #c31432;
+                    margin-left: 6px;
+                  "
+                  >person</mat-icon
+                >
+                שם לקוח:</strong
+              >
               <span>{{ sh?.customerName }}</span>
             </div>
             <div class="detail-item">
-              <strong><mat-icon style="font-size: 1.3rem; vertical-align: middle; color: #f59e42; margin-left: 6px;">home</mat-icon> כתובת:</strong>
+              <strong
+                ><mat-icon
+                  style="
+                    font-size: 1.3rem;
+                    vertical-align: middle;
+                    color: #f59e42;
+                    margin-left: 6px;
+                  "
+                  >home</mat-icon
+                >
+                כתובת:</strong
+              >
               <span>{{ sh?.address }}</span>
             </div>
             <div class="detail-item">
-              <strong><mat-icon style="font-size: 1.3rem; vertical-align: middle; color: #ffd200; margin-left: 6px;">scale</mat-icon> משקל (ק"ג):</strong>
+              <strong
+                ><mat-icon
+                  style="
+                    font-size: 1.3rem;
+                    vertical-align: middle;
+                    color: #ffd200;
+                    margin-left: 6px;
+                  "
+                  >scale</mat-icon
+                >
+                משקל (ק"ג):</strong
+              >
               <span>{{ sh?.weight }}</span>
             </div>
             <div class="detail-item">
-              <strong><mat-icon style="font-size: 1.3rem; vertical-align: middle; color: #4caf50; margin-left: 6px;">attach_money</mat-icon> מחיר (₪):</strong>
+              <strong
+                ><mat-icon
+                  style="
+                    font-size: 1.3rem;
+                    vertical-align: middle;
+                    color: #4caf50;
+                    margin-left: 6px;
+                  "
+                  >attach_money</mat-icon
+                >
+                מחיר (₪):</strong
+              >
               <span>{{ sh?.price }}</span>
             </div>
             <!-- kodPeula, perutPeula, atar הוסרו לפי דרישת המשתמש -->
             <div class="detail-item">
-              <strong><mat-icon style="font-size: 1.3rem; vertical-align: middle; color: #64748b; margin-left: 6px;">calendar_today</mat-icon> נוצר בתאריך:</strong>
+              <strong
+                ><mat-icon
+                  style="
+                    font-size: 1.3rem;
+                    vertical-align: middle;
+                    color: #64748b;
+                    margin-left: 6px;
+                  "
+                  >calendar_today</mat-icon
+                >
+                נוצר בתאריך:</strong
+              >
               <span>{{ sh?.createdAt | date : "dd/MM/yyyy HH:mm" }}</span>
             </div>
             <div class="detail-item">
-              <strong><mat-icon style="font-size: 1.3rem; vertical-align: middle; color: #2196f3; margin-left: 6px;">update</mat-icon> תאריך עדכון סטטוס:</strong>
+              <strong
+                ><mat-icon
+                  style="
+                    font-size: 1.3rem;
+                    vertical-align: middle;
+                    color: #2196f3;
+                    margin-left: 6px;
+                  "
+                  >update</mat-icon
+                >
+                תאריך עדכון סטטוס:</strong
+              >
               <span>{{ del?.updatedAt | date : "dd/MM/yyyy HH:mm:ss" }}</span>
             </div>
             <div class="detail-item full-width">
-              <strong><mat-icon style="font-size: 1.3rem; vertical-align: middle; color: #ff9800; margin-left: 6px;">notes</mat-icon> הערות:</strong>
+              <strong
+                ><mat-icon
+                  style="
+                    font-size: 1.3rem;
+                    vertical-align: middle;
+                    color: #ff9800;
+                    margin-left: 6px;
+                  "
+                  >notes</mat-icon
+                >
+                הערות:</strong
+              >
               <span>{{ sh?.notes }}</span>
             </div>
           </div>
