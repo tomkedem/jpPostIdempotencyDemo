@@ -504,12 +504,22 @@ body {
     .price-item { grid-area: 2 / 2 / 3 / 3; }
     .status-item { grid-area: 2 / 3 / 3 / 4; }
     .creation-date-item { grid-area: 3 / 1 / 4 / 2; }
-    .update-date-item { grid-area: 3 / 2 / 4 / 3; }
-    .notes-item { grid-area: 3 / 3 / 4 / 4; }
+    .update-date-item { grid-area: 3 / 2 / 4 / 4; } /* Spans 2 cols */
+    .notes-item { grid-area: 4 / 1 / 5 / 4; }   /* Spans all 3 cols */
   }
   @media (max-width: 767px) {
     grid-template-columns: 1fr;
-    /* All items will stack vertically by default, no need for specific rules */
+    /* Reset all grid-area properties to stack vertically */
+    .customer-name-item,
+    .address-item,
+    .weight-item,
+    .price-item,
+    .status-item,
+    .creation-date-item,
+    .update-date-item,
+    .notes-item {
+      grid-area: auto;
+    }
   }
 }
 .detail-item.full-width {
