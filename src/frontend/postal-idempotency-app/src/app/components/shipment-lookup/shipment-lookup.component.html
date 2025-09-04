@@ -1,14 +1,9 @@
 @let sh = shipment(); @let del = delivery(); @let loading = isLoading();
 <!-- truck animation and barcode at the very top -->
 <div
-  style="
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-  "
->  
+  
+  class="responsive-width"
+>
 </div>
 @if (!sh) {
 <div>
@@ -158,7 +153,17 @@
         </button>
       </div>
     </div>
-   <div [ngClass]="del?.statusId === 2 ? 'truck-animate' : del?.statusId === 3 ? 'truck-animateX' : del?.statusId === 4 ? 'truck-animate' : ''">
+    <div
+      [ngClass]="
+        del?.statusId === 2
+          ? 'truck-animate'
+          : del?.statusId === 3
+          ? 'truck-animateX'
+          : del?.statusId === 4
+          ? 'truck-animate'
+          : ''
+      "
+    >
       <mat-icon
         [ngStyle]="{
           color:
@@ -171,20 +176,21 @@
               : del?.statusId === 6
               ? '#64748b'
               : '#64748b',
-              transform:
-          del?.statusId === 2
-            ? 'scaleX(-1)'
-            : del?.statusId === 3
-            ? 'scaleX(1)'
-            : del?.statusId === 4
-            ? 'scaleX(-1)'
-            : 'none'
+          transform:
+            del?.statusId === 2
+              ? 'scaleX(-1)'
+              : del?.statusId === 3
+              ? 'scaleX(1)'
+              : del?.statusId === 4
+              ? 'scaleX(-1)'
+              : 'none'
         }"
-        style="font-size: 150px; width: 150px; height: 150px;top:100px; "
+        style="font-size: 150px; width: 150px; height: 150px; top: 100px"
         >local_shipping</mat-icon
       >
-      <div class="truck-barcode-overlay-wrapper"
-      [ngStyle]="{
+      <div
+        class="truck-barcode-overlay-wrapper"
+        [ngStyle]="{
           right:
             del?.statusId === 2
               ? '7px'
@@ -194,7 +200,7 @@
               ? '7px'
               : del?.statusId === 6
               ? '7px'
-              : '7px'    
+              : '7px'
         }"
       >
         <div class="truck-barcode-overlay">{{ sh?.barcode }}</div>
