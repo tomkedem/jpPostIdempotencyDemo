@@ -1,63 +1,57 @@
+using PostalIdempotencyDemo.Api.Models;
+using PostalIdempotencyDemo.Api.Models.DTO;
+using PostalIdempotencyDemo.Api.Repositories;
 using PostalIdempotencyDemo.Api.Services.Interfaces;
 
-namespace PostalIdempotencyDemo.Api.Services;
-
-public class ChaosService : IChaosService
+namespace PostalIdempotencyDemo.Api.Services
 {
-    private readonly IConfiguration _configuration;
-    private readonly Random _random = new();
-
-    public ChaosService(IConfiguration configuration)
+    public class ChaosService : PostalIdempotencyDemo.Api.Services.Interfaces.IChaosService
     {
-        _configuration = configuration;
-    }
+        private readonly ISettingsRepository _settingsRepository;
 
-    public Task<bool> ShouldIntroduceFailureAsync()
-    {
-        var enabled = _configuration.GetValue<bool>("ChaosEngineering:Enabled");
-        if (!enabled) return Task.FromResult(false);
-
-        var failureRate = _configuration.GetValue<double>("ChaosEngineering:DefaultFailureRate");
-        return Task.FromResult(_random.NextDouble() < failureRate);
-    }
-
-    public Task<int> GetDelayAsync()
-    {
-        var enabled = _configuration.GetValue<bool>("ChaosEngineering:Enabled");
-        if (!enabled) return Task.FromResult(0);
-
-        var defaultDelay = _configuration.GetValue<int>("ChaosEngineering:DefaultDelayMs");
-        var maxDelay = _configuration.GetValue<int>("ChaosEngineering:MaxDelayMs");
-        
-        if (defaultDelay > 0)
+        public ChaosService(ISettingsRepository settingsRepository)
         {
-            return Task.FromResult(_random.Next(0, Math.Min(defaultDelay * 2, maxDelay)));
+            _settingsRepository = settingsRepository;
         }
 
-        return Task.FromResult(0);
-    }
-
-    public async Task SimulateNetworkIssueAsync()
-    {
-        if (await ShouldIntroduceFailureAsync())
+        public async Task<ChaosSettingsDto> GetChaosSettingsAsync()
         {
-            var delay = await GetDelayAsync();
-            if (delay > 0)
+            var settings = await _settingsRepository.GetSettingsAsync();
+            var settingsDict = settings.ToDictionary(s => s.SettingKey, s => s.SettingValue);
+
+            return new ChaosSettingsDto
             {
-                await Task.Delay(delay);
-            }
-            
-            // Randomly throw network-related exceptions
-            var exceptionType = _random.Next(0, 3);
-            switch (exceptionType)
+                UseIdempotencyKey = bool.TryParse(settingsDict.GetValueOrDefault("UseIdempotencyKey"), out var use) && use,
+                ForceError = bool.TryParse(settingsDict.GetValueOrDefault("ForceError"), out var force) && force
+            };
+        }
+
+        public async Task<bool> UpdateChaosSettingsAsync(ChaosSettingsDto settingsDto)
+        {
+            var settings = new List<SystemSetting>
             {
-                case 0:
-                    throw new TimeoutException("Simulated network timeout");
-                case 1:
-                    throw new HttpRequestException("Simulated network error");
-                case 2:
-                    throw new InvalidOperationException("Simulated connection failure");
-            }
+                new() { SettingKey = "UseIdempotencyKey", SettingValue = settingsDto.UseIdempotencyKey.ToString().ToLower() },
+                new() { SettingKey = "ForceError", SettingValue = settingsDto.ForceError.ToString().ToLower() }
+            };
+
+            return await _settingsRepository.UpdateSettingsAsync(settings);
+        }
+
+        public async Task<bool> ShouldIntroduceFailureAsync()
+        {
+            var settings = await _settingsRepository.GetSettingsAsync();
+            var forceError = settings.FirstOrDefault(s => s.SettingKey == "ForceError")?.SettingValue;
+            return bool.TryParse(forceError, out var result) && result;
+        }
+
+        public async Task<int> GetDelayAsync()
+        {
+            return await Task.FromResult(0);
+        }
+
+        public async Task SimulateNetworkIssueAsync()
+        {
+            await Task.Delay(100);
         }
     }
 }

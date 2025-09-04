@@ -1,22 +1,14 @@
-<div class="bg-slate-100 min-h-full p-4 sm:p-6 md:p-8 font-sans">
+<div class="page-container">
   <div class="max-w-5xl mx-auto">
     <!-- Header -->
-    <div class="text-center mb-12">
-      <h1
-        class="text-9xl md:text-[12rem] lg:text-[14rem] font-black tracking-tight text-black leading-none"
-      >
-        סימולטור תנאי רשת
-      </h1>
-      <p class="mt-6 text-xl text-slate-600">
-        הדמיית תרחישים בעולם האמיתי לבחינת עמידות המערכת.
-      </p>
+    <div class="header-container">
+      <h1 class="main-title gradient-text">סימולטור תנאי רשת</h1>
+      <p class="subtitle">הדמיית תרחישים בעולם האמיתי לבחינת עמידות המערכת.</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
       <!-- Controls Column -->
-      <div
-        class="lg:col-span-3 bg-white/70 backdrop-blur-sm border border-slate-200 rounded-3xl p-8 shadow-lg"
-      >
+      <div class="lg:col-span-3 control-card p-8">
         <h2
           class="text-3xl font-semibold mb-8 flex items-center gap-4 text-slate-800"
         >
@@ -24,11 +16,9 @@
           בקרת סימולציה
         </h2>
 
-        <form [formGroup]="chaosForm" class="space-y-10">
+        <form [formGroup]="chaosForm" class="space-y-8">
           <!-- Idempotency Toggle -->
-          <div
-            class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 transition-all duration-300 hover:shadow-md hover:border-blue-300"
-          >
+          <div class="toggle-container">
             <mat-slide-toggle
               formControlName="useIdempotencyKey"
               color="primary"
@@ -46,9 +36,7 @@
 
           <!-- Force Error Toggle -->
           @if (chaosForm.get('useIdempotencyKey')?.value) {
-          <div
-            class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 transition-all duration-300 hover:shadow-md hover:border-blue-300 nested-toggle"
-          >
+          <div class="toggle-container nested-toggle">
             <mat-slide-toggle
               formControlName="forceError"
               color="primary"
@@ -68,9 +56,7 @@
       </div>
 
       <!-- Guided Demo Column -->
-      <div
-        class="lg:col-span-2 bg-gradient-to-br from-blue-500 to-violet-600 text-white rounded-3xl p-8 shadow-xl shadow-blue-200"
-      >
+      <div class="lg:col-span-2 demo-card p-8">
         <h2 class="text-3xl font-semibold mb-8 flex items-center gap-4">
           <mat-icon class="scale-125">present_to_all</mat-icon>
           הדגמה מודרכת

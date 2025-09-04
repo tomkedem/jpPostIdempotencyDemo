@@ -11,6 +11,100 @@ h1.font-black {
   letter-spacing: -0.025em;
 }
 
+.gradient-text {
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
+.page-container {
+  background-color: #f0f4f8; /* Light gray-blue background */
+  min-height: 100vh;
+  padding: 2rem;
+  overflow: hidden; /* Prevents scrollbars from animations */
+}
+
+.header-container {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: fadeInDown 0.8s ease-out both;
+}
+
+.main-title {
+  font-size: clamp(3rem, 10vw, 7rem);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  color: #475569; /* Slate-600 */
+  margin-top: 1rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeInUp 0.8s 0.2s ease-out both;
+}
+
+.control-card, .demo-card {
+  border-radius: 1.5rem; /* 24px */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  animation: zoomIn 0.6s ease-out both;
+}
+
+.control-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  animation-delay: 0.4s;
+}
+
+.demo-card {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+  animation-delay: 0.6s;
+}
+
+.control-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
+}
+
+.toggle-container {
+  background: rgba(248, 250, 252, 0.7); /* Slate-50 with opacity */
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.toggle-container:hover {
+  border-color: rgba(99, 102, 241, 0.4); /* Indigo-500 with opacity */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Keyframe Animations */
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
 
 /* Customizing Angular Material components for a 2026 feel */
 ::ng-deep .mat-mdc-slide-toggle {

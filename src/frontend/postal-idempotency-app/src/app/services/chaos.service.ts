@@ -1,21 +1,54 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable, catchError, tap, throwError } from "rxjs";
+
+export interface ChaosSettings {
+  useIdempotencyKey: boolean;
+  forceError: boolean;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class ChaosService {
-  private chaosSettings = signal({
+  private chaosSettings = signal<ChaosSettings>({
     useIdempotencyKey: true,
-    forceError: false
+    forceError: false,
   });
 
   // Public signals for components to react to
   settings = this.chaosSettings.asReadonly();
 
-  constructor() {}
+  constructor(private http: HttpClient) {
+    this.loadInitialSettings();
+  }
+
+  private loadInitialSettings() {
+    this.http
+      .get<ChaosSettings>("/api/chaos/settings")
+      .subscribe((settings) => {
+        this.chaosSettings.set(settings);
+      });
+  }
 
   updateSettings(useIdempotencyKey: boolean, forceError: boolean): void {
     this.chaosSettings.set({ useIdempotencyKey, forceError });
+  }
+
+  updateSettingsOnServer(settings: ChaosSettings): Observable<any> {
+    return this.http.post("/api/chaos/settings", settings).pipe(
+      tap(() => {
+        this.chaosSettings.set(settings);
+      }),
+      catchError((err) => {
+        console.error("Failed to update chaos settings", err);
+        // Optionally, revert the local state if the server call fails
+        this.loadInitialSettings();
+        return throwError(
+          () => new Error("Failed to update settings on server")
+        );
+      })
+    );
   }
 
   /**
@@ -27,12 +60,12 @@ export class ChaosService {
     const { useIdempotencyKey, forceError } = this.chaosSettings();
 
     if (!useIdempotencyKey) {
-      return ''; // Don't send a key if the feature is disabled
+      return ""; // Don't send a key if the feature is disabled
     }
 
     if (forceError) {
       // Send a deliberately malformed key to test server-side validation
-      return 'force-error-guid';
+      return "force-error-guid";
     }
 
     // Standard case: generate a valid UUID v4

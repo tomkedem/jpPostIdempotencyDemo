@@ -1,31 +1,25 @@
-import { Component, OnInit, signal } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatInputModule } from "@angular/material/input";
-import { MatButtonModule } from "@angular/material/button";
-import { MatCardModule } from "@angular/material/card";
-import { MatIconModule } from "@angular/material/icon";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatIconModule } from "@angular/material/icon";
 import { CommonModule } from "@angular/common";
 import { ChaosService } from "../../services/chaos.service";
+import { debounceTime, switchMap, catchError, EMPTY } from "rxjs";
+import { signal } from "@angular/core";
 
 @Component({
   selector: "app-chaos-control",
+  templateUrl: "./chaos-control.component.html",
+  styleUrls: ["./chaos-control.component.scss"],
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatCardModule,
-    MatIconModule,
     MatSlideToggleModule,
+    MatIconModule,
     MatSnackBarModule,
   ],
-  templateUrl: "./chaos-control.component.html",
-  styleUrls: ["./chaos-control.component.scss"],
 })
 export class ChaosControlComponent implements OnInit {
   chaosForm: FormGroup;
@@ -49,25 +43,45 @@ export class ChaosControlComponent implements OnInit {
     private chaosService: ChaosService,
     private snackBar: MatSnackBar
   ) {
-    const currentSettings = this.chaosService.settings();
     this.chaosForm = this.fb.group({
-      useIdempotencyKey: [currentSettings.useIdempotencyKey],
-      forceError: [currentSettings.forceError],
+      useIdempotencyKey: [true],
+      forceError: [false],
     });
   }
 
   ngOnInit(): void {
-    this.chaosForm.valueChanges.subscribe((values) => {
-      this.chaosService.updateSettings(
-        values.useIdempotencyKey,
-        values.forceError
-      );
-      this.showSnackbar(values.useIdempotencyKey, values.forceError);
+    // Set initial form state from the service
+    this.chaosForm.patchValue(this.chaosService.settings(), {
+      emitEvent: false,
     });
+
+    this.chaosForm.valueChanges
+      .pipe(
+        debounceTime(300),
+        switchMap((values) => {
+          return this.chaosService.updateSettingsOnServer(values).pipe(
+            catchError((error) => {
+              this.showErrorSnackbar("העדכון נכשל. אנא נסה שוב.");
+              // Revert the toggle state visually
+              this.chaosForm.patchValue(this.chaosService.settings(), {
+                emitEvent: false,
+              });
+              return EMPTY;
+            })
+          );
+        })
+      )
+      .subscribe((values) => {
+        // On success, the service has already updated the signal
+        this.showSnackbar(
+          this.chaosService.settings().useIdempotencyKey,
+          this.chaosService.settings().forceError
+        );
+      });
   }
 
-  private showSnackbar(useIdempotencyKey: boolean, forceError: boolean): void {
-    let message = "";
+  showSnackbar(useIdempotencyKey: boolean, forceError: boolean): void {
+    let message: string;
     if (!useIdempotencyKey) {
       message = "הגנת Idempotency כבויה. המערכת חשופה לכפילויות.";
     } else {
@@ -79,8 +93,19 @@ export class ChaosControlComponent implements OnInit {
     }
 
     this.snackBar.open(message, "סגור", {
-      duration: 3500,
-      panelClass: ["info-snackbar"],
+      duration: 3000,
+      verticalPosition: "top",
+      horizontalPosition: "center",
+      panelClass: useIdempotencyKey ? "success-snackbar" : "error-snackbar",
+    });
+  }
+
+  private showErrorSnackbar(message: string): void {
+    this.snackBar.open(message, "סגור", {
+      duration: 5000,
+      verticalPosition: "top",
+      horizontalPosition: "center",
+      panelClass: "error-snackbar",
     });
   }
 }

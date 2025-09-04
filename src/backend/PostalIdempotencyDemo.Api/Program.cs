@@ -25,12 +25,14 @@ builder.Services.AddScoped<IShipmentRepository, ShipmentRepository>();
 builder.Services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
 builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
 builder.Services.AddScoped<IMetricsRepository, MetricsRepository>();
+builder.Services.AddScoped<ISettingsRepository, SettingsRepository>();
 builder.Services.AddScoped<PostalIdempotencyDemo.Api.Data.ISqlExecutor, PostalIdempotencyDemo.Api.Data.SqlExecutor>();
 
 // Register services
 builder.Services.AddScoped<PostalIdempotencyDemo.Api.Services.Interfaces.IShipmentService, PostalIdempotencyDemo.Api.Services.ShipmentService>();
 builder.Services.AddScoped<IIdempotencyService, IdempotencyService>();
 builder.Services.AddScoped<IDeliveryService, DeliveryService>();
+builder.Services.AddScoped<PostalIdempotencyDemo.Api.Services.Interfaces.IChaosService, PostalIdempotencyDemo.Api.Services.ChaosService>();
 
 // CORS configuration
 builder.Services.AddCors(options =>
