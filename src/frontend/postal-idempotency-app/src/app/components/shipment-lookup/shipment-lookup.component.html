@@ -212,38 +212,9 @@
     <mat-card-header>
       <mat-card-title>פרטי המסירה</mat-card-title>
       <mat-card-subtitle>ברקוד: {{ sh?.barcode }}</mat-card-subtitle>
-      <mat-card-subtitle>
-        <div
-          class="detail-item"
-          style="
-            justify-content: center;
-            align-items: center;
-            display: flex;
-            flex-direction: column;
-          "
-        >
-          <strong style="text-align: center; width: 100%"
-            >סטטוס מסירה</strong
-          >
-          <span
-            [ngClass]="{
-              'status-chip': true,
-              'status-delivered': del?.statusId === 2,
-              'status-failed': del?.statusId === 3,
-              'status-partial': del?.statusId === 4,
-              'status-intransit': del?.statusId === 6,
-              'centered-chip': true
-            }"
-            style="margin: 0 auto; text-align: center"
-          >
-            {{ sh?.statusNameHe || getStatusText(sh?.status ?? 0) }}
-          </span>
-        </div>
-      </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <div class="details-grid">
-        <!-- מזהה (id) הוסר לפי דרישת המשתמש -->
         <div class="detail-item">
           <strong
             ><mat-icon
@@ -304,7 +275,7 @@
           >
           <span>{{ sh?.price }}</span>
         </div>
-        <!-- kodPeula, perutPeula, atar הוסרו לפי דרישת המשתמש -->
+
         <div class="detail-item">
           <strong
             ><mat-icon
@@ -320,6 +291,33 @@
           >
           <span>{{ sh?.createdAt | date : "dd/MM/yyyy HH:mm" }}</span>
         </div>
+
+        <div class="detail-item status-item">
+          <strong
+            ><mat-icon
+              style="
+                font-size: 1.3rem;
+                vertical-align: middle;
+                color: #3b82f6;
+                margin-left: 6px;
+              "
+              >local_shipping</mat-icon
+            >
+            סטטוס מסירה:</strong
+          >
+          <span
+            [ngClass]="{
+              'status-chip': true,
+              'status-delivered': del?.statusId === 2,
+              'status-failed': del?.statusId === 3,
+              'status-partial': del?.statusId === 4,
+              'status-intransit': del?.statusId === 6
+            }"
+          >
+            {{ sh?.statusNameHe || getStatusText(sh?.status ?? 0) }}
+          </span>
+        </div>
+
         <div class="detail-item">
           <strong
             ><mat-icon
