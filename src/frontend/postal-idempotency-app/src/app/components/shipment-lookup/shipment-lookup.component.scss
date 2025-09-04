@@ -537,6 +537,22 @@ body {
   grid-column: 1 / -1;
 }
 
+.detail-item.notes-item {
+  grid-column: 3 / 6;
+  grid-row: 2 / 3;
+  align-self: stretch;
+
+  @media (max-width: 1200px) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  @media (max-width: 767px) {
+    grid-column: 1 / 2;
+    grid-row: auto;
+  }
+}
+
 .detail-item.status-item {
   grid-column: 5 / 6; 
   grid-row: 1 / 2;
