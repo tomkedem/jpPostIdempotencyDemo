@@ -107,13 +107,7 @@
             type="button"
             class="status-card status-delivered"
             [class.selected]="sh?.deliveryStatus === 2"
-            (click)="
-              sh?.barcode
-                ? sh?.barcode
-                  ? onUpdateStatus(sh!.barcode!, 2)
-                  : null
-                : null
-            "
+            (click)="(sh?.barcode ? (sh?.barcode ? sh?.barcode : null) : null)"
             [disabled]="loading || sh?.deliveryStatus === 2"
           >
             <span class="status-icon">
@@ -215,7 +209,8 @@
     </mat-card-header>
     <mat-card-content>
       <div class="details-grid">
-        <div class="detail-item">
+        <!-- Row 1 -->
+        <div class="detail-item customer-name-item">
           <strong
             ><mat-icon
               style="
@@ -230,7 +225,7 @@
           >
           <span>{{ sh?.customerName }}</span>
         </div>
-        <div class="detail-item">
+        <div class="detail-item address-item">
           <strong
             ><mat-icon
               style="
@@ -245,7 +240,7 @@
           >
           <span>{{ sh?.address }}</span>
         </div>
-        <div class="detail-item">
+        <div class="detail-item weight-item">
           <strong
             ><mat-icon
               style="
@@ -260,7 +255,7 @@
           >
           <span>{{ sh?.weight }}</span>
         </div>
-        <div class="detail-item">
+        <div class="detail-item price-item">
           <strong
             ><mat-icon
               style="
@@ -275,23 +270,6 @@
           >
           <span>{{ sh?.price }}</span>
         </div>
-
-        <div class="detail-item">
-          <strong
-            ><mat-icon
-              style="
-                font-size: 1.3rem;
-                vertical-align: middle;
-                color: #64748b;
-                margin-left: 6px;
-              "
-              >calendar_today</mat-icon
-            >
-            נוצר בתאריך:</strong
-          >
-          <span>{{ sh?.createdAt | date : "dd/MM/yyyy HH:mm" }}</span>
-        </div>
-
         <div class="detail-item status-item">
           <strong
             ><mat-icon
@@ -318,6 +296,22 @@
           </span>
         </div>
 
+        <!-- Row 2 -->
+        <div class="detail-item creation-date-item">
+          <strong
+            ><mat-icon
+              style="
+                font-size: 1.3rem;
+                vertical-align: middle;
+                color: #64748b;
+                margin-left: 6px;
+              "
+              >calendar_today</mat-icon
+            >
+            נוצר בתאריך:</strong
+          >
+          <span>{{ sh?.createdAt | date : "dd/MM/yyyy HH:mm" }}</span>
+        </div>
         <div class="detail-item update-date-item">
           <strong
             ><mat-icon
