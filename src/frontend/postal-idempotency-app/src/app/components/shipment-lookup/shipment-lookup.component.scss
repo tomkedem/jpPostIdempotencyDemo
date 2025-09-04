@@ -1293,6 +1293,16 @@ body {
   animation: truckMoveY 5.5s linear infinite;
 }
 
+
+.truck-animateX {
+  top:100px !important;
+  font-size: 90px !important;
+  width: 110px !important;
+  height: 110px !important;
+  z-index: 10px;  
+  animation: truckMoveX 5.5s linear infinite;
+}
+
 .truck-barcode-overlay-wrapper {
   position: absolute;
   top: 42px;

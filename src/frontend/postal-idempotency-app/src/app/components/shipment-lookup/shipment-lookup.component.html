@@ -158,10 +158,7 @@
         </button>
       </div>
     </div>
-   <div
-   class="truck-animate"
- 
->    
+   <div [ngClass]="del?.statusId === 2 ? 'truck-animate' : del?.statusId === 3 ? 'truck-animateX' : del?.statusId === 4 ? 'truck-animate' : ''">
       <mat-icon
         [ngStyle]="{
           color:
