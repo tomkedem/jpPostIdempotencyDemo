@@ -12,12 +12,14 @@ namespace PostalIdempotencyDemo.Api.Services
     {
         private readonly IIdempotencyRepository _repository;
         private readonly ILogger<IdempotencyService> _logger;
+        private readonly IChaosService _chaosService;
         private readonly TimeSpan _defaultTtl = TimeSpan.FromHours(24);
 
-        public IdempotencyService(IIdempotencyRepository repository, ILogger<IdempotencyService> logger)
+        public IdempotencyService(IIdempotencyRepository repository, ILogger<IdempotencyService> logger, IChaosService chaosService)
         {
             _repository = repository;
             _logger = logger;
+            _chaosService = chaosService;
         }
 
         public string GenerateIdempotencyKey(string requestContent)
@@ -57,6 +59,12 @@ namespace PostalIdempotencyDemo.Api.Services
 
         public async Task<(object? cachedResponse, IdempotencyEntry? entry)> GetCachedResponseAsync(string idempotencyKey)
         {
+            var chaosSettings = await _chaosService.GetChaosSettingsAsync();
+            if (idempotencyKey == null || !chaosSettings.UseIdempotencyKey)
+            {
+                return (null, null); // Idempotency is disabled or no key, bypass cache check
+            }
+
             var entry = await _repository.GetByKeyAsync(idempotencyKey);
             if (entry != null && entry.ResponseData != null)
             {
@@ -75,6 +83,9 @@ namespace PostalIdempotencyDemo.Api.Services
 
         public async Task CacheResponseAsync(string idempotencyKey, object response)
         {
+            var chaosSettings = await _chaosService.GetChaosSettingsAsync();
+            if (idempotencyKey == null || !chaosSettings.UseIdempotencyKey) return; // Do not cache if disabled
+
             var responseData = JsonSerializer.Serialize(response);
             // StatusCode can be set as needed, here using 200 as default
             await _repository.UpdateResponseAsync(idempotencyKey, responseData, 200);
