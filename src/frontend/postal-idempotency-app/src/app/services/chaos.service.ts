@@ -1,6 +1,7 @@
 import { Injectable, signal } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, catchError, tap, throwError } from "rxjs";
+import { environment } from "../../environments/environment";
 
 export interface ChaosSettings {
   useIdempotencyKey: boolean;
@@ -25,7 +26,7 @@ export class ChaosService {
 
   private loadInitialSettings() {
     this.http
-      .get<ChaosSettings>("/api/chaos/settings")
+      .get<ChaosSettings>(`${environment.apiUrl}/chaos/settings`)
       .subscribe((settings) => {
         this.chaosSettings.set(settings);
       });
@@ -36,19 +37,21 @@ export class ChaosService {
   }
 
   updateSettingsOnServer(settings: ChaosSettings): Observable<any> {
-    return this.http.post("/api/chaos/settings", settings).pipe(
-      tap(() => {
-        this.chaosSettings.set(settings);
-      }),
-      catchError((err) => {
-        console.error("Failed to update chaos settings", err);
-        // Optionally, revert the local state if the server call fails
-        this.loadInitialSettings();
-        return throwError(
-          () => new Error("Failed to update settings on server")
-        );
-      })
-    );
+    return this.http
+      .post(`${environment.apiUrl}/chaos/settings`, settings)
+      .pipe(
+        tap(() => {
+          this.chaosSettings.set(settings);
+        }),
+        catchError((err) => {
+          console.error("Failed to update chaos settings", err);
+          // Optionally, revert the local state if the server call fails
+          this.loadInitialSettings();
+          return throwError(
+            () => new Error("Failed to update settings on server")
+          );
+        })
+      );
   }
 
   /**

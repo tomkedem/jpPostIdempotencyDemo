@@ -1,0 +1,8 @@
+{
+  "/api/chaos/*": {
+    "target": "http://localhost:5000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

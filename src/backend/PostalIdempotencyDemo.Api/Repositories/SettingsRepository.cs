@@ -23,18 +23,15 @@ public class SettingsRepository : ISettingsRepository
     public async Task<bool> UpdateSettingsAsync(IEnumerable<SystemSetting> settings)
     {
         const string sql = @"
-            MERGE INTO SystemSettings AS Target
-            USING (VALUES (@SettingKey, @SettingValue, @Description))
-                AS Source (SettingKey, SettingValue, Description)
-            ON Target.SettingKey = Source.SettingKey
-            WHEN MATCHED THEN
-                UPDATE SET
-                    Target.SettingValue = Source.SettingValue,
-                    Target.Description = Source.Description,
-                    Target.UpdatedAt = GETUTCDATE()
-            WHEN NOT MATCHED BY TARGET THEN
-                INSERT (SettingKey, SettingValue, Description, UpdatedAt)
-                VALUES (Source.SettingKey, Source.SettingValue, Source.Description, GETUTCDATE());";
+            UPDATE SystemSettings WITH (UPDLOCK, HOLDLOCK)
+            SET SettingValue = @SettingValue, UpdatedAt = GETUTCDATE()
+            WHERE SettingKey = @SettingKey;
+
+            IF @@ROWCOUNT = 0
+            BEGIN
+                INSERT INTO SystemSettings (SettingKey, SettingValue, UpdatedAt)
+                VALUES (@SettingKey, @SettingValue, GETUTCDATE());
+            END";
 
         using var connection = _connectionFactory.CreateConnection();
         connection.Open();

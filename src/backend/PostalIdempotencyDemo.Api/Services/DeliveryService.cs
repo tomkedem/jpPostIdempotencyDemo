@@ -1,7 +1,6 @@
 using PostalIdempotencyDemo.Api.Models;
 using PostalIdempotencyDemo.Api.Repositories;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using PostalIdempotencyDemo.Api.Services.Interfaces;
 
 namespace PostalIdempotencyDemo.Api.Services

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PostalIdempotencyDemo.Api.Models.DTO;
-using PostalIdempotencyDemo.Api.Services;
+using PostalIdempotencyDemo.Api.Services.Interfaces;
 
 namespace PostalIdempotencyDemo.Api.Controllers;
 

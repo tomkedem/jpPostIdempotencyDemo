@@ -1,11 +1,13 @@
 using PostalIdempotencyDemo.Api.Models;
 using PostalIdempotencyDemo.Api.Models.DTO;
 using PostalIdempotencyDemo.Api.Repositories;
-using PostalIdempotencyDemo.Api.Services.Interfaces;
+
 
 namespace PostalIdempotencyDemo.Api.Services
 {
-    public class ChaosService : PostalIdempotencyDemo.Api.Services.Interfaces.IChaosService
+    using PostalIdempotencyDemo.Api.Services.Interfaces;
+
+    public class ChaosService : IChaosService
     {
         private readonly ISettingsRepository _settingsRepository;
 
