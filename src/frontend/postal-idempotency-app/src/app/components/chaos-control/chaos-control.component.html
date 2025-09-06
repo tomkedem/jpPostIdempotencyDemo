@@ -72,7 +72,7 @@
     </div>
 
     <!-- Metrics Section -->
-    <div class="metrics-section">
+    <div class="metrics-section" style="margin-top: 20px;">
       <div class="section-header">
         <h2 class="section-title">
           <mat-icon class="title-icon">analytics</mat-icon>
@@ -82,9 +82,19 @@
 
       <div
         class="metrics-grid"
-        style="display: flex; flex-wrap: wrap; justify-content: space-around"
+        style="display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 8px;"
       >
-        <div class="metric-card primary" style="flex-basis: 19%; margin: 10px">
+        <div class="metric-card accent" style="flex: 1; min-width: 0;">
+          <div class="card-header">
+            <mat-icon class="metric-icon">percent</mat-icon>
+            <span class="metric-title">אחוז הצלחה</span>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">{{ metrics()?.successRate || 0 }}%</div>
+          </div>
+        </div>
+
+        <div class="metric-card primary" style="flex: 1; min-width: 0;">
           <div class="card-header">
             <mat-icon class="metric-icon">trending_up</mat-icon>
             <span class="metric-title">סה"כ פעולות</span>
@@ -96,7 +106,7 @@
           </div>
         </div>
 
-        <div class="metric-card success" style="flex-basis: 19%; margin: 10px">
+        <div class="metric-card success" style="flex: 1; min-width: 0;">
           <div class="card-header">
             <mat-icon class="metric-icon">check_circle</mat-icon>
             <span class="metric-title">פעולות מוצלחות</span>
@@ -108,7 +118,7 @@
           </div>
         </div>
 
-        <div class="metric-card warning" style="flex-basis: 19%; margin: 10px">
+        <div class="metric-card warning" style="flex: 1; min-width: 0;">
           <div class="card-header">
             <mat-icon class="metric-icon">block</mat-icon>
             <span class="metric-title">חסימות אידמפוטנטיות</span>
@@ -120,7 +130,7 @@
           </div>
         </div>
 
-        <div class="metric-card info" style="flex-basis: 19%; margin: 10px">
+        <div class="metric-card info" style="flex: 1; min-width: 0;">
           <div class="card-header">
             <mat-icon class="metric-icon">speed</mat-icon>
             <span class="metric-title">זמן תגובה ממוצע</span>
@@ -129,16 +139,6 @@
             <div class="metric-value">
               {{ metrics()?.averageResponseTime || 0 }}ms
             </div>
-          </div>
-        </div>
-
-        <div class="metric-card accent" style="flex-basis: 19%; margin: 10px">
-          <div class="card-header">
-            <mat-icon class="metric-icon">percent</mat-icon>
-            <span class="metric-title">אחוז הצלחה</span>
-          </div>
-          <div class="metric-content">
-            <div class="metric-value">{{ metrics()?.successRate || 0 }}%</div>
           </div>
         </div>
       </div>
