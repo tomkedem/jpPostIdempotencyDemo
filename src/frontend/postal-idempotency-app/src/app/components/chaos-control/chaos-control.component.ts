@@ -1,5 +1,10 @@
 import { Component, OnInit, signal } from "@angular/core";
-import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import {
+  FormBuilder,
+  FormGroup,
+  FormControl,
+  ReactiveFormsModule,
+} from "@angular/forms";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatIconModule } from "@angular/material/icon";
@@ -32,7 +37,19 @@ import {
 })
 export class ChaosControlComponent implements OnInit {
   chaosForm: FormGroup;
+  idempotencyProtectionControl: FormControl;
   metricsSummary = signal<MetricsSummary | null>(null);
+
+  // Computed signal for metrics with proper structure
+  metrics = signal<{
+    totalOperations: number;
+    successfulOperations: number;
+    idempotentBlocks: number;
+    averageResponseTime: number;
+    successRate: number;
+    failedOperations: number;
+  } | null>(null);
+
   demoSteps: { icon: string; text: string }[] = [
     {
       icon: "looks_one",
@@ -50,8 +67,9 @@ export class ChaosControlComponent implements OnInit {
     private metricsService: MetricsService,
     private snackBar: MatSnackBar
   ) {
+    this.idempotencyProtectionControl = new FormControl(true);
     this.chaosForm = this.fb.group({
-      useIdempotencyKey: [true],
+      useIdempotencyKey: this.idempotencyProtectionControl,
     });
   }
 
@@ -68,6 +86,25 @@ export class ChaosControlComponent implements OnInit {
       )
       .subscribe((summary) => {
         this.metricsSummary.set(summary);
+
+        // Update metrics signal with calculated values
+        if (summary) {
+          const successfulOps =
+            summary.totalOperations - summary.failedOperations;
+          const successRate =
+            summary.totalOperations > 0
+              ? Math.round((successfulOps / summary.totalOperations) * 100)
+              : 0;
+
+          this.metrics.set({
+            totalOperations: summary.totalOperations,
+            successfulOperations: successfulOps,
+            idempotentBlocks: summary.idempotentHits,
+            averageResponseTime: Math.round(summary.averageExecutionTimeMs),
+            successRate: successRate,
+            failedOperations: summary.failedOperations,
+          });
+        }
       });
 
     // Set initial form state from the service

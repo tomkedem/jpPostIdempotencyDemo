@@ -1,112 +1,144 @@
-<div class="page-container">
-  <div class="max-w-5xl mx-auto">
-    <!-- Header -->
-    <div class="header-container">
-      <h1 class="main-title gradient-text">סימולטור תנאי רשת</h1>
-      <p class="subtitle">הדמיית תרחישים בעולם האמיתי לבחינת עמידות המערכת.</p>
+<div class="premium-container">
+  <div class="ambient-grid"></div>
+
+  <div class="content-wrapper">
+    <!-- Header Section -->
+    <div class="header-section">
+      <h1 class="premium-title">מערכת בקרת כאוס</h1>
+      <p class="premium-subtitle">בקרה מתקדמת על הגנת אידמפוטנטיות</p>
+      <div class="title-accent"></div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-      <!-- Controls Column -->
-      <div class="lg:col-span-3 control-card p-8">
-        <h2
-          class="text-3xl font-semibold mb-8 flex items-center gap-4 text-slate-800"
-        >
-          <mat-icon class="text-blue-500 scale-125">tune</mat-icon>
-          בקרת סימולציה
-        </h2>
+    <div class="main-content">
+      <!-- Control Panel -->
+      <div class="control-panel">
+        <div class="panel-header">
+          <h2 class="section-title">
+            <mat-icon class="title-icon">security</mat-icon>
+            הגדרות הגנה
+          </h2>
+        </div>
 
-        <form [formGroup]="chaosForm" class="space-y-8">
-          <!-- Idempotency Toggle -->
-          <div class="toggle-container">
-            <mat-slide-toggle
-              formControlName="useIdempotencyKey"
-              color="primary"
-              class="scale-110 origin-right"
-            >
-              <span class="font-semibold text-xl text-slate-700"
-                >הפעל הגנת Idempotency</span
+        <div class="control-form">
+          <div class="control-group">
+            <div class="control-frame">
+              <mat-slide-toggle
+                [formControl]="idempotencyProtectionControl"
+                color="primary"
+                class="toggle-label"
               >
-            </mat-slide-toggle>
-            <div class="text-slate-600 text-base mt-3 pr-10">
-              מונע יצירת פעולות כפולות במקרה של תקלות רשת או קריאות חוזרות.
-            </div>
-          </div>
-        </form>
+                <span class="label-primary">הגנת אידמפוטנטיות</span>
+                <span class="label-secondary"
+                  >מונע עדכונים כפולים באמצעות מפתחות ייחודיים</span
+                >
+              </mat-slide-toggle>
 
-        <!-- Metrics Display -->
-        @if (metricsSummary(); as summary) {
-        <div class="mt-10">
-          <h3
-            class="text-2xl font-semibold mb-6 flex items-center gap-4 text-slate-800"
-          >
-            <mat-icon class="text-blue-500 scale-110">analytics</mat-icon>
-            לוח מחוונים: תוצאות בזמן אמת
-          </h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <!-- Total Operations -->
-            <div class="metric-card bg-blue-100 border-blue-200">
-              <mat-icon class="metric-icon text-blue-500">functions</mat-icon>
-              <div class="metric-value" [countUp]="summary.totalOperations">
-                0
-              </div>
-              <div class="metric-label">סך כל הפעולות</div>
-            </div>
-
-            <!-- Idempotent Hits -->
-            <div class="metric-card bg-purple-100 border-purple-200">
-              <mat-icon class="metric-icon text-purple-500">shield</mat-icon>
-              <div class="metric-value" [countUp]="summary.idempotentHits">
-                0
-              </div>
-              <div class="metric-label">חסימות Idempotency</div>
-            </div>
-
-            <!-- Failed Operations -->
-            <div class="metric-card bg-red-100 border-red-200">
-              <mat-icon class="metric-icon text-red-500"
-                >error_outline</mat-icon
+              <div
+                class="status-indicator"
+                [class.protected]="idempotencyProtectionControl.value"
               >
-              <div class="metric-value" [countUp]="summary.failedOperations">
-                0
+                <div class="indicator-light"></div>
+                <span class="status-text">
+                  {{
+                    idempotencyProtectionControl.value
+                      ? "מוגן - הגנה פעילה"
+                      : "לא מוגן - הגנה כבויה"
+                  }}
+                </span>
               </div>
-              <div class="metric-label">פעולות שנכשלו</div>
-            </div>
-
-            <!-- Avg Execution Time -->
-            <div class="metric-card bg-green-100 border-green-200">
-              <mat-icon class="metric-icon text-green-500">timer</mat-icon>
-              <div class="metric-value">
-                <span
-                  [countUp]="summary.averageExecutionTimeMs"
-                  [options]="{ decimalPlaces: 0 }"
-                  >0</span
-                >ms
-              </div>
-              <div class="metric-label">זמן ביצוע ממוצע</div>
             </div>
           </div>
         </div>
-        }
       </div>
 
-      <!-- Guided Demo Column -->
-      <div class="lg:col-span-2 demo-card p-8">
-        <h2 class="text-3xl font-semibold mb-8 flex items-center gap-4">
-          <mat-icon class="scale-125">present_to_all</mat-icon>
-          הדגמה מודרכת
-        </h2>
-        <div class="space-y-6 text-blue-100">
-          <div
-            *ngFor="let step of demoSteps; let i = index"
-            class="flex items-start gap-4"
-          >
-            <div
-              class="flex-shrink-0 w-10 h-10 bg-white/20 text-white rounded-full flex items-center justify-center font-bold text-lg border-2 border-white/50"
-            >
-              {{ i + 1 }}
+      <!-- Demo Guide Panel -->
+      <div class="demo-panel">
+        <div class="panel-header">
+          <h2 class="section-title">
+            <mat-icon class="title-icon">school</mat-icon>
+            מדריך שימוש
+          </h2>
+        </div>
+
+        <div class="demo-content">
+          <div class="demo-step" *ngFor="let step of demoSteps; let i = index">
+            <div class="step-number">{{ i + 1 }}</div>
+            <div class="step-content">
+              <div class="step-text" [innerHTML]="step.text"></div>
             </div>
-            <div class="pt-1 text-base" [innerHTML]="step.text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metrics Section -->
+    <div class="metrics-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <mat-icon class="title-icon">analytics</mat-icon>
+          מדדי ביצועים
+        </h2>
+      </div>
+
+      <div
+        class="metrics-grid"
+        style="display: flex; flex-wrap: wrap; justify-content: space-around"
+      >
+        <div class="metric-card primary" style="flex-basis: 19%; margin: 10px">
+          <div class="card-header">
+            <mat-icon class="metric-icon">trending_up</mat-icon>
+            <span class="metric-title">סה"כ פעולות</span>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">
+              {{ metrics()?.totalOperations || 0 }}
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card success" style="flex-basis: 19%; margin: 10px">
+          <div class="card-header">
+            <mat-icon class="metric-icon">check_circle</mat-icon>
+            <span class="metric-title">פעולות מוצלחות</span>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">
+              {{ metrics()?.successfulOperations || 0 }}
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card warning" style="flex-basis: 19%; margin: 10px">
+          <div class="card-header">
+            <mat-icon class="metric-icon">block</mat-icon>
+            <span class="metric-title">חסימות אידמפוטנטיות</span>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">
+              {{ metrics()?.idempotentBlocks || 0 }}
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card info" style="flex-basis: 19%; margin: 10px">
+          <div class="card-header">
+            <mat-icon class="metric-icon">speed</mat-icon>
+            <span class="metric-title">זמן תגובה ממוצע</span>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">
+              {{ metrics()?.averageResponseTime || 0 }}ms
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card accent" style="flex-basis: 19%; margin: 10px">
+          <div class="card-header">
+            <mat-icon class="metric-icon">percent</mat-icon>
+            <span class="metric-title">אחוז הצלחה</span>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value">{{ metrics()?.successRate || 0 }}%</div>
           </div>
         </div>
       </div>
