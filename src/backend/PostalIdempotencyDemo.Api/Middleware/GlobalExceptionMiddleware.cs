@@ -27,10 +27,21 @@ namespace PostalIdempotencyDemo.Api.Middleware
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unhandled exception occurred");
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                context.Response.ContentType = "application/json";
-                var errorResponse = new { Success = false, Message = "An unexpected error occurred.", Details = ex.Message };
-                await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+
+                // Only modify response if it hasn't started yet
+                if (!context.Response.HasStarted)
+                {
+                    context.Response.Clear();
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    context.Response.ContentType = "application/json";
+                    var errorResponse = new { Success = false, Message = "An unexpected error occurred.", Details = ex.Message };
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+                }
+                else
+                {
+                    // Response has already started, we can't modify it
+                    _logger.LogWarning("Cannot send error response as the response has already started");
+                }
             }
         }
     }

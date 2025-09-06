@@ -1,6 +1,6 @@
-namespace PostalIdempotencyDemo.Api.Services.Interfaces;
-
 using PostalIdempotencyDemo.Api.Models.DTO;
+
+namespace PostalIdempotencyDemo.Api.Services.Interfaces;
 
 public interface IChaosService
 {
@@ -9,4 +9,8 @@ public interface IChaosService
     Task<bool> ShouldIntroduceFailureAsync();
     Task<int> GetDelayAsync();
     Task SimulateNetworkIssueAsync();
+    Task<int> GetIdempotencyExpirationHoursAsync();
+    Task<bool> IsMaintenanceModeAsync();
+    Task<int> GetMaxRetryAttemptsAsync();
+    Task<int> GetDefaultTimeoutSecondsAsync();
 }

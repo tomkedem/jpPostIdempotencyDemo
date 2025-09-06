@@ -6,6 +6,13 @@ import { environment } from "../../environments/environment";
 export interface ChaosSettings {
   useIdempotencyKey: boolean;
   forceError: boolean;
+  idempotencyExpirationHours: number;
+  maxRetryAttempts: number;
+  defaultTimeoutSeconds: number;
+  enableMetricsCollection: boolean;
+  metricsRetentionDays: number;
+  enableChaosMode: boolean;
+  systemMaintenanceMode: boolean;
 }
 
 @Injectable({
@@ -15,6 +22,13 @@ export class ChaosService {
   private chaosSettings = signal<ChaosSettings>({
     useIdempotencyKey: true,
     forceError: false,
+    idempotencyExpirationHours: 24,
+    maxRetryAttempts: 3,
+    defaultTimeoutSeconds: 30,
+    enableMetricsCollection: true,
+    metricsRetentionDays: 30,
+    enableChaosMode: false,
+    systemMaintenanceMode: false,
   });
 
   // Public signals for components to react to
@@ -32,8 +46,8 @@ export class ChaosService {
       });
   }
 
-  updateSettings(useIdempotencyKey: boolean, forceError: boolean): void {
-    this.chaosSettings.set({ useIdempotencyKey, forceError });
+  updateSettings(settings: Partial<ChaosSettings>): void {
+    this.chaosSettings.update((current) => ({ ...current, ...settings }));
   }
 
   updateSettingsOnServer(settings: ChaosSettings): Observable<any> {
@@ -73,5 +87,26 @@ export class ChaosService {
 
     // Standard case: generate a valid UUID v4
     return self.crypto.randomUUID();
+  }
+
+  /**
+   * Get the current idempotency expiration time in hours
+   */
+  getIdempotencyExpirationHours(): number {
+    return this.chaosSettings().idempotencyExpirationHours;
+  }
+
+  /**
+   * Check if system is in maintenance mode
+   */
+  isMaintenanceMode(): boolean {
+    return this.chaosSettings().systemMaintenanceMode;
+  }
+
+  /**
+   * Check if chaos mode is enabled
+   */
+  isChaosMode(): boolean {
+    return this.chaosSettings().enableChaosMode;
   }
 }

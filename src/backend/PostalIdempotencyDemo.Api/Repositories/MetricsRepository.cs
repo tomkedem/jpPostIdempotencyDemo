@@ -76,10 +76,10 @@ namespace PostalIdempotencyDemo.Api.Repositories
                     if (await reader.ReadAsync())
                     {
                         summary.TotalOperations = reader["TotalOperations"] as int? ?? 0;
-                        summary.IdempotentHits = reader["IdempotentHits"] as int? ?? 0;
-                        summary.FailedOperations = reader["FailedOperations"] as int? ?? 0;
-                        summary.AverageExecutionTimeMs = reader["AverageExecutionTimeMs"] as double? ?? 0;
-                        summary.SuccessfulOperations = summary.TotalOperations - summary.FailedOperations;
+                        summary.IdempotentBlocks = reader["IdempotentHits"] as int? ?? 0;
+                        summary.ErrorCount = reader["FailedOperations"] as int? ?? 0;
+                        summary.AverageResponseTime = reader["AverageExecutionTimeMs"] as double? ?? 0;
+                        summary.SuccessfulOperations = summary.TotalOperations - summary.ErrorCount;
                     }
                 });
             }

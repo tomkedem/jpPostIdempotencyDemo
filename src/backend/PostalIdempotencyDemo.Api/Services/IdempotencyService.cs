@@ -13,7 +13,6 @@ namespace PostalIdempotencyDemo.Api.Services
         private readonly IIdempotencyRepository _repository;
         private readonly ILogger<IdempotencyService> _logger;
         private readonly IChaosService _chaosService;
-        private readonly TimeSpan _defaultTtl = TimeSpan.FromHours(24);
 
         public IdempotencyService(IIdempotencyRepository repository, ILogger<IdempotencyService> logger, IChaosService chaosService)
         {
@@ -68,6 +67,17 @@ namespace PostalIdempotencyDemo.Api.Services
             var entry = await _repository.GetByKeyAsync(idempotencyKey);
             if (entry != null && entry.ResponseData != null)
             {
+                // Check if entry has expired based on configurable expiration time
+                var expirationHours = await _chaosService.GetIdempotencyExpirationHoursAsync();
+                var expirationTime = entry.CreatedAt.AddHours(expirationHours);
+                
+                if (DateTime.UtcNow > expirationTime)
+                {
+                    _logger.LogInformation("Idempotency entry for key {IdempotencyKey} has expired after {ExpirationHours} hours", 
+                        idempotencyKey, expirationHours);
+                    return (null, null);
+                }
+
                 try
                 {
                     var cachedResponse = JsonSerializer.Deserialize<object>(entry.ResponseData);
