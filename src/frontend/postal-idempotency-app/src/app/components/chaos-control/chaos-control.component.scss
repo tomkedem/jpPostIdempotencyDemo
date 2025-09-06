@@ -16,7 +16,6 @@ h1.font-black {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
 }
 
 .page-container {
@@ -88,6 +87,44 @@ h1.font-black {
 .toggle-container:hover {
   border-color: rgba(99, 102, 241, 0.4); /* Indigo-500 with opacity */
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Metrics Dashboard Styles */
+.metric-card {
+  border-radius: 1rem;
+  padding: 1.5rem 1rem;
+  border: 1px solid;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.metric-icon {
+  font-size: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.metric-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1e293b; // slate-800
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569; // slate-600
 }
 
 /* Keyframe Animations */

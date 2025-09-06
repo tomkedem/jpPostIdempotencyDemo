@@ -29,30 +29,65 @@
               >
             </mat-slide-toggle>
             <div class="text-slate-600 text-base mt-3 pr-10">
-              מונע יצירת משלוחים כפולים במקרה של תקלות רשת או קריאות חוזרות. כל
-              בקשה מסומנת במזהה ייחודי.
+              מונע יצירת פעולות כפולות במקרה של תקלות רשת או קריאות חוזרות.
             </div>
           </div>
-
-          <!-- Force Error Toggle -->
-          @if (chaosForm.get('useIdempotencyKey')?.value) {
-          <div class="toggle-container nested-toggle">
-            <mat-slide-toggle
-              formControlName="forceError"
-              color="primary"
-              class="scale-110 origin-right"
-            >
-              <span class="font-semibold text-xl text-slate-700"
-                >דמה שגיאת רשת</span
-              >
-            </mat-slide-toggle>
-            <div class="text-slate-600 text-base mt-3 pr-10">
-              שולח בכוונה בקשה כפולה (עם אותו מזהה) כדי להדגים כיצד השרת מזהה
-              ומונע את הכפילות, ומחזיר את התוצאה המקורית.
-            </div>
-          </div>
-          }
         </form>
+
+        <!-- Metrics Display -->
+        @if (metricsSummary(); as summary) {
+        <div class="mt-10">
+          <h3
+            class="text-2xl font-semibold mb-6 flex items-center gap-4 text-slate-800"
+          >
+            <mat-icon class="text-blue-500 scale-110">analytics</mat-icon>
+            לוח מחוונים: תוצאות בזמן אמת
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <!-- Total Operations -->
+            <div class="metric-card bg-blue-100 border-blue-200">
+              <mat-icon class="metric-icon text-blue-500">functions</mat-icon>
+              <div class="metric-value" [countUp]="summary.totalOperations">
+                0
+              </div>
+              <div class="metric-label">סך כל הפעולות</div>
+            </div>
+
+            <!-- Idempotent Hits -->
+            <div class="metric-card bg-purple-100 border-purple-200">
+              <mat-icon class="metric-icon text-purple-500">shield</mat-icon>
+              <div class="metric-value" [countUp]="summary.idempotentHits">
+                0
+              </div>
+              <div class="metric-label">חסימות Idempotency</div>
+            </div>
+
+            <!-- Failed Operations -->
+            <div class="metric-card bg-red-100 border-red-200">
+              <mat-icon class="metric-icon text-red-500"
+                >error_outline</mat-icon
+              >
+              <div class="metric-value" [countUp]="summary.failedOperations">
+                0
+              </div>
+              <div class="metric-label">פעולות שנכשלו</div>
+            </div>
+
+            <!-- Avg Execution Time -->
+            <div class="metric-card bg-green-100 border-green-200">
+              <mat-icon class="metric-icon text-green-500">timer</mat-icon>
+              <div class="metric-value">
+                <span
+                  [countUp]="summary.averageExecutionTimeMs"
+                  [options]="{ decimalPlaces: 0 }"
+                  >0</span
+                >ms
+              </div>
+              <div class="metric-label">זמן ביצוע ממוצע</div>
+            </div>
+          </div>
+        </div>
+        }
       </div>
 
       <!-- Guided Demo Column -->

@@ -3,12 +3,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using PostalIdempotencyDemo.Api.Models.DTO;
 
 namespace PostalIdempotencyDemo.Api.Repositories
 {
     public interface IMetricsRepository
     {
         Task LogMetricsAsync(string operationType, string endpoint, long executionTimeMs, bool isIdempotentHit, string? idempotencyKey, bool isError = false);
+        Task<MetricsSummaryDto> GetMetricsSummaryAsync();
     }
 
     public class MetricsRepository : IMetricsRepository
@@ -51,6 +53,41 @@ namespace PostalIdempotencyDemo.Api.Repositories
             {
                 _logger.LogError(ex, "Error logging metrics");
             }
+        }
+
+        public async Task<MetricsSummaryDto> GetMetricsSummaryAsync()
+        {
+            var summary = new MetricsSummaryDto();
+            try
+            {
+                await _sqlExecutor.ExecuteAsync(async connection =>
+                {
+                    const string sql = @"
+                        SELECT 
+                            COUNT(*) AS TotalOperations,
+                            SUM(CASE WHEN is_idempotent_hit = 1 THEN 1 ELSE 0 END) AS IdempotentHits,
+                            SUM(CASE WHEN is_error = 1 THEN 1 ELSE 0 END) AS FailedOperations,
+                            AVG(CAST(execution_time_ms AS FLOAT)) AS AverageExecutionTimeMs
+                        FROM operation_metrics;";
+
+                    using var command = new SqlCommand(sql, connection);
+                    using var reader = await command.ExecuteReaderAsync();
+
+                    if (await reader.ReadAsync())
+                    {
+                        summary.TotalOperations = reader["TotalOperations"] as int? ?? 0;
+                        summary.IdempotentHits = reader["IdempotentHits"] as int? ?? 0;
+                        summary.FailedOperations = reader["FailedOperations"] as int? ?? 0;
+                        summary.AverageExecutionTimeMs = reader["AverageExecutionTimeMs"] as double? ?? 0;
+                        summary.SuccessfulOperations = summary.TotalOperations - summary.FailedOperations;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting metrics summary");
+            }
+            return summary;
         }
     }
 }

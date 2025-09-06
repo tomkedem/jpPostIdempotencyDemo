@@ -1,12 +1,20 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, signal } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatIconModule } from "@angular/material/icon";
 import { CommonModule } from "@angular/common";
 import { ChaosService } from "../../services/chaos.service";
-import { debounceTime, switchMap, catchError, EMPTY } from "rxjs";
-import { signal } from "@angular/core";
+import { MetricsService, MetricsSummary } from "../../services/metrics.service";
+import { CountUpModule } from "ngx-countup";
+import {
+  debounceTime,
+  switchMap,
+  catchError,
+  EMPTY,
+  interval,
+  startWith,
+} from "rxjs";
 
 @Component({
   selector: "app-chaos-control",
@@ -19,37 +27,49 @@ import { signal } from "@angular/core";
     MatSlideToggleModule,
     MatIconModule,
     MatSnackBarModule,
+    CountUpModule,
   ],
 })
 export class ChaosControlComponent implements OnInit {
   chaosForm: FormGroup;
+  metricsSummary = signal<MetricsSummary | null>(null);
   demoSteps: { icon: string; text: string }[] = [
     {
       icon: "looks_one",
-      text: `<strong>תרחיש בסיסי (ללא הגנה):</strong> <br> כבו את "הפעל הגנת Idempotency" ונסו ליצור משלוח חדש. לאחר מכן, רעננו את הדף ונסו לשלוח שוב את אותו הטופס. תיווצר כפילות.`,
+      text: `<strong>תרחיש בסיסי (ללא הגנה):</strong> <br> כבו את \"הפעל הגנת Idempotency\" ונסו לעדכן סטטוס פעמיים. שימו לב בלוח המחוונים שהפעולה מתבצעת פעמיים.`,
     },
     {
       icon: "looks_two",
-      text: `<strong>הפעלת הגנה:</strong> <br> הפעילו את "הפעל הגנת Idempotency". כל בקשת יצירה כעת מוגנת מכפילויות.`,
-    },
-    {
-      icon: "looks_3",
-      text: `<strong>בדיקת הגנה:</strong> <br> הפעילו את "דמה שגיאת רשת". כעת, כשתנסו ליצור משלוח, המערכת תדמה שליחה כפולה. שימו לב שהמשלוח נוצר רק פעם אחת, והמערכת מחזירה את התשובה המקורית במקום ליצור כפילות.`,
+      text: `<strong>הפעלת הגנה:</strong> <br> הפעילו את \"הפעל הגנת Idempotency\". נסו לעדכן את אותו הסטטוס שוב. שימו לב שהפעולה נחסמת ונספרת בלוח המחוונים.`,
     },
   ];
 
   constructor(
     private fb: FormBuilder,
     private chaosService: ChaosService,
+    private metricsService: MetricsService,
     private snackBar: MatSnackBar
   ) {
     this.chaosForm = this.fb.group({
       useIdempotencyKey: [true],
-      forceError: [false],
     });
   }
 
   ngOnInit(): void {
+    // Fetch metrics periodically
+    interval(5000)
+      .pipe(
+        startWith(0),
+        switchMap(() => this.metricsService.getMetricsSummary()),
+        catchError((err) => {
+          console.error("Failed to fetch metrics:", err);
+          return EMPTY;
+        })
+      )
+      .subscribe((summary) => {
+        this.metricsSummary.set(summary);
+      });
+
     // Set initial form state from the service
     this.chaosForm.patchValue(this.chaosService.settings(), {
       emitEvent: false,
@@ -62,7 +82,6 @@ export class ChaosControlComponent implements OnInit {
           return this.chaosService.updateSettingsOnServer(values).pipe(
             catchError((error) => {
               this.showErrorSnackbar("העדכון נכשל. אנא נסה שוב.");
-              // Revert the toggle state visually
               this.chaosForm.patchValue(this.chaosService.settings(), {
                 emitEvent: false,
               });
@@ -72,24 +91,16 @@ export class ChaosControlComponent implements OnInit {
         })
       )
       .subscribe((values) => {
-        // On success, the service has already updated the signal
-        this.showSnackbar(
-          this.chaosService.settings().useIdempotencyKey,
-          this.chaosService.settings().forceError
-        );
+        this.showSnackbar(this.chaosService.settings().useIdempotencyKey);
       });
   }
 
-  showSnackbar(useIdempotencyKey: boolean, forceError: boolean): void {
+  showSnackbar(useIdempotencyKey: boolean): void {
     let message: string;
     if (!useIdempotencyKey) {
       message = "הגנת Idempotency כבויה. המערכת חשופה לכפילויות.";
     } else {
-      if (forceError) {
-        message = "סימולציית שגיאת רשת פעילה. המערכת תמנע כפילויות.";
-      } else {
-        message = "הגנת Idempotency פעילה. המערכת תקינה.";
-      }
+      message = "הגנת Idempotency פעילה. המערכת תקינה.";
     }
 
     this.snackBar.open(message, "סגור", {

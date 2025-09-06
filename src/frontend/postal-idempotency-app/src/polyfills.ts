@@ -19,6 +19,8 @@
  */
 
 /***************************************************************************************************
- * Angular 20 uses signals and experimental zoneless change detection.
- * Zone.js is no longer required for modern Angular applications.
+ * Zone JS is required by default for Angular itself.
  */
+import "zone.js"; // Included with Angular CLI.
+
+// This file is required by karma.conf.js and loads recursively all the .spec and framework files

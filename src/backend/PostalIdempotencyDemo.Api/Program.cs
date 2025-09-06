@@ -32,9 +32,8 @@ builder.Services.AddScoped<ISqlExecutor, SqlExecutor>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IIdempotencyService, IdempotencyService>();
 builder.Services.AddScoped<IDeliveryService, DeliveryService>();
-// Removing duplicate registration
-builder.Services.AddScoped<PostalIdempotencyDemo.Api.Services.Interfaces.IChaosService, ChaosService>();
-
+builder.Services.AddScoped<IChaosService, ChaosService>();
+builder.Services.AddScoped<IMetricsService, MetricsService>();
 
 // CORS configuration
 builder.Services.AddCors(options =>
