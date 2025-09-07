@@ -105,6 +105,26 @@
           </ol>
         </div>
       </div>
+
+      <!-- Real-time Performance Chart -->
+      <div class="performance-chart">
+        <div class="chart-header">
+          <h3>מגמות ביצועים (דקות אחרונות)</h3>
+          <div class="chart-legend">
+            <span class="legend-item success">
+              <div class="legend-color success"></div>
+              פעולות מוצלחות
+            </span>
+            <span class="legend-item blocked">
+              <div class="legend-color blocked"></div>
+              חסימות אידמפוטנט
+            </span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas #performanceChart width="400" height="150"></canvas>
+        </div>
+      </div>
     </div>
 
     <!-- Right Column -->
@@ -137,10 +157,6 @@
             <div class="update-info">
               <mat-icon>info</mat-icon>
               <span>המדדים מתעדכנים אוטומטיקלית כל 5 שניות מהשרת</span>
-            </div>
-            <div class="last-update">
-              <mat-icon>schedule</mat-icon>
-              <span>עדכון אחרון: {{ currentTime() | date : "HH:mm:ss" }}</span>
             </div>
           </div>
 
@@ -223,26 +239,6 @@
                   [style.width.%]="getSuccessPercentage()"
                 ></div>
               </div>
-            </div>
-          </div>
-
-          <!-- Real-time Performance Chart -->
-          <div class="performance-chart">
-            <div class="chart-header">
-              <h3>מגמות ביצועים (דקות אחרונות)</h3>
-              <div class="chart-legend">
-                <span class="legend-item success">
-                  <div class="legend-color success"></div>
-                  פעולות מוצלחות
-                </span>
-                <span class="legend-item blocked">
-                  <div class="legend-color blocked"></div>
-                  חסימות אידמפוטנט
-                </span>
-              </div>
-            </div>
-            <div class="chart-container">
-              <canvas #performanceChart width="400" height="150"></canvas>
             </div>
           </div>
 
