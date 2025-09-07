@@ -1,158 +1,199 @@
-<div class="chaos-root light-mode">
-  <!-- Header -->
-  <header class="chaos-header">
-    <div class="logo-area">
-      <mat-icon class="logo-icon">bolt</mat-icon>
-      <span class="logo-title">בקרת כאוס</span>
+<div class="control-screen-container" dir="rtl">
+  <!-- Main Header -->
+  <header class="main-header">
+    <div class="title-container">
+      <mat-icon class="header-icon">security</mat-icon>
+      <h1>הגנת אידמפוטנטיות</h1>
+      <p class="subtitle">מניעת כפילויות בפעולות קריטיות</p>
     </div>
-    <div class="header-center">
-      <span
-        class="status-badge"
-        [ngClass]="idempotencyProtectionControl.value ? 'on' : 'off'"
+    <div class="status-container">
+      <div
+        class="system-status-indicator"
+        [ngClass]="
+          (isProtectionActive$ | async) ? 'status-active' : 'status-inactive'
+        "
       >
-        <mat-icon>{{
-          idempotencyProtectionControl.value ? "shield" : "warning"
-        }}</mat-icon>
-        {{ idempotencyProtectionControl.value ? "מוגן" : "לא מוגן" }}
-      </span>
-      <span class="header-clock">{{ getCurrentTime() }}</span>
+        <div class="status-light"></div>
+        <span>{{
+          (isProtectionActive$ | async) ? "הגנה פעילה" : "הגנה כבויה"
+        }}</span>
+      </div>
+      <div class="current-time">
+        {{ currentTime$ | async | date : "HH:mm:ss" }}
+      </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="chaos-main">
-    <section class="chaos-panels">
+  <!-- Main Content Grid -->
+  <main class="main-grid">
+    <!-- Left Column -->
+    <div class="grid-column column-left">
       <!-- Control Panel -->
-      <div class="chaos-card control-card">
-        <div class="card-header">
-          <mat-icon class="card-icon">settings</mat-icon>
-          <span class="card-title">הגדרות הגנה</span>
+      <div class="panel control-panel">
+        <div class="panel-header">
+          <mat-icon>toggle_on</mat-icon>
+          <h2>בקרה וניהול</h2>
         </div>
-        <div class="card-body">
-          <div class="form-row">
-            <label>הפעל הגנת אידמפוטנטיות</label>
+        <div class="panel-content">
+          <div class="control-row">
+            <label for="idempotency-toggle">הגנת אידמפוטנטיות</label>
             <mat-slide-toggle
+              id="idempotency-toggle"
               [formControl]="idempotencyProtectionControl"
               color="primary"
-            >
-              {{ idempotencyProtectionControl.value ? "פעיל" : "כבוי" }}
-            </mat-slide-toggle>
+            ></mat-slide-toggle>
           </div>
-          <div class="form-row">
-            <label>זמן תפוגה (שעות)</label>
+          <div class="control-row">
+            <label for="expiration-input">תפוגת מפתח (שעות)</label>
             <input
+              id="expiration-input"
               type="number"
               [formControl]="expirationHoursControl"
               min="1"
               max="168"
-              placeholder="24"
             />
           </div>
-        </div>
-        <div class="card-actions">
-          <button mat-raised-button color="primary" (click)="saveSettings()">
-            <mat-icon>save</mat-icon> שמור
-          </button>
-        </div>
-      </div>
-
-      <!-- Metrics Panel -->
-      <div class="chaos-card metrics-card">
-        <div class="card-header">
-          <mat-icon class="card-icon">bar_chart</mat-icon>
-          <span class="card-title">מדדי ביצועים</span>
-        </div>
-        <div class="card-body metrics-body">
-          <div class="metric-box">
-            <mat-icon>trending_up</mat-icon>
-            <div class="metric-value">
-              {{ metrics()?.totalOperations || 0 }}
-            </div>
-            <div class="metric-label">סה"כ פעולות</div>
-          </div>
-          <div class="metric-box">
-            <mat-icon>block</mat-icon>
-            <div class="metric-value">
-              {{ metrics()?.idempotentBlocks || 0 }}
-            </div>
-            <div class="metric-label">חסימות אידמפוטנט</div>
-          </div>
-          <div class="metric-box">
-            <mat-icon>check_circle</mat-icon>
-            <div class="metric-value">
-              {{ metrics()?.successfulOperations || 0 }}
-            </div>
-            <div class="metric-label">פעולות מוצלחות</div>
-          </div>
-          <div class="metric-box">
-            <mat-icon>percent</mat-icon>
-            <div class="metric-value">{{ metrics()?.successRate || 0 }}%</div>
-            <div class="metric-label">אחוז הצלחה</div>
+          <div class="control-actions">
+            <button
+              mat-flat-button
+              class="save-button"
+              (click)="saveSettings()"
+              [disabled]="!settingsChanged()"
+            >
+              <mat-icon>save</mat-icon>
+              <span>שמור שינויים</span>
+            </button>
+            <button
+              mat-stroked-button
+              class="reset-button"
+              (click)="resetSettings()"
+              [disabled]="!settingsChanged()"
+            >
+              <mat-icon>refresh</mat-icon>
+              <span>אפס</span>
+            </button>
           </div>
         </div>
       </div>
-    </section>
 
-    <section class="chaos-bottom">
-      <!-- Guide Panel -->
-      <div class="chaos-card guide-card">
-        <div class="card-header">
-          <mat-icon class="card-icon">menu_book</mat-icon>
-          <span class="card-title">מדריך הגנה</span>
+      <!-- Demo Guide -->
+      <div class="panel guide-panel">
+        <div class="panel-header">
+          <mat-icon>integration_instructions</mat-icon>
+          <h2>מדריך הדגמה</h2>
         </div>
-        <div class="card-body guide-body">
-          <ol class="guide-list">
-            <li>
-              הפעל את הגנת האידמפוטנטיות כדי למנוע כפילויות בפעולות קריטיות.
+        <div class="panel-content">
+          <ol class="guide-steps">
+            <li class="step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <strong>יצירת מפתח:</strong>
+                <span
+                  >צור מפתח דטרמיניסטי מ-<code>barcode</code>
+                  ו-<code>statusId</code>.</span
+                >
+              </div>
             </li>
-            <li>קבע זמן תפוגה למפתחות אידמפוטנטיות.</li>
-            <li>שלח בקשות עם כותרת <code>Idempotency-Key</code> ייחודית.</li>
-            <li>בקשות חוזרות עם אותו מפתח יחסמו אוטומטית.</li>
-            <li>עקוב אחר מדדי ההגנה בלוח הבקרה.</li>
+            <li class="step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <strong>שליחת בקשה:</strong>
+                <span>שלח את המפתח בכותרת <code>Idempotency-Key</code>.</span>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <strong>עיבוד בשרת:</strong>
+                <span>השרת ישמור את התוצאה וימנע כפילות.</span>
+              </div>
+            </li>
+            <li class="step">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <strong>מעקב וניטור:</strong>
+                <span>עקוב אחר התוצאות במדדים ובלוג המערכת.</span>
+              </div>
+            </li>
           </ol>
         </div>
       </div>
+    </div>
 
-      <!-- Terminal Panel -->
-      <div class="chaos-card terminal-card">
-        <div class="card-header">
-          <mat-icon class="card-icon">terminal</mat-icon>
-          <span class="card-title">יומן מערכת</span>
+    <!-- Right Column -->
+    <div class="grid-column column-right">
+      <!-- Metrics Panel -->
+      <div class="panel metrics-panel">
+        <div class="panel-header">
+          <mat-icon>insights</mat-icon>
+          <h2>מדדי הגנת אידמפוטנטיות</h2>
         </div>
-        <div class="card-body terminal-body">
-          <div class="log-line">
-            <span class="timestamp">{{ getCurrentTime() }}</span>
-            <span
-              class="log-level"
-              [ngClass]="
-                idempotencyProtectionControl.value ? 'success' : 'warning'
-              "
-            >
-              {{ idempotencyProtectionControl.value ? "מוגן" : "פגיע" }}
-            </span>
-            <span class="log-message">
-              הגנת אידמפוטנטיות
-              {{ idempotencyProtectionControl.value ? "פעילה" : "כבויה" }}
-            </span>
-          </div>
-          <div class="log-line">
-            <span class="timestamp">{{ getCurrentTime() }}</span>
-            <span class="log-level info">הגדרות</span>
-            <span class="log-message">
-              זמן תפוגה: {{ expirationHoursControl.value || 24 }} שעות
-            </span>
-          </div>
-          <div class="log-line">
-            <span class="timestamp">{{ getCurrentTime() }}</span>
-            <span class="log-level info">סטטיסטיקה</span>
-            <span class="log-message">
-              חסימות: {{ metrics()?.idempotentBlocks || 0 }} | הצלחות:
-              {{ metrics()?.successfulOperations || 0 }} | אחוז הצלחה:
-              {{ metrics()?.successRate || 0 }}%
-            </span>
+        <div class="panel-content">
+          <div class="metrics-grid">
+            <div class="metric-card main-metric">
+              <div class="metric-value">
+                {{ metrics()?.successRate || 0 | number : "1.0-2"
+                }}<span class="metric-unit">%</span>
+              </div>
+              <div class="metric-label">אחוז הצלחה</div>
+              <mat-icon class="metric-icon">verified_user</mat-icon>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">
+                {{ metrics()?.totalOperations || 0 | number }}
+              </div>
+              <div class="metric-label">סה"כ פעולות</div>
+              <mat-icon class="metric-icon">sync_alt</mat-icon>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">
+                {{ metrics()?.idempotentBlocks || 0 | number }}
+              </div>
+              <div class="metric-label">חסימות אידמפוטנט</div>
+              <mat-icon class="metric-icon">gpp_good</mat-icon>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">
+                {{ metrics()?.successfulOperations || 0 | number }}
+              </div>
+              <div class="metric-label">פעולות מוצלחות</div>
+              <mat-icon class="metric-icon">task_alt</mat-icon>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+
+      <!-- Status Log Terminal -->
+      <div class="panel terminal-panel">
+        <div class="panel-header">
+          <mat-icon>terminal</mat-icon>
+          <h2>לוג הגנת אידמפוטנטיות</h2>
+          <div class="terminal-controls">
+            <div class="control-dot red"></div>
+            <div class="control-dot yellow"></div>
+            <div class="control-dot green"></div>
+          </div>
+        </div>
+        <div class="panel-content terminal-content" #terminalContent>
+          @for (log of logHistory(); track log.timestamp) {
+          <div class="log-line" [ngClass]="log.level">
+            <span class="log-timestamp"
+              >[{{ log.timestamp | date : "HH:mm:ss.SSS" }}]</span
+            >
+            <span class="log-level">[{{ log.level.toUpperCase() }}]</span>
+            <span class="log-message">{{ log.message }}</span>
+          </div>
+          } @empty {
+          <div class="log-line info">
+            <span class="log-timestamp"
+              >[{{ currentTime$ | async | date : "HH:mm:ss.SSS" }}]</span
+            >
+            <span class="log-level">[INFO]</span>
+            <span class="log-message">ממתין לפעילות...</span>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
   </main>
 </div>

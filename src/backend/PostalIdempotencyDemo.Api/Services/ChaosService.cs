@@ -24,15 +24,10 @@ namespace PostalIdempotencyDemo.Api.Services
             return new ChaosSettingsDto
             {
                 UseIdempotencyKey = bool.TryParse(settingsDict.GetValueOrDefault("UseIdempotencyKey"), out var use) && use,
-                ForceError = bool.TryParse(settingsDict.GetValueOrDefault("ForceError"), out var force) && force,
+              
                 IdempotencyExpirationHours = int.TryParse(settingsDict.GetValueOrDefault("IdempotencyExpirationHours"), out var hours) ? hours : 24,
-                MaxRetryAttempts = int.TryParse(settingsDict.GetValueOrDefault("MaxRetryAttempts"), out var retries) ? retries : 3,
-                DefaultTimeoutSeconds = int.TryParse(settingsDict.GetValueOrDefault("DefaultTimeoutSeconds"), out var timeout) ? timeout : 30,
-                EnableMetricsCollection = bool.TryParse(settingsDict.GetValueOrDefault("EnableMetricsCollection"), out var metrics) && metrics,
-                MetricsRetentionDays = int.TryParse(settingsDict.GetValueOrDefault("MetricsRetentionDays"), out var retention) ? retention : 30,
-                EnableChaosMode = bool.TryParse(settingsDict.GetValueOrDefault("EnableChaosMode"), out var chaos) && chaos,
-                SystemMaintenanceMode = bool.TryParse(settingsDict.GetValueOrDefault("SystemMaintenanceMode"), out var maintenance) && maintenance
-            };
+                
+             };
         }
 
         public async Task<bool> UpdateChaosSettingsAsync(ChaosSettingsDto settingsDto)
@@ -40,14 +35,7 @@ namespace PostalIdempotencyDemo.Api.Services
             var settings = new List<SystemSetting>
             {
                 new() { SettingKey = "UseIdempotencyKey", SettingValue = settingsDto.UseIdempotencyKey.ToString().ToLower() },
-                new() { SettingKey = "ForceError", SettingValue = settingsDto.ForceError.ToString().ToLower() },
-                new() { SettingKey = "IdempotencyExpirationHours", SettingValue = settingsDto.IdempotencyExpirationHours.ToString() },
-                new() { SettingKey = "MaxRetryAttempts", SettingValue = settingsDto.MaxRetryAttempts.ToString() },
-                new() { SettingKey = "DefaultTimeoutSeconds", SettingValue = settingsDto.DefaultTimeoutSeconds.ToString() },
-                new() { SettingKey = "EnableMetricsCollection", SettingValue = settingsDto.EnableMetricsCollection.ToString().ToLower() },
-                new() { SettingKey = "MetricsRetentionDays", SettingValue = settingsDto.MetricsRetentionDays.ToString() },
-                new() { SettingKey = "EnableChaosMode", SettingValue = settingsDto.EnableChaosMode.ToString().ToLower() },
-                new() { SettingKey = "SystemMaintenanceMode", SettingValue = settingsDto.SystemMaintenanceMode.ToString().ToLower() }
+                new() { SettingKey = "IdempotencyExpirationHours", SettingValue = settingsDto.IdempotencyExpirationHours.ToString() },                
             };
 
             return await _settingsRepository.UpdateSettingsAsync(settings);

@@ -21,13 +21,8 @@ GO
 MERGE SystemSettings AS target
 USING (VALUES 
     ('UseIdempotencyKey', 'true', 'Enable or disable idempotency protection globally', 'boolean'),
-    ('IdempotencyExpirationHours', '24', 'Number of hours after which idempotency entries expire', 'integer'),
-    ('MaxRetryAttempts', '3', 'Maximum number of retry attempts for failed operations', 'integer'),
-    ('DefaultTimeoutSeconds', '30', 'Default timeout for API operations in seconds', 'integer'),
-    ('EnableMetricsCollection', 'true', 'Enable collection of operation metrics', 'boolean'),
-    ('MetricsRetentionDays', '30', 'Number of days to retain metrics data', 'integer'),
-    ('EnableChaosMode', 'false', 'Enable chaos engineering features for testing', 'boolean'),
-    ('SystemMaintenanceMode', 'false', 'Put system in maintenance mode', 'boolean')
+    ('IdempotencyExpirationHours', '24', 'Number of hours after which idempotency entries expire', 'integer')
+  
 ) AS source (SettingKey, SettingValue, Description, DataType)
 ON target.SettingKey = source.SettingKey
 WHEN NOT MATCHED THEN
