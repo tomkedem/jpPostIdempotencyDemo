@@ -571,13 +571,17 @@
 
 .metric-card {
   position: relative;
-  padding: 0.875rem;
+  padding: 0.5rem 0.75rem;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-  border-radius: 12px;
+  border-radius: 8px;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 
   &::before {
     content: '';
@@ -585,15 +589,15 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background: linear-gradient(90deg, #6366f1 0%, #10b981 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
     &::before {
       opacity: 1;
@@ -624,70 +628,55 @@
 
   .metric-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
 
     .metric-icon {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      border-radius: 8px;
-      color: white;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
-    }
-
-    .metric-trend {
-      display: flex;
-      align-items: center;
-      justify-content: center;
       width: 20px;
       height: 20px;
-      background: rgba(16, 185, 129, 0.1);
-      border-radius: 4px;
-      color: #10b981;
-
-      mat-icon {
-        font-size: 12px;
-        width: 12px;
-        height: 12px;
-      }
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
+      border-radius: 6px;
+      color: white;
+      font-size: 12px;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 3px rgba(99, 102, 241, 0.2);
     }
   }
 
   .metric-value {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 2.25rem;
+    font-weight: 800;
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 0.25rem;
-    line-height: 1.2;
+    line-height: 1;
   }
 
   .metric-label {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     font-weight: 600;
     color: var(--text-secondary);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.375rem;
+    line-height: 1.2;
   }
 
   .metric-progress {
     position: relative;
-    height: 4px;
+    height: 3px;
+    width: 100%;
     background: rgba(226, 232, 240, 0.6);
-    border-radius: 2px;
+    border-radius: 1.5px;
     overflow: hidden;
 
     .progress-bar {
       height: 100%;
-      border-radius: 2px;
+      border-radius: 1.5px;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
 
@@ -731,43 +720,12 @@
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
-  
-  .metric-card {
-    padding: 0.875rem;
-    
-    .metric-value {
-      font-size: 1.25rem;
-    }
-  }
 }
 
 // --- Terminal Panel ---
 .terminal-panel {
-  .panel-header {
-    position: relative;
-    .terminal-controls {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      gap: 8px;
-
-      .control-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        &.red {
-          background-color: #ff5f56;
-        }
-        &.yellow {
-          background-color: #ffbd2e;
-        }
-        &.green {
-          background-color: #27c93f;
-        }
-      }
-    }
+  .panel-content {
+    padding: 0;
   }
 
   .terminal-content {
@@ -775,32 +733,73 @@
     color: hsl(var(--primary-hue), 15%, 85%);
     font-family: var(--font-mono);
     font-size: 13px;
-    padding: var(--spacing);
-    display: flex;
-    flex-direction: column-reverse; // Newest logs at the bottom
+    border-radius: 8px;
+    overflow: hidden;
 
-    .log-line {
-      white-space: pre-wrap;
-      line-height: 1.6;
+    .terminal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background-color: hsl(var(--primary-hue), 15%, 12%);
+      border-bottom: 1px solid hsl(var(--primary-hue), 15%, 25%);
 
-      .log-timestamp {
-        opacity: 0.6;
-      }
-      .log-level {
-        font-weight: 700;
+      .terminal-title {
+        font-weight: 600;
+        color: hsl(var(--primary-hue), 15%, 90%);
       }
 
-      &.info .log-level {
-        color: hsl(var(--secondary-hue), 80%, 70%);
+      .clear-logs-btn {
+        color: hsl(var(--primary-hue), 15%, 70%);
+        
+        &:hover {
+          color: hsl(var(--primary-hue), 15%, 90%);
+          background-color: hsl(var(--primary-hue), 15%, 20%);
+        }
       }
-      &.success .log-level {
-        color: var(--success-color);
-      }
-      &.warn .log-level {
-        color: var(--warning-hue);
-      }
-      &.error .log-level {
-        color: var(--danger-color);
+    }
+
+    .terminal-logs {
+      padding: 0.5rem;
+      max-height: 300px;
+      overflow-y: auto;
+
+      .log-entry {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.25rem 0;
+        font-size: 12px;
+        line-height: 1.4;
+
+        .log-timestamp {
+          color: hsl(var(--primary-hue), 15%, 60%);
+          min-width: 60px;
+        }
+
+        .log-level {
+          min-width: 50px;
+          font-weight: 600;
+        }
+
+        .log-message {
+          flex: 1;
+        }
+
+        &.info .log-level {
+          color: #3b82f6;
+        }
+
+        &.success .log-level {
+          color: #10b981;
+        }
+
+        &.warning .log-level {
+          color: #f59e0b;
+        }
+
+        &.error .log-level {
+          color: #ef4444;
+        }
       }
     }
   }
@@ -842,9 +841,6 @@
 
   .metrics-panel .metrics-grid {
     grid-template-columns: 1fr;
-    .metric-card.main-metric .metric-value {
-      font-size: 40px;
-    }
   }
 }
 
@@ -904,176 +900,6 @@
       }
     }
   }
-}
-
-// Enhanced Metrics Grid
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.metric-card {
-  position: relative;
-  padding: 2rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-  border-radius: 20px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #6366f1 0%, #10b981 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  &:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-
-    &::before {
-      opacity: 1;
-    }
-
-    .metric-icon {
-      transform: scale(1.1) rotate(5deg);
-    }
-
-    .metric-progress .progress-bar {
-      animation: progressPulse 2s ease-in-out infinite;
-    }
-  }
-
-  &.total-operations {
-    &::before {
-      background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
-    }
-  }
-
-  &.blocked-operations {
-    &::before {
-      background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);
-    }
-  }
-
-  &.successful-operations {
-    &::before {
-      background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-    }
-  }
-
-  .metric-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-
-    .metric-icon {
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      border-radius: 16px;
-      color: white;
-      font-size: 24px;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-    }
-
-    .metric-trend {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      background: rgba(16, 185, 129, 0.1);
-      border-radius: 8px;
-      color: #10b981;
-
-      mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-      }
-    }
-  }
-
-  .metric-value {
-    font-size: 2.5rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.5rem;
-    line-height: 1.2;
-  }
-
-  .metric-label {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-  }
-
-  .metric-progress {
-    position: relative;
-    height: 8px;
-    background: rgba(226, 232, 240, 0.6);
-    border-radius: 4px;
-    overflow: hidden;
-
-    .progress-bar {
-      height: 100%;
-      border-radius: 4px;
-      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
-        animation: shimmer 2s ease-in-out infinite;
-      }
-
-      &.total {
-        background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
-        width: 100%;
-      }
-
-      &.blocked {
-        background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);
-      }
-
-      &.successful {
-        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-      }
-    }
-  }
-}
-
-@keyframes progressPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
 }
 
 // Enhanced Terminal Styling

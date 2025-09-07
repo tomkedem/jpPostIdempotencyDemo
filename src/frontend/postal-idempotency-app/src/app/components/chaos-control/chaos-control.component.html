@@ -189,10 +189,7 @@
           <div class="metrics-grid">
             <div class="metric-card total-operations">
               <div class="metric-header">
-                <mat-icon class="metric-icon">analytics</mat-icon>
-                <div class="metric-trend">
-                  <mat-icon>trending_up</mat-icon>
-                </div>
+                <mat-icon class="metric-icon">bar_chart</mat-icon>
               </div>
               <div class="metric-value">
                 {{ metrics()?.totalOperations || 0 | number }}
@@ -205,10 +202,7 @@
 
             <div class="metric-card blocked-operations">
               <div class="metric-header">
-                <mat-icon class="metric-icon">block</mat-icon>
-                <div class="metric-trend">
-                  <mat-icon>shield</mat-icon>
-                </div>
+                <mat-icon class="metric-icon">security</mat-icon>
               </div>
               <div class="metric-value">
                 {{ metrics()?.idempotentBlocks || 0 | number }}
@@ -225,9 +219,6 @@
             <div class="metric-card successful-operations">
               <div class="metric-header">
                 <mat-icon class="metric-icon">check_circle</mat-icon>
-                <div class="metric-trend">
-                  <mat-icon>done_all</mat-icon>
-                </div>
               </div>
               <div class="metric-value">
                 {{ metrics()?.successfulOperations || 0 | number }}
@@ -241,54 +232,34 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- לוג הגנת אידמפוטנטיות -->
-          <div class="panel">
-            <div class="panel-header">
-              <h2>לוג הגנת אידמפוטנטיות</h2>
-              <div class="terminal-controls">
-                <div class="terminal-button red"></div>
-                <div class="terminal-button yellow"></div>
-                <div class="terminal-button green"></div>
-              </div>
+      <!-- Terminal Panel -->
+      <div class="panel terminal-panel">
+        <div class="panel-content">
+          <div class="terminal-content">
+            <div class="terminal-header">
+              <span class="terminal-title">לוג הגנת אידמפוטנטיות</span>
+              <button
+                mat-icon-button
+                (click)="clearLogs()"
+                class="clear-logs-btn"
+                title="נקה לוג"
+              >
+                <mat-icon>clear_all</mat-icon>
+              </button>
             </div>
-            <div class="panel-content">
-              <div class="terminal-container">
-                <div class="terminal-header">
-                  <span class="terminal-title">System Log</span>
-                  <span class="terminal-info"
-                    >{{ logHistory().length }} entries</span
-                  >
-                </div>
-                <div class="terminal-content recent-logs">
-                  @for (log of getRecentLogs(); track log.timestamp) {
-                  <div class="log-entry" [ngClass]="'log-' + log.level">
-                    <span class="log-timestamp">{{
-                      log.timestamp | date : "HH:mm:ss"
-                    }}</span>
-                    <span class="log-level"
-                      >[{{ log.level.toUpperCase() }}]</span
-                    >
-                    <span class="log-message">{{ log.message }}</span>
-                  </div>
-                  } @if (logHistory().length === 0) {
-                  <div class="log-entry log-info">
-                    <span class="log-message">אין רשומות זמינות</span>
-                  </div>
-                  }
-                </div>
-                <div class="terminal-footer">
-                  <span class="terminal-status">Live monitoring active</span>
-                  <button
-                    mat-stroked-button
-                    class="clear-logs-btn"
-                    (click)="clearLogs()"
-                  >
-                    <mat-icon>clear_all</mat-icon>
-                    נקה לוג
-                  </button>
-                </div>
+            <div class="terminal-logs">
+              @for (log of getRecentLogs(); track log.timestamp) {
+              <div class="log-entry" [class]="log.level">
+                <span class="log-timestamp">{{
+                  log.timestamp | date : "HH:mm:ss"
+                }}</span>
+                <span class="log-level">[{{ log.level.toUpperCase() }}]</span>
+                <span class="log-message">{{ log.message }}</span>
               </div>
+              }
             </div>
           </div>
         </div>
