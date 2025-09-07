@@ -128,6 +128,22 @@
           </div>
         </div>
         <div class="panel-content">
+          <!-- Real-time Update Status -->
+          <div class="update-status-panel">
+            <div class="update-indicator">
+              <div class="indicator-dot active"></div>
+              <span class="status-text">עדכון אוטומטי פעיל</span>
+            </div>
+            <div class="update-info">
+              <mat-icon>info</mat-icon>
+              <span>המדדים מתעדכנים אוטומטיקלית כל 5 שניות מהשרת</span>
+            </div>
+            <div class="last-update">
+              <mat-icon>schedule</mat-icon>
+              <span>עדכון אחרון: {{ currentTime() | date : "HH:mm:ss" }}</span>
+            </div>
+          </div>
+
           <!-- Quick Stats Summary -->
           <div class="quick-stats">
             <div class="stat-item">
@@ -154,19 +170,59 @@
             </div>
           </div>
 
-          <!-- Real-time Update Status -->
-          <div class="update-status-panel">
-            <div class="update-indicator">
-              <div class="indicator-dot active"></div>
-              <span class="status-text">עדכון אוטומטי פעיל</span>
+          <div class="metrics-grid">
+            <div class="metric-card total-operations">
+              <div class="metric-header">
+                <mat-icon class="metric-icon">analytics</mat-icon>
+                <div class="metric-trend">
+                  <mat-icon>trending_up</mat-icon>
+                </div>
+              </div>
+              <div class="metric-value">
+                {{ metrics()?.totalOperations || 0 | number }}
+              </div>
+              <div class="metric-label">סה"כ פעולות</div>
+              <div class="metric-progress">
+                <div class="progress-bar total"></div>
+              </div>
             </div>
-            <div class="update-info">
-              <mat-icon>info</mat-icon>
-              <span>המדדים מתעדכנים אוטומטיקלית כל 5 שניות מהשרת</span>
+
+            <div class="metric-card blocked-operations">
+              <div class="metric-header">
+                <mat-icon class="metric-icon">block</mat-icon>
+                <div class="metric-trend">
+                  <mat-icon>shield</mat-icon>
+                </div>
+              </div>
+              <div class="metric-value">
+                {{ metrics()?.idempotentBlocks || 0 | number }}
+              </div>
+              <div class="metric-label">חסימות אידמפוטנט</div>
+              <div class="metric-progress">
+                <div
+                  class="progress-bar blocked"
+                  [style.width.%]="getBlockedPercentage()"
+                ></div>
+              </div>
             </div>
-            <div class="last-update">
-              <mat-icon>schedule</mat-icon>
-              <span>עדכון אחרון: {{ currentTime() | date : "HH:mm:ss" }}</span>
+
+            <div class="metric-card successful-operations">
+              <div class="metric-header">
+                <mat-icon class="metric-icon">check_circle</mat-icon>
+                <div class="metric-trend">
+                  <mat-icon>done_all</mat-icon>
+                </div>
+              </div>
+              <div class="metric-value">
+                {{ metrics()?.successfulOperations || 0 | number }}
+              </div>
+              <div class="metric-label">פעולות מוצלחות</div>
+              <div class="metric-progress">
+                <div
+                  class="progress-bar successful"
+                  [style.width.%]="getSuccessPercentage()"
+                ></div>
+              </div>
             </div>
           </div>
 
@@ -190,83 +246,53 @@
             </div>
           </div>
 
-          <div class="metrics-grid">
-            <div class="metric-card main-metric">
-              <div class="metric-value">
-                {{ metrics()?.successRate || 0 | number : "1.0-2"
-                }}<span class="metric-unit">%</span>
+          <!-- לוג הגנת אידמפוטנטיות -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2>לוג הגנת אידמפוטנטיות</h2>
+              <div class="terminal-controls">
+                <div class="terminal-button red"></div>
+                <div class="terminal-button yellow"></div>
+                <div class="terminal-button green"></div>
               </div>
-              <div class="metric-label">אחוז הצלחה</div>
-              <mat-icon class="metric-icon">verified_user</mat-icon>
             </div>
-            <div class="metric-card">
-              <div class="metric-value">
-                {{ metrics()?.totalOperations || 0 | number }}
+            <div class="panel-content">
+              <div class="terminal-container">
+                <div class="terminal-header">
+                  <span class="terminal-title">System Log</span>
+                  <span class="terminal-info"
+                    >{{ logHistory().length }} entries</span
+                  >
+                </div>
+                <div class="terminal-content recent-logs">
+                  @for (log of getRecentLogs(); track log.timestamp) {
+                  <div class="log-entry" [ngClass]="'log-' + log.level">
+                    <span class="log-timestamp">{{
+                      log.timestamp | date : "HH:mm:ss"
+                    }}</span>
+                    <span class="log-level"
+                      >[{{ log.level.toUpperCase() }}]</span
+                    >
+                    <span class="log-message">{{ log.message }}</span>
+                  </div>
+                  } @if (logHistory().length === 0) {
+                  <div class="log-entry log-info">
+                    <span class="log-message">אין רשומות זמינות</span>
+                  </div>
+                  }
+                </div>
+                <div class="terminal-footer">
+                  <span class="terminal-status">Live monitoring active</span>
+                  <button
+                    mat-stroked-button
+                    class="clear-logs-btn"
+                    (click)="clearLogs()"
+                  >
+                    <mat-icon>clear_all</mat-icon>
+                    נקה לוג
+                  </button>
+                </div>
               </div>
-              <div class="metric-label">סה"כ פעולות</div>
-              <mat-icon class="metric-icon">sync_alt</mat-icon>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value">
-                {{ metrics()?.idempotentBlocks || 0 | number }}
-              </div>
-              <div class="metric-label">חסימות אידמפוטנט</div>
-              <mat-icon class="metric-icon">gpp_good</mat-icon>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value">
-                {{ metrics()?.successfulOperations || 0 | number }}
-              </div>
-              <div class="metric-label">פעולות מוצלחות</div>
-              <mat-icon class="metric-icon">task_alt</mat-icon>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- לוג הגנת אידמפוטנטיות -->
-      <div class="panel">
-        <div class="panel-header">
-          <h2>לוג הגנת אידמפוטנטיות</h2>
-          <div class="terminal-controls">
-            <div class="terminal-button red"></div>
-            <div class="terminal-button yellow"></div>
-            <div class="terminal-button green"></div>
-          </div>
-        </div>
-        <div class="panel-content">
-          <div class="terminal-container">
-            <div class="terminal-header">
-              <span class="terminal-title">System Log</span>
-              <span class="terminal-info"
-                >{{ logHistory().length }} entries</span
-              >
-            </div>
-            <div class="terminal-content recent-logs">
-              @for (log of getRecentLogs(); track log.timestamp) {
-              <div class="log-entry" [ngClass]="'log-' + log.level">
-                <span class="log-timestamp">{{
-                  log.timestamp | date : "HH:mm:ss"
-                }}</span>
-                <span class="log-level">[{{ log.level.toUpperCase() }}]</span>
-                <span class="log-message">{{ log.message }}</span>
-              </div>
-              } @if (logHistory().length === 0) {
-              <div class="log-entry log-info">
-                <span class="log-message">אין רשומות זמינות</span>
-              </div>
-              }
-            </div>
-            <div class="terminal-footer">
-              <span class="terminal-status">Live monitoring active</span>
-              <button
-                mat-stroked-button
-                class="clear-logs-btn"
-                (click)="clearLogs()"
-              >
-                <mat-icon>clear_all</mat-icon>
-                נקה לוג
-              </button>
             </div>
           </div>
         </div>
