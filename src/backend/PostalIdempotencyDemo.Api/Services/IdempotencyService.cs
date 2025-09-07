@@ -4,7 +4,6 @@ using System.Text.Json;
 using PostalIdempotencyDemo.Api.Models;
 using PostalIdempotencyDemo.Api.Repositories;
 using PostalIdempotencyDemo.Api.Services.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace PostalIdempotencyDemo.Api.Services
 {

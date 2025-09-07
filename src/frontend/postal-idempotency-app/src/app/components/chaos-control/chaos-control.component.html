@@ -10,12 +10,16 @@
       <div
         class="system-status-indicator"
         [ngClass]="
-          (chaosService.settings().useIdempotencyKey) ? 'status-active' : 'status-inactive'
+          chaosService.settings().useIdempotencyKey
+            ? 'status-active'
+            : 'status-inactive'
         "
       >
         <div class="status-light"></div>
         <span>{{
-          (chaosService.settings().useIdempotencyKey) ? "הגנה פעילה" : "הגנה כבויה"
+          chaosService.settings().useIdempotencyKey
+            ? "הגנה פעילה"
+            : "הגנה כבויה"
         }}</span>
       </div>
       <div class="current-time">
@@ -42,7 +46,7 @@
               [checked]="idempotencyProtectionEnabled()"
               (change)="toggleIdempotencyProtection()"
               color="primary"
-            ></mat-slide-toggle >
+            ></mat-slide-toggle>
           </div>
           <div class="control-row">
             <label for="expiration-input">תפוגת מפתח (שעות)</label>
@@ -54,26 +58,6 @@
               min="1"
               max="168"
             />
-          </div>
-          <div class="control-actions">
-            <button
-              mat-flat-button
-              class="save-button"
-              (click)="saveSettings()"
-              [disabled]="!settingsChanged()"
-            >
-              <mat-icon>save</mat-icon>
-              <span>שמור שינויים</span>
-            </button>
-            <button
-              mat-stroked-button
-              class="reset-button"
-              (click)="resetSettings()"
-              [disabled]="!settingsChanged()"
-            >
-              <mat-icon>refresh</mat-icon>
-              <span>אפס</span>
-            </button>
           </div>
         </div>
       </div>

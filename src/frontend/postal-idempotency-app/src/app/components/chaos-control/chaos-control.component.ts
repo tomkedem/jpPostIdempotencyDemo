@@ -66,11 +66,10 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
 
   // --- Derived Signals using computed ---
   isProtectionActive = computed(() => this.idempotencyProtectionEnabled());
-  
-  currentTime = toSignal(
-    timer(0, 1000).pipe(map(() => new Date())),
-    { initialValue: new Date() }
-  );
+
+  currentTime = toSignal(timer(0, 1000).pipe(map(() => new Date())), {
+    initialValue: new Date(),
+  });
 
   settingsChanged = computed(() => {
     const initial = this.initialSettings();
@@ -101,7 +100,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-    
+
     // Clear any pending save timeout
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
@@ -141,61 +140,19 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
       });
   }
 
-  saveSettings() {
-    const newSettings: Partial<ChaosSettings> = {
-      useIdempotencyKey: this.idempotencyProtectionEnabled(),
-      idempotencyExpirationHours: this.expirationHours(),
-    };
-
-    this.addLog("info", "שומר הגדרות חדשות...");
-
-    // Create a simplified settings object with only the 2 supported settings
-    const completeSettings: ChaosSettings = {
-      useIdempotencyKey: newSettings.useIdempotencyKey!,
-      idempotencyExpirationHours: newSettings.idempotencyExpirationHours!,
-    };
-
-    // Update settings on server via HTTP call
-    this.chaosService.updateSettingsOnServer(completeSettings)
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: () => {
-        // Update local state
-        this.chaosService.updateSettings(newSettings);
-        this.initialSettings.set(newSettings);
-        this.addLog("success", "ההגדרות נשמרו בהצלחה בשרת");
-      },
-      error: (error) => {
-        console.error("Failed to save settings:", error);
-        this.addLog("error", "שגיאה בשמירת ההגדרות בשרת");
-        // Revert to previous values
-        this.resetSettings();
-      }
-    });
-  }
-
-  resetSettings() {
-    const initial = this.initialSettings();
-    this.idempotencyProtectionEnabled.set(initial.useIdempotencyKey ?? true);
-    this.expirationHours.set(initial.idempotencyExpirationHours ?? 24);
-    this.addLog("warn", "השינויים בוטלו - חזרה להגדרות הקודמות");
-  }
-
   // Methods for template binding
   toggleIdempotencyProtection() {
-    this.idempotencyProtectionEnabled.update(current => !current);
-    // Auto-save when user toggles
-    this.saveSettings();
+    this.idempotencyProtectionEnabled.update((current) => !current);
   }
 
   updateExpirationHours(hours: number) {
     this.expirationHours.set(hours);
-    
+
     // Clear existing timeout
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
     }
-    
+
     // Set new timeout for auto-save
     this.saveTimeout = window.setTimeout(() => this.saveSettings(), 1000);
   }
@@ -220,5 +177,37 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     } catch (err) {
       // שגיאה שקטה - לא חשוב אם הגלילה נכשלת
     }
+  }
+
+  private saveSettings() {
+    const newSettings: Partial<ChaosSettings> = {
+      useIdempotencyKey: this.idempotencyProtectionEnabled(),
+      idempotencyExpirationHours: this.expirationHours(),
+    };
+
+    this.addLog("info", "שומר הגדרות חדשות...");
+
+    // Create a simplified settings object with only the 2 supported settings
+    const completeSettings: ChaosSettings = {
+      useIdempotencyKey: newSettings.useIdempotencyKey!,
+      idempotencyExpirationHours: newSettings.idempotencyExpirationHours!,
+    };
+
+    // Update settings on server via HTTP call
+    this.chaosService
+      .updateSettingsOnServer(completeSettings)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          // Update local state
+          this.chaosService.updateSettings(newSettings);
+          this.initialSettings.set(newSettings);
+          this.addLog("success", "ההגדרות נשמרו בהצלחה בשרת");
+        },
+        error: (error) => {
+          console.error("Failed to save settings:", error);
+          this.addLog("error", "שגיאה בשמירת ההגדרות בשרת");
+        },
+      });
   }
 }

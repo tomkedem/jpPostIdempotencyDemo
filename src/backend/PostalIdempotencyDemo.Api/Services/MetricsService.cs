@@ -68,18 +68,19 @@ public class MetricsService : IMetricsService
             // Update counters
             Interlocked.Increment(ref _totalOperations);
             
-            if (wasSuccessful)
+            if (wasIdempotent)
             {
+                // פעולה אידמפוטנטית - נחסמה בהצלחה אבל לא נספרת כמוצלחת
+                Interlocked.Increment(ref _idempotentBlocks);
+            }
+            else if (wasSuccessful)
+            {
+                // רק פעולות שלא היו אידמפוטנטיות נספרות כמוצלחות
                 Interlocked.Increment(ref _successfulOperations);
             }
             else
             {
                 Interlocked.Increment(ref _errorCount);
-            }
-
-            if (wasIdempotent)
-            {
-                Interlocked.Increment(ref _idempotentBlocks);
             }
 
             // Update operation-specific counters

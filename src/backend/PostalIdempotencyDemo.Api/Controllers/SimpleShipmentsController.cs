@@ -93,6 +93,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
                     locationLng = delivery.LocationLng,
                     recipientName = delivery.RecipientName,
                     statusId = delivery.StatusId,
+                    StatusNameHe = delivery.StatusNameHe ?? "לא עודכן",
                     notes = delivery.Notes,
                     createdAt = delivery.CreatedAt,
                     updatedAt = delivery.UpdatedAt

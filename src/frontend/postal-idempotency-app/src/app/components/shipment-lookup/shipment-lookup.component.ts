@@ -15,6 +15,7 @@ import { MatChipsModule } from "@angular/material/chips";
 import { CommonModule, DatePipe } from "@angular/common";
 import { ShipmentService } from "../../services/shipment.service";
 import { Shipment } from "../../models/shipment.model";
+import { Delivery } from "src/app/models/delivery.model";
 
 @Component({
   selector: "app-shipment-lookup",
@@ -38,9 +39,7 @@ export class ShipmentLookupComponent implements OnInit {
   lookupForm: FormGroup;
   isLoading = signal(false);
   shipment = signal<Shipment | null>(null);
-  delivery = signal<import("../../models/delivery.model").Delivery | null>(
-    null
-  );
+  delivery = signal<Delivery | null>(null);
   lastSearchedBarcode: string | null = null;
 
   private shipmentStatuses: Map<number, string> = new Map([

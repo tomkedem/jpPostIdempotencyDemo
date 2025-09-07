@@ -19,9 +19,25 @@ namespace PostalIdempotencyDemo.Api.Repositories
                 const string query = @"SELECT TOP 1 id, barcode, employee_id, delivery_date, location_lat, location_lng, recipient_name, status_id, notes, created_at, updated_at FROM deliveries WHERE barcode = @barcode ORDER BY delivery_date DESC";
                 using var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@barcode", barcode);
+
                 using var reader = await command.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
                 {
+                    var statusId = reader.IsDBNull(reader.GetOrdinal("status_id")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("status_id"));
+                    string? statusNameHe = statusId 
+                    switch
+                    {
+                        1 => "נוצר",
+                        2 => "נמסר",
+                        3 => "נכשל",
+                        4 => "נמסר חלקית",
+                        5 => "בדרך",
+                        6 => "בדרך לחלוקה",
+                        7 => "חריגה",
+                        _ => null
+                    };
+                    
+                    
                     return new Models.Delivery
                     {
                         Id = reader.GetGuid(reader.GetOrdinal("id")),
@@ -32,6 +48,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         LocationLng = reader.IsDBNull(reader.GetOrdinal("location_lng")) ? null : (double)reader.GetDecimal(reader.GetOrdinal("location_lng")),
                         RecipientName = reader.IsDBNull(reader.GetOrdinal("recipient_name")) ? null : reader.GetString(reader.GetOrdinal("recipient_name")),
                         StatusId = reader.GetInt32(reader.GetOrdinal("status_id")),
+                        StatusNameHe = statusNameHe,
                         Notes = reader.IsDBNull(reader.GetOrdinal("notes")) ? null : reader.GetString(reader.GetOrdinal("notes")),
                         CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
                         UpdatedAt = reader.GetDateTime(reader.GetOrdinal("updated_at")),
@@ -95,7 +112,8 @@ namespace PostalIdempotencyDemo.Api.Repositories
                 if (await reader.ReadAsync())
                 {
                     var statusId = reader.IsDBNull(reader.GetOrdinal("status_id")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("status_id"));
-                    string? statusNameHe = statusId switch
+                    string? statusNameHe = statusId 
+                    switch
                     {
                         1 => "נוצר",
                         2 => "נמסר",

@@ -79,7 +79,9 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         summary.IdempotentBlocks = reader["IdempotentHits"] as int? ?? 0;
                         summary.ErrorCount = reader["FailedOperations"] as int? ?? 0;
                         summary.AverageResponseTime = reader["AverageExecutionTimeMs"] as double? ?? 0;
-                        summary.SuccessfulOperations = summary.TotalOperations - summary.ErrorCount;
+                        
+                        // פעולות מוצלחות = סה"כ פעולות מינוס חסימות אידמפוטנטיות מינוס שגיאות
+                        summary.SuccessfulOperations = summary.TotalOperations - summary.IdempotentBlocks - summary.ErrorCount;
                     }
                 });
             }

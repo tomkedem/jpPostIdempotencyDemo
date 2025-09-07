@@ -35,7 +35,7 @@ namespace PostalIdempotencyDemo.Api.Services
                 LocationLat = request.LocationLat,
                 LocationLng = request.LocationLng,
                 RecipientName = request.RecipientName,
-                StatusId = request.DeliveryStatus,
+                StatusId = request.DeliveryStatus,                
                 Notes = request.Notes,
                 CreatedAt = DateTime.UtcNow
             };

@@ -7,6 +7,7 @@ export interface Delivery {
   locationLng?: number;
   recipientName?: string;
   statusId: number;
+  statusNameHe?: string;
   notes?: string;
   createdAt?: Date;
   updatedAt?: Date;
