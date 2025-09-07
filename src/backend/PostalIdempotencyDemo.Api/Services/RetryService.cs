@@ -16,7 +16,8 @@ namespace PostalIdempotencyDemo.Api.Services
 
         public async Task<T> ExecuteWithRetryAsync<T>(Func<Task<T>> operation, string operationName)
         {
-            var maxRetries = await _chaosService.GetMaxRetryAttemptsAsync();
+            // Using fixed retry count since chaos settings functionality was removed
+            var maxRetries = 3; // Default to 3 retries
             var attempt = 0;
             Exception? lastException = null;
 
@@ -24,9 +25,9 @@ namespace PostalIdempotencyDemo.Api.Services
             {
                 try
                 {
-                    _logger.LogDebug("Executing {OperationName}, attempt {Attempt}/{MaxRetries}", 
+                    _logger.LogDebug("Executing {OperationName}, attempt {Attempt}/{MaxRetries}",
                         operationName, attempt + 1, maxRetries + 1);
-                    
+
                     return await operation();
                 }
                 catch (Exception ex)
@@ -36,21 +37,21 @@ namespace PostalIdempotencyDemo.Api.Services
 
                     if (attempt > maxRetries)
                     {
-                        _logger.LogError(ex, "Operation {OperationName} failed after {MaxRetries} attempts", 
+                        _logger.LogError(ex, "Operation {OperationName} failed after {MaxRetries} attempts",
                             operationName, maxRetries + 1);
                         break;
                     }
 
                     var delay = CalculateDelay(attempt);
-                    _logger.LogWarning("Operation {OperationName} failed on attempt {Attempt}, retrying in {Delay}ms. Error: {Error}", 
+                    _logger.LogWarning("Operation {OperationName} failed on attempt {Attempt}, retrying in {Delay}ms. Error: {Error}",
                         operationName, attempt, delay, ex.Message);
-                    
+
                     await Task.Delay(delay);
                 }
             }
 
             throw new InvalidOperationException(
-                $"Operation '{operationName}' failed after {maxRetries + 1} attempts", 
+                $"Operation '{operationName}' failed after {maxRetries + 1} attempts",
                 lastException);
         }
 

@@ -12,13 +12,13 @@ namespace PostalIdempotencyDemo.Api.Services
     {
         private readonly IIdempotencyRepository _repository;
         private readonly ILogger<IdempotencyService> _logger;
-        private readonly IChaosService _chaosService;
+        private readonly ISettingsRepository _settingsRepository;
 
-        public IdempotencyService(IIdempotencyRepository repository, ILogger<IdempotencyService> logger, IChaosService chaosService)
+        public IdempotencyService(IIdempotencyRepository repository, ILogger<IdempotencyService> logger, ISettingsRepository settingsRepository)
         {
             _repository = repository;
             _logger = logger;
-            _chaosService = chaosService;
+            _settingsRepository = settingsRepository;
         }
 
         public string GenerateIdempotencyKey(string requestContent)
@@ -56,45 +56,13 @@ namespace PostalIdempotencyDemo.Api.Services
             }
         }
 
-        public async Task<(object? cachedResponse, IdempotencyEntry? entry)> GetCachedResponseAsync(string idempotencyKey)
-        {
-            var chaosSettings = await _chaosService.GetChaosSettingsAsync();
-            if (idempotencyKey == null || !chaosSettings.UseIdempotencyKey)
-            {
-                return (null, null); // Idempotency is disabled or no key, bypass cache check
-            }
 
-            var entry = await _repository.GetByKeyAsync(idempotencyKey);
-            if (entry != null && entry.ResponseData != null)
-            {
-                // Check if entry has expired based on configurable expiration time
-                var expirationHours = await _chaosService.GetIdempotencyExpirationHoursAsync();
-                var expirationTime = entry.CreatedAt.AddHours(expirationHours);
-                
-                if (DateTime.UtcNow > expirationTime)
-                {
-                    _logger.LogInformation("Idempotency entry for key {IdempotencyKey} has expired after {ExpirationHours} hours", 
-                        idempotencyKey, expirationHours);
-                    return (null, null);
-                }
-
-                try
-                {
-                    var cachedResponse = JsonSerializer.Deserialize<object>(entry.ResponseData);
-                    return (cachedResponse, entry);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to deserialize cached response for key {IdempotencyKey}", idempotencyKey);
-                }
-            }
-            return (null, entry);
-        }
 
         public async Task CacheResponseAsync(string idempotencyKey, object response)
         {
-            var chaosSettings = await _chaosService.GetChaosSettingsAsync();
-            if (idempotencyKey == null || !chaosSettings.UseIdempotencyKey) return; // Do not cache if disabled
+            var settings = await _settingsRepository.GetSettingsAsync();
+            var useIdempotencySetting = settings.FirstOrDefault(s => s.SettingKey == "UseIdempotencyKey");
+            if (idempotencyKey == null || useIdempotencySetting?.SettingValue != "true") return; // Do not cache if disabled
 
             var responseData = JsonSerializer.Serialize(response);
             // StatusCode can be set as needed, here using 200 as default

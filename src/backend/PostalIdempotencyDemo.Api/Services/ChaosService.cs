@@ -39,54 +39,7 @@ namespace PostalIdempotencyDemo.Api.Services
             };
 
             return await _settingsRepository.UpdateSettingsAsync(settings);
-        }
+        }       
 
-        public async Task<bool> ShouldIntroduceFailureAsync()
-        {
-            var settings = await _settingsRepository.GetSettingsAsync();
-            var forceError = settings.FirstOrDefault(s => s.SettingKey == "ForceError")?.SettingValue;
-            return bool.TryParse(forceError, out var result) && result;
-        }
-
-        public async Task<int> GetDelayAsync()
-        {
-            var settings = await _settingsRepository.GetSettingsAsync();
-            var timeoutSetting = settings.FirstOrDefault(s => s.SettingKey == "DefaultTimeoutSeconds")?.SettingValue;
-            return int.TryParse(timeoutSetting, out var timeout) ? timeout * 1000 : 30000; // Convert to milliseconds
-        }
-
-        public async Task SimulateNetworkIssueAsync()
-        {
-            var delay = await GetDelayAsync();
-            await Task.Delay(Math.Min(delay / 10, 1000)); // Use 1/10th of timeout or max 1 second
-        }
-
-        public async Task<int> GetIdempotencyExpirationHoursAsync()
-        {
-            var settings = await _settingsRepository.GetSettingsAsync();
-            var expirationSetting = settings.FirstOrDefault(s => s.SettingKey == "IdempotencyExpirationHours")?.SettingValue;
-            return int.TryParse(expirationSetting, out var hours) ? hours : 24;
-        }
-
-        public async Task<bool> IsMaintenanceModeAsync()
-        {
-            var settings = await _settingsRepository.GetSettingsAsync();
-            var maintenanceMode = settings.FirstOrDefault(s => s.SettingKey == "SystemMaintenanceMode")?.SettingValue;
-            return bool.TryParse(maintenanceMode, out var result) && result;
-        }
-
-        public async Task<int> GetMaxRetryAttemptsAsync()
-        {
-            var settings = await _settingsRepository.GetSettingsAsync();
-            var retrySetting = settings.FirstOrDefault(s => s.SettingKey == "MaxRetryAttempts")?.SettingValue;
-            return int.TryParse(retrySetting, out var retries) ? retries : 3;
-        }
-
-        public async Task<int> GetDefaultTimeoutSecondsAsync()
-        {
-            var settings = await _settingsRepository.GetSettingsAsync();
-            var timeoutSetting = settings.FirstOrDefault(s => s.SettingKey == "DefaultTimeoutSeconds")?.SettingValue;
-            return int.TryParse(timeoutSetting, out var timeout) ? timeout : 30;
-        }
     }
 }

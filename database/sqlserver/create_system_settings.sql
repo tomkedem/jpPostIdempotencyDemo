@@ -18,19 +18,24 @@ END
 GO
 
 -- Insert default system settings
-MERGE SystemSettings AS target
+MERGE dbo.SystemSettings AS target
 USING (VALUES 
     ('UseIdempotencyKey', 'true', 'Enable or disable idempotency protection globally', 'boolean'),
     ('IdempotencyExpirationHours', '24', 'Number of hours after which idempotency entries expire', 'integer')
-  
 ) AS source (SettingKey, SettingValue, Description, DataType)
 ON target.SettingKey = source.SettingKey
 WHEN NOT MATCHED THEN
     INSERT (SettingKey, SettingValue, Description, DataType, CreatedAt, UpdatedAt)
     VALUES (source.SettingKey, source.SettingValue, source.Description, source.DataType, GETUTCDATE(), GETUTCDATE())
 WHEN MATCHED THEN
-    UPDATE SET UpdatedAt = GETUTCDATE();
+    UPDATE SET 
+        target.SettingValue = source.SettingValue,
+        target.Description  = source.Description,
+        target.DataType     = source.DataType,
+        target.UpdatedAt    = GETUTCDATE()
+;
 GO
+
 
 -- Create index for faster lookups
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[SystemSettings]') AND name = N'IX_SystemSettings_DataType')

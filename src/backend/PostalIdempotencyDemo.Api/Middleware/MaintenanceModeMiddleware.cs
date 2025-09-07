@@ -23,25 +23,26 @@ namespace PostalIdempotencyDemo.Api.Middleware
                 return;
             }
 
-            var isMaintenanceMode = await chaosService.IsMaintenanceModeAsync();
-            if (isMaintenanceMode)
-            {
-                _logger.LogWarning("Request blocked due to maintenance mode: {Path}", context.Request.Path);
-                
-                context.Response.StatusCode = 503; // Service Unavailable
-                context.Response.ContentType = "application/json";
-                
-                var response = new
-                {
-                    error = "System is currently in maintenance mode",
-                    message = "The system is temporarily unavailable for maintenance. Please try again later.",
-                    statusCode = 503,
-                    timestamp = DateTime.UtcNow
-                };
-
-                await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(response));
-                return;
-            }
+            // Maintenance mode functionality removed - only keeping core idempotency settings
+            // var isMaintenanceMode = await chaosService.IsMaintenanceModeAsync();
+            // if (isMaintenanceMode)
+            // {
+            //     _logger.LogWarning("Request blocked due to maintenance mode: {Path}", context.Request.Path);
+            //     
+            //     context.Response.StatusCode = 503; // Service Unavailable
+            //     context.Response.ContentType = "application/json";
+            //     
+            //     var response = new
+            //     {
+            //         error = "System is currently in maintenance mode",
+            //         message = "The system is temporarily unavailable for maintenance. Please try again later.",
+            //         statusCode = 503,
+            //         timestamp = DateTime.UtcNow
+            //     };
+            //
+            //     await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(response));
+            //     return;
+            // }
 
             await _next(context);
         }
