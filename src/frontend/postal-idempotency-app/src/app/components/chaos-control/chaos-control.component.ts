@@ -23,6 +23,7 @@ import {
   startWith,
   Subject,
   takeUntil,
+  Observable,
 } from "rxjs";
 
 import { ChaosService, ChaosSettings } from "../../services/chaos.service";
@@ -50,8 +51,16 @@ interface LogEntry {
 })
 export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   @ViewChild("terminalContent") private terminalContentRef!: ElementRef;
+  @ViewChild("performanceChart")
+  private chartRef!: ElementRef<HTMLCanvasElement>;
   private destroy$ = new Subject<void>();
   private saveTimeout?: number;
+  private chartContext?: CanvasRenderingContext2D;
+  private performanceData: {
+    timestamp: number;
+    successful: number;
+    blocked: number;
+  }[] = [];
 
   // Inject services using modern Angular 20 approach
   chaosService = inject(ChaosService); // Made public for template access
@@ -79,6 +88,22 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     );
   });
 
+  systemHealthStatus = computed(() => {
+    const m = this.metrics();
+    if (!m) return "unknown";
+
+    const successRate =
+      m.totalOperations > 0
+        ? (m.successfulOperations / m.totalOperations) * 100
+        : 100;
+    const avgResponseTime = m.averageResponseTime || 0;
+
+    if (successRate >= 98 && avgResponseTime < 200) return "excellent";
+    if (successRate >= 95 && avgResponseTime < 500) return "good";
+    if (successRate >= 90 && avgResponseTime < 1000) return "fair";
+    return "poor";
+  });
+
   constructor() {
     // Effect to scroll terminal down when new logs are added
     effect(() => {
@@ -95,6 +120,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     setTimeout(() => this.scrollToBottom(), 100);
+    this.initializeChart();
   }
 
   ngOnDestroy() {
@@ -132,12 +158,26 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
       .subscribe({
         next: (metrics) => {
           this.metrics.set(metrics);
+          this.updatePerformanceData(metrics);
         },
         error: (error) => {
           console.error("שגיאה בטעינת מדדים:", error);
           this.addLog("error", "שגיאה בטעינת מדדים");
         },
       });
+  }
+
+  private updatePerformanceData(metrics: MetricsSummary) {
+    const newPoint = {
+      timestamp: Date.now(),
+      successful: metrics.successfulOperations,
+      blocked: metrics.idempotentBlocks,
+    };
+
+    this.performanceData.push(newPoint);
+    this.performanceData = this.performanceData.slice(-10); // Keep last 10 points
+
+    this.drawChart();
   }
 
   // Methods for template binding
@@ -209,5 +249,205 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
           this.addLog("error", "שגיאה בשמירת ההגדרות בשרת");
         },
       });
+  }
+
+  private initializeChart() {
+    if (this.chartRef?.nativeElement) {
+      const context = this.chartRef.nativeElement.getContext("2d");
+      this.chartContext = context || undefined;
+      this.drawChart();
+    }
+  }
+
+  private drawChart() {
+    if (!this.chartContext) return;
+
+    const canvas = this.chartRef.nativeElement;
+    const ctx = this.chartContext;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid and axes
+    ctx.strokeStyle = "#e2e8f0";
+    ctx.lineWidth = 1;
+
+    // Vertical grid lines
+    for (let i = 0; i <= 10; i++) {
+      const x = (canvas.width / 10) * i;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+
+    // Horizontal grid lines
+    for (let i = 0; i <= 5; i++) {
+      const y = (canvas.height / 5) * i;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+
+    // Draw performance data if available
+    if (this.performanceData.length > 1) {
+      this.drawPerformanceLine(ctx, canvas);
+    }
+  }
+
+  private drawPerformanceLine(
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+  ) {
+    const maxValue =
+      Math.max(
+        ...this.performanceData.map((d) => Math.max(d.successful, d.blocked))
+      ) || 10;
+
+    // Draw successful operations line
+    ctx.strokeStyle = "#10b981";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    this.performanceData.forEach((point, index) => {
+      const x = (canvas.width / (this.performanceData.length - 1)) * index;
+      const y = canvas.height - (point.successful / maxValue) * canvas.height;
+
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    ctx.stroke();
+
+    // Draw blocked operations line
+    ctx.strokeStyle = "#f59e0b";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    this.performanceData.forEach((point, index) => {
+      const x = (canvas.width / (this.performanceData.length - 1)) * index;
+      const y = canvas.height - (point.blocked / maxValue) * canvas.height;
+
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    ctx.stroke();
+  }
+
+  // Advanced functionality methods
+  resetMetrics() {
+    if (confirm("האם אתה בטוח שברצונך לאפס את כל המדדים?")) {
+      this.metricsService.resetMetrics().subscribe({
+        next: () => {
+          this.performanceData = [];
+          this.drawChart();
+          this.addLog("success", "המדדים אופסו בהצלחה");
+        },
+        error: (error) => {
+          console.error("Error resetting metrics:", error);
+          this.addLog("error", "שגיאה באיפוס המדדים");
+        },
+      });
+    }
+  }
+
+  exportMetrics() {
+    const currentMetrics = this.metrics();
+    if (!currentMetrics) {
+      this.addLog("warn", "אין מדדים לייצוא");
+      return;
+    }
+
+    const reportData = {
+      timestamp: new Date().toISOString(),
+      metrics: currentMetrics,
+      performanceHistory: this.performanceData,
+      systemHealth: this.systemHealthStatus(),
+      settings: {
+        idempotencyEnabled: this.idempotencyProtectionEnabled(),
+        expirationHours: this.expirationHours(),
+      },
+    };
+
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], {
+      type: "application/json",
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `idempotency-report-${
+      new Date().toISOString().split("T")[0]
+    }.json`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.addLog("success", "דוח המדדים יוצא בהצלחה");
+  }
+
+  // Helper methods for system health indicator
+  getSystemHealthClass(): string {
+    const status = this.systemHealthStatus();
+    return `health-${status}`;
+  }
+
+  getSystemHealthIcon(): string {
+    const status = this.systemHealthStatus();
+    switch (status) {
+      case "excellent":
+        return "check_circle";
+      case "good":
+        return "thumb_up";
+      case "fair":
+        return "warning";
+      case "poor":
+        return "error";
+      default:
+        return "help";
+    }
+  }
+
+  getSystemHealthText(): string {
+    const status = this.systemHealthStatus();
+    switch (status) {
+      case "excellent":
+        return "מצוין";
+      case "good":
+        return "טוב";
+      case "fair":
+        return "בסדר";
+      case "poor":
+        return "בעייתי";
+      default:
+        return "לא ידוע";
+    }
+  }
+
+  getBlockedPercentage(): number {
+    const metrics = this.metrics();
+    if (!metrics || metrics.totalOperations === 0) return 0;
+    return (metrics.idempotentBlocks / metrics.totalOperations) * 100;
+  }
+
+  getSuccessPercentage(): number {
+    const metrics = this.metrics();
+    if (!metrics || metrics.totalOperations === 0) return 0;
+    return (metrics.successfulOperations / metrics.totalOperations) * 100;
+  }
+
+  getRecentLogs(): LogEntry[] {
+    const logs = this.logHistory();
+    // הצגת 10 הרשומות האחרונות בלבד
+    return logs.slice(-10).reverse();
+  }
+
+  clearLogs(): void {
+    this.logHistory.set([]);
+    this.addLog("info", "לוג נוקה על ידי המשתמש");
   }
 }

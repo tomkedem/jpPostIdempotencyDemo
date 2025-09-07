@@ -10,17 +10,18 @@
       <div
         class="system-status-indicator"
         [ngClass]="
-          chaosService.settings().useIdempotencyKey
-            ? 'status-active'
-            : 'status-inactive'
+          idempotencyProtectionEnabled() ? 'status-active' : 'status-inactive'
         "
       >
         <div class="status-light"></div>
         <span>{{
-          chaosService.settings().useIdempotencyKey
-            ? "הגנה פעילה"
-            : "הגנה כבויה"
+          idempotencyProtectionEnabled() ? "הגנה פעילה" : "הגנה כבויה"
         }}</span>
+      </div>
+      <!-- הוספת אינדיקטור בריאות מערכת -->
+      <div class="system-health" [ngClass]="getSystemHealthClass()">
+        <mat-icon>{{ getSystemHealthIcon() }}</mat-icon>
+        <span>{{ getSystemHealthText() }}</span>
       </div>
       <div class="current-time">
         {{ currentTime() | date : "HH:mm:ss" }}
@@ -113,8 +114,82 @@
         <div class="panel-header">
           <mat-icon>insights</mat-icon>
           <h2>מדדי הגנת אידמפוטנטיות</h2>
+          <div class="panel-actions">
+            <button
+              mat-icon-button
+              (click)="resetMetrics()"
+              title="איפוס מדדים"
+            >
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button (click)="exportMetrics()" title="ייצוא דוח">
+              <mat-icon>download</mat-icon>
+            </button>
+          </div>
         </div>
         <div class="panel-content">
+          <!-- Quick Stats Summary -->
+          <div class="quick-stats">
+            <div class="stat-item">
+              <div class="stat-icon">
+                <mat-icon>speed</mat-icon>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value">
+                  {{ metrics()?.averageResponseTime || 0 | number : "1.0-0" }}ms
+                </div>
+                <div class="stat-label">זמן תגובה ממוצע</div>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon">
+                <mat-icon>trending_up</mat-icon>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value">
+                  {{ metrics()?.successRate || 0 | number : "1.0-1" }}%
+                </div>
+                <div class="stat-label">אחוז הצלחה</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-time Update Status -->
+          <div class="update-status-panel">
+            <div class="update-indicator">
+              <div class="indicator-dot active"></div>
+              <span class="status-text">עדכון אוטומטי פעיל</span>
+            </div>
+            <div class="update-info">
+              <mat-icon>info</mat-icon>
+              <span>המדדים מתעדכנים אוטומטיקלית כל 5 שניות מהשרת</span>
+            </div>
+            <div class="last-update">
+              <mat-icon>schedule</mat-icon>
+              <span>עדכון אחרון: {{ currentTime() | date : "HH:mm:ss" }}</span>
+            </div>
+          </div>
+
+          <!-- Real-time Performance Chart -->
+          <div class="performance-chart">
+            <div class="chart-header">
+              <h3>מגמות ביצועים (דקות אחרונות)</h3>
+              <div class="chart-legend">
+                <span class="legend-item success">
+                  <div class="legend-color success"></div>
+                  פעולות מוצלחות
+                </span>
+                <span class="legend-item blocked">
+                  <div class="legend-color blocked"></div>
+                  חסימות אידמפוטנט
+                </span>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas #performanceChart width="400" height="150"></canvas>
+            </div>
+          </div>
+
           <div class="metrics-grid">
             <div class="metric-card main-metric">
               <div class="metric-value">
@@ -149,35 +224,51 @@
         </div>
       </div>
 
-      <!-- Status Log Terminal -->
-      <div class="panel terminal-panel">
+      <!-- לוג הגנת אידמפוטנטיות -->
+      <div class="panel">
         <div class="panel-header">
-          <mat-icon>terminal</mat-icon>
           <h2>לוג הגנת אידמפוטנטיות</h2>
           <div class="terminal-controls">
-            <div class="control-dot red"></div>
-            <div class="control-dot yellow"></div>
-            <div class="control-dot green"></div>
+            <div class="terminal-button red"></div>
+            <div class="terminal-button yellow"></div>
+            <div class="terminal-button green"></div>
           </div>
         </div>
-        <div class="panel-content terminal-content" #terminalContent>
-          @for (log of logHistory(); track log.timestamp) {
-          <div class="log-line" [ngClass]="log.level">
-            <span class="log-timestamp"
-              >[{{ log.timestamp | date : "HH:mm:ss.SSS" }}]</span
-            >
-            <span class="log-level">[{{ log.level.toUpperCase() }}]</span>
-            <span class="log-message">{{ log.message }}</span>
+        <div class="panel-content">
+          <div class="terminal-container">
+            <div class="terminal-header">
+              <span class="terminal-title">System Log</span>
+              <span class="terminal-info"
+                >{{ logHistory().length }} entries</span
+              >
+            </div>
+            <div class="terminal-content recent-logs">
+              @for (log of getRecentLogs(); track log.timestamp) {
+              <div class="log-entry" [ngClass]="'log-' + log.level">
+                <span class="log-timestamp">{{
+                  log.timestamp | date : "HH:mm:ss"
+                }}</span>
+                <span class="log-level">[{{ log.level.toUpperCase() }}]</span>
+                <span class="log-message">{{ log.message }}</span>
+              </div>
+              } @if (logHistory().length === 0) {
+              <div class="log-entry log-info">
+                <span class="log-message">אין רשומות זמינות</span>
+              </div>
+              }
+            </div>
+            <div class="terminal-footer">
+              <span class="terminal-status">Live monitoring active</span>
+              <button
+                mat-stroked-button
+                class="clear-logs-btn"
+                (click)="clearLogs()"
+              >
+                <mat-icon>clear_all</mat-icon>
+                נקה לוג
+              </button>
+            </div>
           </div>
-          } @empty {
-          <div class="log-line info">
-            <span class="log-timestamp"
-              >[{{ currentTime() | date : "HH:mm:ss.SSS" }}]</span
-            >
-            <span class="log-level">[INFO]</span>
-            <span class="log-message">ממתין לפעילות...</span>
-          </div>
-          }
         </div>
       </div>
     </div>
