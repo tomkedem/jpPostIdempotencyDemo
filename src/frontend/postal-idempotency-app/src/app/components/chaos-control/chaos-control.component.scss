@@ -564,68 +564,172 @@
 // --- Metrics Panel ---
 .metrics-panel .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
 
-  .metric-card {
-    background-color: var(--panel-header-bg);
-    border-radius: var(--border-radius);
-    padding: var(--spacing);
-    position: relative;
-    overflow: hidden;
+.metric-card {
+  position: relative;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 
-    .metric-value {
-      font-size: 32px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      line-height: 1;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1 0%, #10b981 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
-      .metric-unit {
-        font-size: 18px;
-        font-weight: 500;
-        opacity: 0.6;
-        margin-left: 4px;
-      }
-    }
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 
-    .metric-label {
-      font-size: 14px;
-      font-weight: 500;
-      opacity: 0.8;
-      margin-top: 8px;
+    &::before {
+      opacity: 1;
     }
 
     .metric-icon {
-      position: absolute;
-      right: 16px;
-      top: 16px;
-      font-size: 28px;
-      opacity: 0.1;
-      color: var(--text-color);
+      transform: scale(1.05);
+    }
+  }
+
+  &.total-operations {
+    &::before {
+      background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+    }
+  }
+
+  &.blocked-operations {
+    &::before {
+      background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);
+    }
+  }
+
+  &.successful-operations {
+    &::before {
+      background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    }
+  }
+
+  .metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    .metric-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      border-radius: 12px;
+      color: white;
+      font-size: 20px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
     }
 
-    &.main-metric {
-      grid-column: 1 / -1;
-      background: linear-gradient(
-        135deg,
-        var(--primary-color),
-        hsl(var(--primary-hue), 90%, 75%)
-      );
-      color: white;
+    .metric-trend {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: rgba(16, 185, 129, 0.1);
+      border-radius: 6px;
+      color: #10b981;
 
-      .metric-value {
-        font-size: 48px;
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  .metric-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+  }
+
+  .metric-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .metric-progress {
+    position: relative;
+    height: 6px;
+    background: rgba(226, 232, 240, 0.6);
+    border-radius: 3px;
+    overflow: hidden;
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+        animation: shimmer 2s ease-in-out infinite;
       }
 
-      .metric-label {
-        opacity: 0.9;
+      &.total {
+        background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+        width: 100%;
       }
 
-      .metric-icon {
-        opacity: 0.2;
-        color: white;
-        font-size: 40px;
+      &.blocked {
+        background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);
       }
+
+      &.successful {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .metric-card {
+    padding: 1rem;
+    
+    .metric-value {
+      font-size: 1.5rem;
     }
   }
 }
