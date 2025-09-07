@@ -188,48 +188,48 @@
 
           <div class="metrics-grid">
             <div class="metric-card total-operations">
-              <div class="metric-header">
-                <mat-icon class="metric-icon">bar_chart</mat-icon>
+              <div class="metric-content">
+                <div class="metric-value">
+                  {{ metrics()?.totalOperations || 0 | number }}
+                </div>
+                <div class="metric-label">סה"כ פעולות</div>
+                <div class="metric-progress">
+                  <div class="progress-bar total"></div>
+                </div>
               </div>
-              <div class="metric-value">
-                {{ metrics()?.totalOperations || 0 | number }}
-              </div>
-              <div class="metric-label">סה"כ פעולות</div>
-              <div class="metric-progress">
-                <div class="progress-bar total"></div>
-              </div>
+              <mat-icon class="metric-icon">bar_chart</mat-icon>
             </div>
 
             <div class="metric-card blocked-operations">
-              <div class="metric-header">
-                <mat-icon class="metric-icon">security</mat-icon>
+              <div class="metric-content">
+                <div class="metric-value">
+                  {{ metrics()?.idempotentBlocks || 0 | number }}
+                </div>
+                <div class="metric-label">חסימות אידמפוטנט</div>
+                <div class="metric-progress">
+                  <div
+                    class="progress-bar blocked"
+                    [style.width.%]="getBlockedPercentage()"
+                  ></div>
+                </div>
               </div>
-              <div class="metric-value">
-                {{ metrics()?.idempotentBlocks || 0 | number }}
-              </div>
-              <div class="metric-label">חסימות אידמפוטנט</div>
-              <div class="metric-progress">
-                <div
-                  class="progress-bar blocked"
-                  [style.width.%]="getBlockedPercentage()"
-                ></div>
-              </div>
+              <mat-icon class="metric-icon">security</mat-icon>
             </div>
 
             <div class="metric-card successful-operations">
-              <div class="metric-header">
-                <mat-icon class="metric-icon">check_circle</mat-icon>
+              <div class="metric-content">
+                <div class="metric-value">
+                  {{ metrics()?.successfulOperations || 0 | number }}
+                </div>
+                <div class="metric-label">פעולות מוצלחות</div>
+                <div class="metric-progress">
+                  <div
+                    class="progress-bar successful"
+                    [style.width.%]="getSuccessPercentage()"
+                  ></div>
+                </div>
               </div>
-              <div class="metric-value">
-                {{ metrics()?.successfulOperations || 0 | number }}
-              </div>
-              <div class="metric-label">פעולות מוצלחות</div>
-              <div class="metric-progress">
-                <div
-                  class="progress-bar successful"
-                  [style.width.%]="getSuccessPercentage()"
-                ></div>
-              </div>
+              <mat-icon class="metric-icon">check_circle</mat-icon>
             </div>
           </div>
         </div>
