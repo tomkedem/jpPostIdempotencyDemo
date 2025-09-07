@@ -183,6 +183,8 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   // Methods for template binding
   toggleIdempotencyProtection() {
     this.idempotencyProtectionEnabled.update((current) => !current);
+    // Auto-save when user toggles
+    this.saveSettings();
   }
 
   updateExpirationHours(hours: number) {
