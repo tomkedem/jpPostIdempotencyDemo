@@ -70,6 +70,20 @@
           <h2>מדריך הדגמה</h2>
         </div>
         <div class="panel-content">
+          <!-- Real-time Performance Chart - Compact Version -->
+          <div class="performance-chart-compact">
+            <div class="chart-header-compact">
+              <h4>מגמות ביצועים</h4>
+              <div class="chart-legend-compact">
+                <span class="legend-dot success"></span>
+                <span class="legend-dot blocked"></span>
+              </div>
+            </div>
+            <div class="chart-container-compact">
+              <canvas #performanceChart width="300" height="80"></canvas>
+            </div>
+          </div>
+
           <ol class="guide-steps">
             <li class="step">
               <div class="step-number">1</div>
@@ -91,7 +105,7 @@
             <li class="step">
               <div class="step-number">3</div>
               <div class="step-content">
-                <strong>עיבוד בשרת:</strong>
+                <strong>קבלת תגובה:</strong>
                 <span>השרת ישמור את התוצאה וימנע כפילות.</span>
               </div>
             </li>
@@ -107,24 +121,24 @@
       </div>
 
       <!-- Real-time Performance Chart -->
-      <div class="performance-chart">
+      <!-- <div class="performance-chart">
         <div class="chart-header">
           <h3>מגמות ביצועים (דקות אחרונות)</h3>
           <div class="chart-legend">
             <span class="legend-item success">
               <div class="legend-color success"></div>
-              פעולות מוצלחות
+              <strong class="green-text">ירוק:</strong> בקשות שעובדו בהצלחה
             </span>
             <span class="legend-item blocked">
               <div class="legend-color blocked"></div>
-              חסימות אידמפוטנט
+              <strong class="red-text">אדום:</strong> בקשות שנחסמו (כפולות)
             </span>
           </div>
         </div>
         <div class="chart-container">
           <canvas #performanceChart width="400" height="150"></canvas>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <!-- Right Column -->

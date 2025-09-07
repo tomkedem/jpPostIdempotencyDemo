@@ -308,7 +308,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
       ) || 10;
 
     // Draw successful operations line
-    ctx.strokeStyle = "#10b981";
+    ctx.strokeStyle = "#22c55e"; // ירוק בהיר יותר
     ctx.lineWidth = 2;
     ctx.beginPath();
 
@@ -325,7 +325,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     ctx.stroke();
 
     // Draw blocked operations line
-    ctx.strokeStyle = "#f59e0b";
+    ctx.strokeStyle = "#ef4444"; // אדום-כתום להדגשת חסימה
     ctx.lineWidth = 2;
     ctx.beginPath();
 
