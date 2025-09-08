@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using PostalIdempotencyDemo.Api.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using PostalIdempotencyDemo.Api.DTOs;
-using System.Data;
 
 namespace PostalIdempotencyDemo.Api.Controllers
 {
