@@ -12,8 +12,7 @@ namespace PostalIdempotencyDemo.Api.Services.Interfaces
         /// </summary>
         Task<IdempotencyDemoResponse<Delivery>> ProcessCreateDeliveryWithIdempotencyAsync(
             CreateDeliveryRequest request,
-            string idempotencyKey,
-            string correlationId,
+            string idempotencyKey,            
             string requestPath);
 
         /// <summary>

@@ -31,9 +31,6 @@ public class ShipmentService : IShipmentService
             var shipment = new Shipment
             {
                 Barcode = request.Barcode,
-                KodPeula = request.KodPeula,
-                PerutPeula = request.PerutPeula,
-                Atar = request.Atar,
                 CustomerName = request.CustomerName,
                 Address = request.Address,
                 Weight = request.Weight,

@@ -59,8 +59,8 @@ namespace PostalIdempotencyDemo.Api.Services
 
         public async Task CacheResponseAsync(string idempotencyKey, object response)
         {
-            var settings = await _settingsRepository.GetSettingsAsync();
-            var useIdempotencySetting = settings.FirstOrDefault(s => s.SettingKey == "UseIdempotencyKey");
+            IEnumerable<SystemSetting> settings = await _settingsRepository.GetSettingsAsync();
+            SystemSetting? useIdempotencySetting = settings.FirstOrDefault(s => s.SettingKey == "UseIdempotencyKey");
             if (idempotencyKey == null || useIdempotencySetting?.SettingValue != "true") return; // Do not cache if disabled
 
             var responseData = JsonSerializer.Serialize(response);
@@ -68,9 +68,9 @@ namespace PostalIdempotencyDemo.Api.Services
             await _repository.UpdateResponseAsync(idempotencyKey, responseData, 200);
         }
 
-        public async Task<IdempotencyEntry?> GetLatestEntryByCorrelationIdAsync(string correlationId)
+        public async Task<IdempotencyEntry?> GetLatestEntryByCorrelationIdAsync(string requestPath)
         {
-            return await _repository.GetLatestByCorrelationIdAsync(correlationId);
+            return await _repository.GetLatestByCorrelationIdAsync(requestPath);
         }
     }
 }

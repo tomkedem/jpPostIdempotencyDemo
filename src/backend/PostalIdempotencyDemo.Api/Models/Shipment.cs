@@ -8,16 +8,7 @@ public class Shipment
     
     [Required]
     [StringLength(50)]
-    public string Barcode { get; set; } = string.Empty;
-    
-    [Required]
-    public int KodPeula { get; set; }
-    
-    [Required]
-    public int PerutPeula { get; set; }
-    
-    [Required]
-    public int Atar { get; set; }
+    public string Barcode { get; set; } = string.Empty;       
     
     [StringLength(100)]
     public string? CustomerName { get; set; }

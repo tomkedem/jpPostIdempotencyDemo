@@ -60,6 +60,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     timestamp: number;
     successful: number;
     blocked: number;
+    chaosErrors: number; // NEW: שגיאות כאשר הגנה כבויה
   }[] = [];
 
   // Inject services using modern Angular 20 approach
@@ -172,6 +173,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
       timestamp: Date.now(),
       successful: metrics.successfulOperations,
       blocked: metrics.idempotentBlocks,
+      chaosErrors: metrics.chaosDisabledErrors || 0, // NEW: שגיאות כאשר הגנה כבויה
     };
 
     this.performanceData.push(newPoint);
@@ -304,11 +306,11 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   ) {
     const maxValue =
       Math.max(
-        ...this.performanceData.map((d) => Math.max(d.successful, d.blocked))
+        ...this.performanceData.map((d) => Math.max(d.successful, d.blocked, d.chaosErrors))
       ) || 10;
 
     // Draw successful operations line
-    ctx.strokeStyle = "#22c55e"; // ירוק בהיר יותר
+    ctx.strokeStyle = "#22c55e"; // ירוק - פעולות מוצלחות
     ctx.lineWidth = 2;
     ctx.beginPath();
 
@@ -325,13 +327,30 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     ctx.stroke();
 
     // Draw blocked operations line
-    ctx.strokeStyle = "#ef4444"; // אדום-כתום להדגשת חסימה
+    ctx.strokeStyle = "#ef4444"; // אדום - פעולות חסומות (הגנה עבדה)
     ctx.lineWidth = 2;
     ctx.beginPath();
 
     this.performanceData.forEach((point, index) => {
       const x = (canvas.width / (this.performanceData.length - 1)) * index;
       const y = canvas.height - (point.blocked / maxValue) * canvas.height;
+
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    ctx.stroke();
+
+    // Draw chaos disabled errors line
+    ctx.strokeStyle = "#f97316"; // כתום - שגיאות כאשר הגנה כבויה
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    this.performanceData.forEach((point, index) => {
+      const x = (canvas.width / (this.performanceData.length - 1)) * index;
+      const y = canvas.height - (point.chaosErrors / maxValue) * canvas.height;
 
       if (index === 0) {
         ctx.moveTo(x, y);
@@ -440,6 +459,17 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     const metrics = this.metrics();
     if (!metrics || metrics.totalOperations === 0) return 0;
     return (metrics.successfulOperations / metrics.totalOperations) * 100;
+  }
+
+  getChaosErrorsPercentage(): number {
+    const metrics = this.metrics();
+    if (!metrics || metrics.totalOperations === 0) return 0;
+    return ((metrics.chaosDisabledErrors || 0) / metrics.totalOperations) * 100;
+  }
+
+  getChaosErrorsCount(): number {
+    const metrics = this.metrics();
+    return metrics?.chaosDisabledErrors || 0;
   }
 
   getRecentLogs(): LogEntry[] {

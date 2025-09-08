@@ -1,8 +1,4 @@
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 using PostalIdempotencyDemo.Api.Models.DTO;
 
 namespace PostalIdempotencyDemo.Api.Repositories
@@ -66,7 +62,8 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         SELECT 
                             COUNT(*) AS TotalOperations,
                             SUM(CASE WHEN is_idempotent_hit = 1 THEN 1 ELSE 0 END) AS IdempotentHits,
-                            SUM(CASE WHEN is_error = 1 THEN 1 ELSE 0 END) AS FailedOperations,
+                            SUM(CASE WHEN is_error = 1 AND operation_type NOT LIKE '%_chaos_error' THEN 1 ELSE 0 END) AS FailedOperations,
+                            SUM(CASE WHEN operation_type LIKE '%_chaos_error' THEN 1 ELSE 0 END) AS ChaosDisabledErrors,
                             AVG(CAST(execution_time_ms AS FLOAT)) AS AverageExecutionTimeMs
                         FROM operation_metrics;";
 
@@ -78,10 +75,11 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         summary.TotalOperations = reader["TotalOperations"] as int? ?? 0;
                         summary.IdempotentBlocks = reader["IdempotentHits"] as int? ?? 0;
                         summary.ErrorCount = reader["FailedOperations"] as int? ?? 0;
+                        summary.ChaosDisabledErrors = reader["ChaosDisabledErrors"] as int? ?? 0; // NEW
                         summary.AverageResponseTime = reader["AverageExecutionTimeMs"] as double? ?? 0;
-                        
-                        // פעולות מוצלחות = סה"כ פעולות מינוס חסימות אידמפוטנטיות מינוס שגיאות
-                        summary.SuccessfulOperations = summary.TotalOperations - summary.IdempotentBlocks - summary.ErrorCount;
+
+                        // פעולות מוצלחות = סה"כ פעולות מינוס חסימות אידמפוטנטיות מינוס שגיאות רגילות מינוס שגיאות כאוס
+                        summary.SuccessfulOperations = summary.TotalOperations - summary.IdempotentBlocks - summary.ErrorCount - summary.ChaosDisabledErrors;
                     }
                 });
             }

@@ -1,9 +1,6 @@
 export interface Shipment {
   // Legacy shipment fields (optional for backward compatibility)
   id: string;
-  kod_peula?: string;
-  perut_peula?: string;
-  atar?: string;
   customerName?: string;
   address?: string;
   weight?: number;
@@ -43,9 +40,6 @@ export interface CreateDeliveryRequest {
 
 export interface CreateShipmentRequest {
   barcode: string;
-  kodPeula: number;
-  perutPeula: number;
-  atar: number;
   customerName?: string;
   address?: string;
   weight: number;

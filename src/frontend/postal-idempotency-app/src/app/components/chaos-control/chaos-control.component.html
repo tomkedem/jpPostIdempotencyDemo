@@ -77,6 +77,7 @@
               <div class="chart-legend-compact">
                 <span class="legend-dot success"></span>
                 <span class="legend-dot blocked"></span>
+                <span class="legend-dot chaos-errors"></span>
               </div>
             </div>
             <div class="chart-container-compact">
@@ -224,6 +225,23 @@
                 </div>
               </div>
               <mat-icon class="metric-icon">check_circle</mat-icon>
+            </div>
+
+            <!-- NEW: Chaos Disabled Errors Card -->
+            <div class="metric-card chaos-errors">
+              <div class="metric-content">
+                <div class="metric-value">
+                  {{ getChaosErrorsCount() | number }}
+                </div>
+                <div class="metric-label">שגיאות בלי הגנה</div>
+                <div class="metric-progress">
+                  <div
+                    class="progress-bar chaos-errors"
+                    [style.width.%]="getChaosErrorsPercentage()"
+                  ></div>
+                </div>
+              </div>
+              <mat-icon class="metric-icon">warning</mat-icon>
             </div>
           </div>
         </div>

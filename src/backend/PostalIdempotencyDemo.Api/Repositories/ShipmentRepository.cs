@@ -19,8 +19,8 @@ namespace PostalIdempotencyDemo.Api.Repositories
 
         public async Task<Shipment> CreateAsync(Shipment shipment)
         {
-            const string query = @"INSERT INTO shipments (id, barcode, kod_peula, perut_peula, atar, customer_name, address, weight, price, status_id, created_at, notes)
-                                 VALUES (@id, @barcode, @kod_peula, @perut_peula, @atar, @customer_name, @address, @weight, @price, @status_id, @created_at, @notes)";
+            const string query = @"INSERT INTO shipments (id, barcode, customer_name, address, weight, price, status_id, created_at, notes)
+                                 VALUES (@id, @barcode, @customer_name, @address, @weight, @price, @status_id, @created_at, @notes)";
 
             shipment.Id = Guid.NewGuid();
             shipment.CreatedAt = DateTime.UtcNow;
@@ -30,9 +30,6 @@ namespace PostalIdempotencyDemo.Api.Repositories
                 var command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@id", shipment.Id);
                 command.Parameters.AddWithValue("@barcode", shipment.Barcode);
-                command.Parameters.AddWithValue("@kod_peula", shipment.KodPeula);
-                command.Parameters.AddWithValue("@perut_peula", shipment.PerutPeula);
-                command.Parameters.AddWithValue("@atar", shipment.Atar);
                 command.Parameters.AddWithValue("@customer_name", (object?)shipment.CustomerName ?? DBNull.Value);
                 command.Parameters.AddWithValue("@address", (object?)shipment.Address ?? DBNull.Value);
                 command.Parameters.AddWithValue("@weight", shipment.Weight);
@@ -48,7 +45,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
 
         public async Task<Shipment?> GetByBarcodeAsync(string barcode)
         {
-            const string query = @"SELECT s.id, s.barcode, s.kod_peula, s.perut_peula, s.atar, s.customer_name, s.address, s.weight, s.price, 
+            const string query = @"SELECT s.id, s.barcode, s.customer_name, s.address, s.weight, s.price, 
                                       s.status_id, ss.status_name, ss.status_name_he, s.created_at, s.updated_at, s.notes
                                FROM shipments s
                                JOIN shipment_statuses ss ON s.status_id = ss.id
@@ -70,7 +67,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
 
         public async Task<Shipment?> GetByIdAsync(Guid id)
         {
-            const string query = @"SELECT s.id, s.barcode, s.kod_peula, s.perut_peula, s.atar, s.customer_name, s.address, s.weight, s.price, 
+            const string query = @"SELECT s.id, s.barcode, s.customer_name, s.address, s.weight, s.price, 
                                       s.status_id, ss.status_name, ss.status_name_he, s.created_at, s.updated_at, s.notes
                                FROM shipments s
                                JOIN shipment_statuses ss ON s.status_id = ss.id
@@ -120,7 +117,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
 
         public async Task<IEnumerable<Shipment>> GetAllAsync()
         {
-            const string query = @"SELECT s.id, s.barcode, s.kod_peula, s.perut_peula, s.atar, s.customer_name, s.address, s.weight, s.price, 
+            const string query = @"SELECT s.id, s.barcode, s.customer_name, s.address, s.weight, s.price, 
                                       s.status_id, ss.status_name, ss.status_name_he, s.created_at, s.updated_at, s.notes
                                FROM shipments s
                                JOIN shipment_statuses ss ON s.status_id = ss.id
@@ -141,16 +138,13 @@ namespace PostalIdempotencyDemo.Api.Repositories
 
         public async Task<bool> UpdateAsync(Shipment shipment)
         {
-            const string query = @"UPDATE shipments SET barcode = @barcode, kod_peula = @kod_peula, perut_peula = @perut_peula, atar = @atar, customer_name = @customer_name, address = @address, weight = @weight, price = @price, status_id = @status_id, updated_at = @updated_at, notes = @notes WHERE id = @id";
+            const string query = @"UPDATE shipments SET barcode = @barcode, customer_name = @customer_name, address = @address, weight = @weight, price = @price, status_id = @status_id, updated_at = @updated_at, notes = @notes WHERE id = @id";
 
             return await _sqlExecutor.ExecuteAsync(async connection =>
             {
                 var command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@id", shipment.Id);
-                command.Parameters.AddWithValue("@barcode", shipment.Barcode);
-                command.Parameters.AddWithValue("@kod_peula", shipment.KodPeula);
-                command.Parameters.AddWithValue("@perut_peula", shipment.PerutPeula);
-                command.Parameters.AddWithValue("@atar", shipment.Atar);
+                command.Parameters.AddWithValue("@barcode", shipment.Barcode);                
                 command.Parameters.AddWithValue("@customer_name", (object?)shipment.CustomerName ?? DBNull.Value);
                 command.Parameters.AddWithValue("@address", (object?)shipment.Address ?? DBNull.Value);
                 command.Parameters.AddWithValue("@weight", shipment.Weight);
@@ -170,9 +164,6 @@ namespace PostalIdempotencyDemo.Api.Repositories
             {
                 Id = reader.GetGuid(reader.GetOrdinal("id")),
                 Barcode = reader.GetString(reader.GetOrdinal("barcode")),
-                KodPeula = reader.IsDBNull(reader.GetOrdinal("kod_peula")) ? 0 : reader.GetInt32(reader.GetOrdinal("kod_peula")),
-                PerutPeula = reader.IsDBNull(reader.GetOrdinal("perut_peula")) ? 0 : reader.GetInt32(reader.GetOrdinal("perut_peula")),
-                Atar = reader.IsDBNull(reader.GetOrdinal("atar")) ? 0 : reader.GetInt32(reader.GetOrdinal("atar")),
                 CustomerName = reader.IsDBNull(reader.GetOrdinal("customer_name")) ? null : reader.GetString(reader.GetOrdinal("customer_name")),
                 Address = reader.IsDBNull(reader.GetOrdinal("address")) ? null : reader.GetString(reader.GetOrdinal("address")),
                 Weight = reader.IsDBNull(reader.GetOrdinal("weight")) ? 0 : reader.GetDecimal(reader.GetOrdinal("weight")),

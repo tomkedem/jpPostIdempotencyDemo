@@ -459,6 +459,29 @@
             opacity: 1;
           }
         }
+
+        &.chaos-errors {
+          background: #f97316;
+          box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+
+          &::after {
+            content: 'שגיאות בלי הגנה';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.625rem;
+            font-weight: 600;
+            color: #ea580c;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+          }
+
+          &:hover::after {
+            opacity: 1;
+          }
+        }
       }
     }
   }
@@ -475,7 +498,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: 
+      background:
         linear-gradient(90deg, transparent 0%, rgba(99, 102, 241, 0.02) 50%, transparent 100%),
         linear-gradient(0deg, transparent 0%, rgba(16, 185, 129, 0.02) 50%, transparent 100%);
       pointer-events: none;
@@ -878,6 +901,10 @@
 
         &.successful {
           background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        }
+
+        &.chaos-errors {
+          background: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
         }
       }
     }

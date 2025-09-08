@@ -46,7 +46,7 @@ namespace PostalIdempotencyDemo.Api.Services
             return new IdempotencyDemoResponse<Delivery> { Success = true, Data = delivery };
         }
 
-        public async Task<IdempotencyDemoResponse<Shipment>> UpdateDeliveryStatusAsync(string barcode, int statusId)
+        public async Task<IdempotencyDemoResponse<Shipment>> UpdateDeliveryStatusAsync(string barcode, int statusId, string requestPath)
         {
             var stopwatch = Stopwatch.StartNew();
             var updatedShipment = await _deliveryRepository.UpdateDeliveryStatusAsync(barcode, statusId);
@@ -54,10 +54,10 @@ namespace PostalIdempotencyDemo.Api.Services
             var executionTime = (int)stopwatch.ElapsedMilliseconds;
             if (updatedShipment == null)
             {
-                await _metricsRepository.LogMetricsAsync("update_status", $"/api/idempotency-demo/delivery/{barcode}/status", executionTime, false, null);
+                await _metricsRepository.LogMetricsAsync("update_status", $"{requestPath}", executionTime, false, null);
                 return new IdempotencyDemoResponse<Shipment> { Success = false, Message = $"Shipment with barcode {barcode} not found." };
             }
-            await _metricsRepository.LogMetricsAsync("update_status", $"/api/idempotency-demo/delivery/{barcode}/status", executionTime, false, null);
+            await _metricsRepository.LogMetricsAsync("update_status", $"{requestPath}", executionTime, false, null);
             return new IdempotencyDemoResponse<Shipment>
             {
                 Success = true,
@@ -67,12 +67,12 @@ namespace PostalIdempotencyDemo.Api.Services
             };
         }
 
-        public async Task LogIdempotentHitAsync(string barcode, string idempotencyKey, string endpoint)
+        public async Task LogIdempotentHitAsync(string barcode, string idempotencyKey, string requestPath)
         {
             _logger.LogDebug("רושם hit אידמפוטנטי עבור ברקוד {Barcode} עם מפתח {IdempotencyKey}", barcode, idempotencyKey);
             await _metricsRepository.LogMetricsAsync(
                 operationType: "update_delivery_status", // סוג הפעולה
-                endpoint: endpoint, // הנתיב שנקרא
+                endpoint: requestPath, // הנתיב שנקרא
                 executionTimeMs: 0, // זמן ביצוע 0 כי זו בקשה שנחסמה
                 isIdempotentHit: true, // זה hit אידמפוטנטי
                 idempotencyKey: idempotencyKey // המפתח שגרם לחסימה               

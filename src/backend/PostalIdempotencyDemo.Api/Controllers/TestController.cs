@@ -56,10 +56,7 @@ public class TestController : ControllerBase
                 shipments.Add(new
                 {
                     id = reader["id"],
-                    barcode = reader["barcode"],
-                    kodPeula = reader["kod_peula"],
-                    perutPeula = reader["perut_peula"],
-                    atar = reader["atar"],
+                    barcode = reader["barcode"],                   
                     customerName = reader["customer_name"],
                     address = reader["address"],
                     weight = reader["weight"],

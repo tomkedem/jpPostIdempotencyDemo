@@ -62,10 +62,7 @@
 **דוגמה:**
 ```json
 {
-  "barcode": "RR63457568548",
-  "kodPeula": 3,
-  "perutPeula": 1,
-  "atar": 100
+  "barcode": "RR63457568548"  
 }
 ```
 → יניב hash שישמש כ־Idempotency-Key

@@ -99,7 +99,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
             {
                 const string query = @"
                     SELECT 
-                        s.id, s.barcode, s.kod_peula, s.perut_peula, s.atar, s.customer_name, s.address, s.weight, s.price, s.status_id, s.created_at, s.updated_at, s.notes,
+                        s.id, s.barcode, s.customer_name, s.address, s.weight, s.price, s.status_id, s.created_at, s.updated_at, s.notes,
                         d.employee_id, d.delivery_date, d.location_lat, d.location_lng, d.recipient_name, d.status_id AS delivery_status_id, d.notes AS delivery_notes, d.created_at AS delivery_created_at
                     FROM shipments s
                     LEFT JOIN deliveries d ON s.barcode = d.barcode

@@ -23,49 +23,51 @@ public class MetricsService : IMetricsService
     private static int _successfulOperations = 0;
     private static int _idempotentBlocks = 0;
     private static int _errorCount = 0;
+    private static int _chaosDisabledErrors = 0; // NEW: שגיאות כאשר הגנה כבויה
     private static DateTime _lastResetTime = DateTime.UtcNow;
 
     public MetricsService(IMetricsRepository metricsRepository, ILogger<MetricsService> logger)
     {
         _metricsRepository = metricsRepository;
         _logger = logger;
-        
+
         // Add some sample response times for testing
         InitializeSampleData();
     }
-    
+
     private void InitializeSampleData()
     {
         // Add sample response times to test the average calculation
         var sampleTimes = new double[] { 150.5, 200.3, 175.8, 220.1, 190.7, 165.2, 180.9, 195.4, 210.6, 185.3 };
-        
+
         foreach (var time in sampleTimes)
         {
             _responseTimeHistory.Enqueue(time);
         }
-        
+
         // Update the average
         _averageResponseTime = CalculateCurrentAverageResponseTime();
-        
+
         _logger.LogInformation("Initialized sample response times. Current average: {Average}ms", _averageResponseTime);
     }
 
     public async Task<MetricsSummaryDto> GetMetricsSummaryAsync()
     {
         var dbSummary = await _metricsRepository.GetMetricsSummaryAsync();
-        
+
         // Use current calculated average instead of old static value
         var currentAvgResponseTime = CalculateCurrentAverageResponseTime();
-        
+
         // Combine database metrics with real-time in-memory metrics
         return new MetricsSummaryDto
         {
             TotalOperations = dbSummary.TotalOperations + _totalOperations,
             SuccessfulOperations = dbSummary.SuccessfulOperations + _successfulOperations,
             IdempotentBlocks = dbSummary.IdempotentBlocks + _idempotentBlocks,
+            ErrorCount = dbSummary.ErrorCount + _errorCount,
+            ChaosDisabledErrors = dbSummary.ChaosDisabledErrors + _chaosDisabledErrors, // NEW
             AverageResponseTime = currentAvgResponseTime,
             SuccessRate = CalculateSuccessRate(dbSummary),
-            ErrorCount = dbSummary.ErrorCount + _errorCount,
             LastUpdated = DateTime.UtcNow,
             SystemHealth = CalculateSystemHealth(),
             ThroughputPerMinute = CalculateThroughput(),
@@ -104,6 +106,19 @@ public class MetricsService : IMetricsService
             operationType, wasSuccessful, wasIdempotent, responseTimeMs, _totalOperations);
     }
 
+    public void RecordChaosDisabledError(string operationType)
+    {
+        Interlocked.Increment(ref _chaosDisabledErrors);
+        Interlocked.Increment(ref _totalOperations);
+
+        // Track operation type
+        _operationCounters.AddOrUpdate($"{operationType}_chaos_error", 1, (key, value) => value + 1);
+        _lastOperationTimes[$"{operationType}_chaos_error"] = DateTime.UtcNow;
+
+        _logger.LogWarning("Chaos disabled error recorded - Type: {Type}, Total Chaos Errors: {ChaosErrors}",
+            operationType, _chaosDisabledErrors);
+    }
+
     public void RecordResponseTime(double responseTimeMs)
     {
         _responseTimeHistory.Enqueue(responseTimeMs);
@@ -131,6 +146,7 @@ public class MetricsService : IMetricsService
         _successfulOperations = 0;
         _idempotentBlocks = 0;
         _errorCount = 0;
+        _chaosDisabledErrors = 0; // NEW: איפוס שגיאות כאוס
         _averageResponseTime = 0.0;
         _lastResetTime = DateTime.UtcNow;
 

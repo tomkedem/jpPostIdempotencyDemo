@@ -36,10 +36,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
             var shipments = result.Data.Select(shipment => new
             {
                 id = shipment.Id,
-                barcode = shipment.Barcode,
-                kodPeula = shipment.KodPeula,
-                perutPeula = shipment.PerutPeula,
-                atar = shipment.Atar,
+                barcode = shipment.Barcode,              
                 customerName = shipment.CustomerName,
                 address = shipment.Address,
                 weight = shipment.Weight,
@@ -66,10 +63,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
                 shipment = shipment == null ? null : new
                 {
                     id = shipment.Id,
-                    barcode = shipment.Barcode,
-                    kodPeula = shipment.KodPeula,
-                    perutPeula = shipment.PerutPeula,
-                    atar = shipment.Atar,
+                    barcode = shipment.Barcode,                    
                     customerName = shipment.CustomerName,
                     address = shipment.Address,
                     weight = shipment.Weight,
@@ -110,10 +104,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
             return Ok(new
             {
                 id = shipment.Id,
-                barcode = shipment.Barcode,
-                kodPeula = shipment.KodPeula,
-                perutPeula = shipment.PerutPeula,
-                atar = shipment.Atar,
+                barcode = shipment.Barcode,               
                 customerName = shipment.CustomerName,
                 address = shipment.Address,
                 weight = shipment.Weight,
@@ -157,19 +148,16 @@ namespace PostalIdempotencyDemo.Api.Controllers
 
                 var newId = Guid.NewGuid();
                 const string sql = @"
-                INSERT INTO shipments (id, barcode, kod_peula, perut_peula, atar, customer_name, 
+                INSERT INTO shipments (id, barcode, customer_name, 
                                      address, weight, price, status_id, notes, created_at)
-                VALUES (@id, @barcode, @kod_peula, @perut_peula, @atar, @customer_name, 
+                VALUES (@id, @barcode, @customer_name, 
                         @address, @weight, @price, @status_id, @notes, @created_at);
                 
                 SELECT id, created_at FROM shipments WHERE id = @id";
 
                 using var command = new SqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@id", newId);
-                command.Parameters.AddWithValue("@barcode", request.Barcode);
-                command.Parameters.AddWithValue("@kod_peula", request.KodPeula);
-                command.Parameters.AddWithValue("@perut_peula", request.PerutPeula);
-                command.Parameters.AddWithValue("@atar", request.Atar);
+                command.Parameters.AddWithValue("@barcode", request.Barcode);                
                 command.Parameters.AddWithValue("@customer_name", request.CustomerName ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@address", request.Address ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@weight", request.Weight);
@@ -184,10 +172,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
                     var result = new
                     {
                         id = reader.GetGuid(0),
-                        barcode = request.Barcode,
-                        kodPeula = request.KodPeula,
-                        perutPeula = request.PerutPeula,
-                        atar = request.Atar,
+                        barcode = request.Barcode,                      
                         customerName = request.CustomerName,
                         address = request.Address,
                         weight = request.Weight,
@@ -214,10 +199,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
 
 public class CreateShipmentRequest
 {
-    public string Barcode { get; set; } = string.Empty;
-    public int KodPeula { get; set; }
-    public int PerutPeula { get; set; }
-    public int Atar { get; set; }
+    public string Barcode { get; set; } = string.Empty;    
     public string? CustomerName { get; set; }
     public string? Address { get; set; }
     public decimal Weight { get; set; }

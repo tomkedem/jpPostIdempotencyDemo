@@ -15,7 +15,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
         }
 
         // מחזיר את הרשומה האחרונה לפי correlation_id
-        public async Task<IdempotencyEntry?> GetLatestByCorrelationIdAsync(string correlationId)
+        public async Task<IdempotencyEntry?> GetLatestByCorrelationIdAsync(string requestPath)
         {
             const string sql = @"
                 SELECT TOP 1 idempotency_key, request_hash, response_body, status_code, 
@@ -27,7 +27,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
             return await _sqlExecutor.ExecuteAsync(async connection =>
             {
                 using var command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@correlationId", correlationId);
+                command.Parameters.AddWithValue("@correlationId", requestPath);
 
                 using var reader = await command.ExecuteReaderAsync();
                 if (await reader.ReadAsync())

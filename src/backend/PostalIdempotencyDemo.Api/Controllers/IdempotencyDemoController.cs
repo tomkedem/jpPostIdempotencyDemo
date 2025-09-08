@@ -42,11 +42,11 @@ public class IdempotencyDemoController : ControllerBase
         }
 
         var idempotencyKey = idempotencyKeyValues.First()!;
-        var correlationId = HttpContext.TraceIdentifier;
+
         var requestPath = HttpContext.Request.Path.Value ?? "";
 
         var result = await _orchestrationService.ProcessCreateDeliveryWithIdempotencyAsync(
-            request, idempotencyKey, correlationId, requestPath);
+            request, idempotencyKey, requestPath);
 
         return Ok(result);
     }
@@ -69,10 +69,10 @@ public class IdempotencyDemoController : ControllerBase
             return BadRequest(new { Success = false, Message = "נדרש מפתח Idempotency-Key בכותרת הבקשה" });
         }
 
-        var idempotencyKey = idempotencyKeyValues.First()!;
-        var requestPath = HttpContext.Request.Path.Value ?? "";
+        string idempotencyKey = idempotencyKeyValues.First()!;
+        string requestPath = HttpContext.Request.Path.Value ?? "";
 
-        var result = await _orchestrationService.ProcessUpdateDeliveryStatusWithIdempotencyAsync(
+        IdempotencyDemoResponse<Shipment> result = await _orchestrationService.ProcessUpdateDeliveryStatusWithIdempotencyAsync(
             barcode, request, idempotencyKey, requestPath);
 
         return Ok(result);
@@ -89,6 +89,6 @@ public class IdempotencyDemoController : ControllerBase
         // דחיית קצרה לדמיית זמן עיבוד
         await Task.Delay(500);
 
-        return Ok(new { Success = true, Message = "דמיית תקלת רשת הושלמה" });
+        return Ok(new { Success = true, Message = "הדמיית תקלת רשת הושלמה" });
     }
 }

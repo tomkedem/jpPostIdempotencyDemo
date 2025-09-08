@@ -180,10 +180,7 @@ graph LR
 erDiagram
     SHIPMENTS {
         uuid id PK
-        varchar barcode UK
-        int kod_peula
-        int perut_peula
-        int atar
+        varchar barcode UK       
         varchar customer_name
         varchar address
         decimal weight

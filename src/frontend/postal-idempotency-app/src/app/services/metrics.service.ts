@@ -9,6 +9,7 @@ export interface MetricsSummary {
   successfulOperations: number;
   idempotentBlocks: number;
   errorCount: number;
+  chaosDisabledErrors: number; // NEW: שגיאות כאשר הגנה כבויה
   averageResponseTime: number;
   successRate: number;
   lastUpdated: string;
