@@ -18,14 +18,14 @@ public class ChaosController : ControllerBase
     [HttpGet("settings")]
     public async Task<IActionResult> GetSettings()
     {
-        var settings = await _chaosService.GetChaosSettingsAsync();
+        ChaosSettingsDto settings = await _chaosService.GetChaosSettingsAsync();
         return Ok(settings);
     }
 
     [HttpPost("settings")]
     public async Task<IActionResult> UpdateSettings([FromBody] ChaosSettingsDto settingsDto)
     {
-        var success = await _chaosService.UpdateChaosSettingsAsync(settingsDto);
+        bool success = await _chaosService.UpdateChaosSettingsAsync(settingsDto);
         if (success)
         {
             return NoContent();
