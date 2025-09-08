@@ -86,6 +86,7 @@ public class MetricsService : IMetricsService
 
         if (wasSuccessful)
         {
+            // כל פעולה מוצלחת נחשבת כהצלחה, גם חסימות!
             Interlocked.Increment(ref _successfulOperations);
         }
         else
@@ -95,6 +96,7 @@ public class MetricsService : IMetricsService
 
         if (wasIdempotent)
         {
+            // רישום נוסף שזו חסימה אידמפוטנטית (סוג מיוחד של הצלחה)
             Interlocked.Increment(ref _idempotentBlocks);
         }
 

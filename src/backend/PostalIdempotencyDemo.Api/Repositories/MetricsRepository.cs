@@ -78,8 +78,9 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         summary.ChaosDisabledErrors = reader["ChaosDisabledErrors"] as int? ?? 0; // NEW
                         summary.AverageResponseTime = reader["AverageExecutionTimeMs"] as double? ?? 0;
 
-                        // פעולות מוצלחות = סה"כ פעולות מינוס חסימות אידמפוטנטיות מינוס שגיאות רגילות מינוס שגיאות כאוס
-                        summary.SuccessfulOperations = summary.TotalOperations - summary.IdempotentBlocks - summary.ErrorCount - summary.ChaosDisabledErrors;
+                        // פעולות מוצלחות = סה"כ פעולות מינוס שגיאות כאוס בלבד
+                        // מתעלמים משגיאות רגילות - מתמקדים רק בהגנה אידמפוטנטית
+                        summary.SuccessfulOperations = summary.TotalOperations - summary.ChaosDisabledErrors;
                     }
                 });
             }

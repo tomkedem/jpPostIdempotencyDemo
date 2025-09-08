@@ -16,6 +16,7 @@ namespace PostalIdempotencyDemo.Api.Services
         private readonly IDeliveryService _deliveryService;
         private readonly ISettingsRepository _settingsRepository;
         private readonly IMetricsService _metricsService;
+        private readonly IMetricsRepository _metricsRepository;
         private readonly ILogger<IdempotencyOrchestrationService> _logger;
 
         public IdempotencyOrchestrationService(
@@ -23,12 +24,14 @@ namespace PostalIdempotencyDemo.Api.Services
             IDeliveryService deliveryService,
             ISettingsRepository settingsRepository,
             IMetricsService metricsService,
+            IMetricsRepository metricsRepository,
             ILogger<IdempotencyOrchestrationService> logger)
         {
             _idempotencyService = idempotencyService;
             _deliveryService = deliveryService;
             _settingsRepository = settingsRepository;
             _metricsService = metricsService;
+            _metricsRepository = metricsRepository;
             _logger = logger;
         }
 
@@ -51,29 +54,25 @@ namespace PostalIdempotencyDemo.Api.Services
                 // בדיקה אם זו פעולה כפולה גם כשההגנה כבויה
                 var existingEntry = await _idempotencyService.GetLatestEntryByCorrelationIdAsync(requestPath);
 
-                if (existingEntry != null && existingEntry.IdempotencyKey == idempotencyKey)
-                {
-                    // זוהתה פעולה כפולה כשההגנה כבויה - רושמים כשגיאה
-                    _logger.LogWarning("זוהתה פעולה כפולה כאשר הגנת אידמפוטנטיות כבויה - מתעד כשגיאה. מפתח: {IdempotencyKey}", idempotencyKey);
+                bool isDuplicateOperation = existingEntry != null && existingEntry.IdempotencyKey == idempotencyKey;
 
-                    // תיעוד כשגיאה בטבלת operation_metrics עם is_error = 1
-                    await LogChaosDisabledErrorForCreateAsync(idempotencyKey, requestPath, "duplicate_operation_without_protection");
-
-                    // מחזירים הודעת שגיאה
-                    return new IdempotencyDemoResponse<Delivery>
-                    {
-                        Success = false,
-                        Data = null,
-                        Message = "שגיאה: ניסיון ליצור את אותו משלוח פעמיים. הגנת אידמפוטנטיות כבויה."
-                    };
-                }
-
-                // אין פעולה כפולה - ממשיכים עם העיבוד הרגיל
+                // בכל מקרה מבצעים את הפעולה (גם אם זו כפילות)
                 _logger.LogInformation("הגנת אידמפוטנטיות כבויה - מעבד בקשה ישירות ללא הגנה");
                 var directResponse = await _deliveryService.CreateDeliveryAsync(request);
 
-                // יצירת רשומה למעקב (אבל לא לחסימה)
-                await CreateTrackingEntryForCreateAsync(request, idempotencyKey, requestPath);
+                if (isDuplicateOperation)
+                {
+                    // זוהתה פעולה כפולה - מתעדים כשגיאה אבל מאפשרים את הפעולה
+                    _logger.LogWarning("זוהתה פעולה כפולה כאשר הגנת אידמפוטנטיות כבויה - מתעד כשגיאה אבל מאפשר פעולה. מפתח: {IdempotencyKey}", idempotencyKey);
+
+                    // תיעוד כשגיאה בטבלת operation_metrics עם is_error = 1
+                    await LogChaosDisabledErrorForCreateAsync(idempotencyKey, requestPath, "duplicate_operation_without_protection");
+                }
+                else
+                {
+                    // פעולה ראשונה - יצירת רשומה למעקב רגילה
+                    await CreateTrackingEntryForCreateAsync(request, idempotencyKey, requestPath);
+                }
 
                 return directResponse;
             }
@@ -141,39 +140,35 @@ namespace PostalIdempotencyDemo.Api.Services
             {
                 _logger.LogInformation("הגנת אידמפוטנטיות כבויה - בודק אם זו פעולה כפולה לצורכי תיעוד");
 
-                // בדיקה אם זו פעולה כפולה גם כשההגנה כבויה
-                string correlationIdForCheck = requestPath;
+                // בדיקה אם זו פעולה כפולה גם כשההגנה כבויה - מחפש לפי ברקוד
+                string correlationIdForCheck = barcode; // שינוי: חיפוש לפי ברקוד במקום requestPath
                 var existingEntry = await _idempotencyService.GetLatestEntryByCorrelationIdAsync(correlationIdForCheck);
 
-                if (existingEntry != null && existingEntry.IdempotencyKey == idempotencyKey)
-                {
-                    // זוהתה פעולה כפולה כשההגנה כבויה - רושמים כשגיאה
-                    _logger.LogWarning("זוהתה פעולה כפולה כאשר הגנת אידמפוטנטיות כבויה - מתעד כשגיאה. ברקוד: {Barcode}", barcode);
+                bool isDuplicateOperation = existingEntry != null && existingEntry.IdempotencyKey == idempotencyKey;
 
-                    // תיעוד כשגיאה בטבלת operation_metrics עם is_error = 1
-                    await LogChaosDisabledErrorAsync(barcode, idempotencyKey, requestPath, "duplicate_operation_without_protection");
-
-                    // מחזירים הודעת שגיאה
-                    return new IdempotencyDemoResponse<Shipment>
-                    {
-                        Success = false,
-                        Data = null,
-                        Message = "שגיאה: ניסיון לעדכן את אותו משלוח פעמיים. הגנת אידמפוטנטיות כבויה."
-                    };
-                }
-
-                // אין פעולה כפולה - ממשיכים עם העיבוד הרגיל
+                // בכל מקרה מבצעים את הפעולה (גם אם זו כפילות)
                 _logger.LogInformation("הגנת אידמפוטנטיות כבויה - מעבד בקשה ישירות ללא הגנה");
                 var directResponse = await _deliveryService.UpdateDeliveryStatusAsync(barcode, request.StatusId, requestPath);
 
-                // יצירת רשומה למעקב (אבל לא לחסימה)
-                await CreateTrackingEntryAsync(barcode, request, idempotencyKey, requestPath);
+                if (isDuplicateOperation)
+                {
+                    // זוהתה פעולה כפולה - מתעדים כשגיאה אבל מאפשרים את הפעולה
+                    _logger.LogWarning("זוהתה פעולה כפולה כאשר הגנת אידמפוטנטיות כבויה - מתעד כשגיאה אבל מאפשר פעולה. ברקוד: {Barcode}", barcode);
+
+                    // תיעוד כשגיאה בטבלת operation_metrics עם is_error = 1
+                    await LogChaosDisabledErrorAsync(barcode, idempotencyKey, requestPath, "duplicate_operation_without_protection");
+                }
+                else
+                {
+                    // פעולה ראשונה - יצירת רשומה למעקב רגילה (עם ברקוד כ-CorrelationId)
+                    await CreateTrackingEntryAsync(barcode, request, idempotencyKey, requestPath);
+                }
 
                 return directResponse;
             }
 
             // שימוש ב-correlation_id לוגי ספציפי לברקוד זה
-            string correlationId = requestPath;
+            string correlationId = barcode; // שינוי: שימוש בברקוד במקום requestPath
             _logger.LogDebug("מחפש רשומה אידמפוטנטית קיימת עבור correlation_id: {CorrelationId}", correlationId);
 
             IdempotencyEntry? latestEntry = await _idempotencyService.GetLatestEntryByCorrelationIdAsync(correlationId);
@@ -312,8 +307,15 @@ namespace PostalIdempotencyDemo.Api.Services
                 // תיעוד שגיאה ישירות בשירות המטריקות
                 _metricsService.RecordChaosDisabledError($"update_status_{errorType}");
 
-                // תיעוד נוסף ב-operation_metrics דרך DeliveryService למטרות legacy
-                await _deliveryService.LogIdempotentHitAsync(barcode, idempotencyKey, requestPath);
+                // תיעוד שגיאה ב-operation_metrics עם is_error = 1
+                await _metricsRepository.LogMetricsAsync(
+                    operationType: $"update_status_{errorType}",
+                    endpoint: requestPath,
+                    executionTimeMs: 0,
+                    isIdempotentHit: false,
+                    idempotencyKey: idempotencyKey,
+                    isError: true // מסמן כשגיאה בבסיס הנתונים
+                );
 
                 _logger.LogDebug("שגיאת הגנת כאוס כבויה תועדה בהצלחה");
             }
@@ -343,7 +345,7 @@ namespace PostalIdempotencyDemo.Api.Services
                     CreatedAt = DateTime.UtcNow,
                     ExpiresAt = DateTime.UtcNow.AddHours(expirationHours),
                     Operation = "update_status_unprotected",
-                    CorrelationId = requestPath,
+                    CorrelationId = barcode, // שינוי: שימוש בברקוד במקום requestPath
                     RelatedEntityId = barcode
                 };
 
@@ -368,8 +370,15 @@ namespace PostalIdempotencyDemo.Api.Services
                 // תיעוד שגיאה ישירות בשירות המטריקות
                 _metricsService.RecordChaosDisabledError($"create_delivery_{errorType}");
 
-                // תיעוד נוסף ב-operation_metrics דרך DeliveryService למטרות legacy
-                await _deliveryService.LogIdempotentHitAsync("CREATE_DUPLICATE", idempotencyKey, requestPath);
+                // תיעוד שגיאה ב-operation_metrics עם is_error = 1
+                await _metricsRepository.LogMetricsAsync(
+                    operationType: $"create_delivery_{errorType}",
+                    endpoint: requestPath,
+                    executionTimeMs: 0,
+                    isIdempotentHit: false,
+                    idempotencyKey: idempotencyKey,
+                    isError: true // מסמן כשגיאה בבסיס הנתונים
+                );
 
                 _logger.LogDebug("שגיאת הגנת כאוס כבויה תועדה בהצלחה ליצירת משלוח");
             }
