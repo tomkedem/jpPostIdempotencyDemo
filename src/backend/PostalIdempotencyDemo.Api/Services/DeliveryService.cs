@@ -10,11 +10,13 @@ namespace PostalIdempotencyDemo.Api.Services
     {
         private readonly IDeliveryRepository _deliveryRepository;
         private readonly IMetricsRepository _metricsRepository;
+        private readonly ILogger<DeliveryService> _logger;
 
-        public DeliveryService(IDeliveryRepository deliveryRepository, IMetricsRepository metricsRepository)
+        public DeliveryService(IDeliveryRepository deliveryRepository, IMetricsRepository metricsRepository, ILogger<DeliveryService> logger)
         {
             _deliveryRepository = deliveryRepository;
             _metricsRepository = metricsRepository;
+            _logger = logger;
         }
 
         public async Task<(Shipment? Shipment, Delivery? Delivery)> GetShipmentAndDeliveryByBarcodeAsync(string barcode)
@@ -67,7 +69,15 @@ namespace PostalIdempotencyDemo.Api.Services
 
         public async Task LogIdempotentHitAsync(string barcode, string idempotencyKey, string endpoint)
         {
-            await _metricsRepository.LogMetricsAsync("update_status", endpoint, 0, true, idempotencyKey);
+            _logger.LogDebug("רושם hit אידמפוטנטי עבור ברקוד {Barcode} עם מפתח {IdempotencyKey}", barcode, idempotencyKey);
+            await _metricsRepository.LogMetricsAsync(
+                operationType: "update_delivery_status", // סוג הפעולה
+                endpoint: endpoint, // הנתיב שנקרא
+                executionTimeMs: 0, // זמן ביצוע 0 כי זו בקשה שנחסמה
+                isIdempotentHit: true, // זה hit אידמפוטנטי
+                idempotencyKey: idempotencyKey // המפתח שגרם לחסימה               
+            );
+             _logger.LogInformation("Hit אידמפוטנטי נרשם בהצלחה עבור ברקוד {Barcode}", barcode);
         }
     }
 }
