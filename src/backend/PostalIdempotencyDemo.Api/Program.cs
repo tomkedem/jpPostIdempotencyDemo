@@ -32,6 +32,7 @@ builder.Services.AddScoped<ISqlExecutor, SqlExecutor>();
 // Register services
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IIdempotencyService, IdempotencyService>();
+builder.Services.AddScoped<IIdempotencyOrchestrationService, IdempotencyOrchestrationService>();
 builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 builder.Services.AddScoped<IChaosService, ChaosService>();
 builder.Services.AddScoped<IMetricsService, MetricsService>();

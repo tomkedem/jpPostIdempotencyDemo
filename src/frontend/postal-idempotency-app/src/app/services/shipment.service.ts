@@ -136,7 +136,7 @@ export class ShipmentService {
     statusId: number
   ): Promise<IdempotencyDemoResponse<Shipment>> {
     console.log("Updating delivery status for barcode:", barcode);
-    const url = `${this.apiUrl}/delivery/${barcode}/status`;
+    const url = `${this.apiUrl}/protected-delivery/${barcode}/status`;
     const body = { statusId };
     // יצירת מפתח idempotency דטרמיניסטי על בסיס ברקוד וסטטוס
     const idempotencyKey = await this.generateDeterministicIdempotencyKey(
