@@ -24,7 +24,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                 if (await reader.ReadAsync())
                 {
                     var statusId = reader.IsDBNull(reader.GetOrdinal("status_id")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("status_id"));
-                    string? statusNameHe = statusId 
+                    string? statusNameHe = statusId
                     switch
                     {
                         1 => "נוצר",
@@ -36,8 +36,8 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         7 => "חריגה",
                         _ => null
                     };
-                    
-                    
+
+
                     return new Models.Delivery
                     {
                         Id = reader.GetGuid(reader.GetOrdinal("id")),
@@ -74,13 +74,13 @@ namespace PostalIdempotencyDemo.Api.Repositories
 
                 using var cmdDeliveries = new Microsoft.Data.SqlClient.SqlCommand(sqlDeliveries, connection);
                 cmdDeliveries.Parameters.AddWithValue("@statusId", statusId);
-                cmdDeliveries.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow);
+                cmdDeliveries.Parameters.AddWithValue("@updatedAt", DateTime.Now);
                 cmdDeliveries.Parameters.AddWithValue("@barcode", barcode);
                 int rowsDeliveries = await cmdDeliveries.ExecuteNonQueryAsync();
 
                 using var cmdShipments = new Microsoft.Data.SqlClient.SqlCommand(sqlShipments, connection);
                 cmdShipments.Parameters.AddWithValue("@statusId", statusId);
-                cmdShipments.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow);
+                cmdShipments.Parameters.AddWithValue("@updatedAt", DateTime.Now);
                 cmdShipments.Parameters.AddWithValue("@barcode", barcode);
                 int rowsShipments = await cmdShipments.ExecuteNonQueryAsync();
 
@@ -112,7 +112,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                 if (await reader.ReadAsync())
                 {
                     var statusId = reader.IsDBNull(reader.GetOrdinal("status_id")) ? null : (int?)reader.GetInt32(reader.GetOrdinal("status_id"));
-                    string? statusNameHe = statusId 
+                    string? statusNameHe = statusId
                     switch
                     {
                         1 => "נוצר",

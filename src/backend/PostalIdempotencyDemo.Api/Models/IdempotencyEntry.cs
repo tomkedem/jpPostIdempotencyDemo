@@ -16,7 +16,7 @@ public class IdempotencyEntry
     [Required]
     public int StatusCode { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime ExpiresAt { get; set; }
 
     [Required]

@@ -141,19 +141,22 @@
               <mat-icon>download</mat-icon>
             </button>
           </div>
-        </div>
-        <div class="panel-content">
-          <!-- Real-time Update Status -->
           <div class="update-status-panel">
             <div class="update-indicator">
               <div class="indicator-dot active"></div>
               <span class="status-text">עדכון אוטומטי פעיל</span>
             </div>
-            <div class="update-info">
-              <mat-icon>info</mat-icon>
-              <span>המדדים מתעדכנים אוטומטיקלית כל 5 שניות מהשרת</span>
-            </div>
           </div>
+        </div>
+        <div class="metrics-info-section">
+          <div class="update-info">
+            <mat-icon>info</mat-icon>
+            <span>המדדים מתעדכנים אוטומטיקלית כל 5 שניות מהשרת</span>
+          </div>
+        </div>
+        <div class="panel-content">
+          <!-- Real-time Update Status -->
+          
 
           <!-- Quick Stats Summary -->
           <div class="quick-stats">
@@ -163,7 +166,7 @@
               </div>
               <div class="stat-content">
                 <div class="stat-value">
-                  {{ metrics()?.averageResponseTime || 0 | number : "1.0-0" }}ms
+                  {{ metrics()?.averageExecutionTimeMs || 0 | number : "1.0-0" }}ms
                 </div>
                 <div class="stat-label">זמן תגובה ממוצע</div>
               </div>
@@ -179,9 +182,51 @@
                 <div class="stat-label">אחוז הצלחה</div>
               </div>
             </div>
+            <div class="stat-item time-saved">
+              <div class="stat-icon">
+                <mat-icon>hourglass_empty</mat-icon>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value">
+                  {{ getTimeSavedMs() | number : "1.0-0" }}ms
+                </div>
+                <div class="stat-label">זמן שנחסך</div>
+              </div>
+            </div>
           </div>
 
           <div class="metrics-grid">
+            <div class="metric-card successful-operations">
+              <div class="metric-content">
+                <div class="metric-value">
+                  {{ metrics()?.successfulOperations || 0 | number }}
+                </div>
+                <div class="metric-label">פעולות שעודכנו</div>
+                <div class="metric-progress">
+                  <div
+                    class="progress-bar successful"
+                    [style.width.%]="getSuccessPercentage()"
+                  ></div>
+                </div>
+              </div>
+              <mat-icon class="metric-icon">check_circle</mat-icon>
+            </div>
+
+            <div class="metric-card blocked-operations">
+              <div class="metric-content">
+                <div class="metric-value">
+                  {{ metrics()?.idempotentHits || 0 | number }}
+                </div>
+                <div class="metric-label">חסימות אידמפוטנט</div>
+                <div class="metric-progress">
+                  <div
+                    class="progress-bar blocked"
+                    [style.width.%]="getBlockedPercentage()"
+                  ></div>
+                </div>
+              </div>
+              <mat-icon class="metric-icon">security</mat-icon>
+            </div>
             <div class="metric-card total-operations">
               <div class="metric-content">
                 <div class="metric-value">
@@ -194,38 +239,7 @@
               </div>
               <mat-icon class="metric-icon">bar_chart</mat-icon>
             </div>
-
-            <div class="metric-card blocked-operations">
-              <div class="metric-content">
-                <div class="metric-value">
-                  {{ metrics()?.idempotentBlocks || 0 | number }}
-                </div>
-                <div class="metric-label">חסימות אידמפוטנט</div>
-                <div class="metric-progress">
-                  <div
-                    class="progress-bar blocked"
-                    [style.width.%]="getBlockedPercentage()"
-                  ></div>
-                </div>
-              </div>
-              <mat-icon class="metric-icon">security</mat-icon>
-            </div>
-
-            <div class="metric-card successful-operations">
-              <div class="metric-content">
-                <div class="metric-value">
-                  {{ metrics()?.successfulOperations || 0 | number }}
-                </div>
-                <div class="metric-label">פעולות מוצלחות</div>
-                <div class="metric-progress">
-                  <div
-                    class="progress-bar successful"
-                    [style.width.%]="getSuccessPercentage()"
-                  ></div>
-                </div>
-              </div>
-              <mat-icon class="metric-icon">check_circle</mat-icon>
-            </div>
+            
 
             <!-- NEW: Chaos Disabled Errors Card -->
             <div class="metric-card chaos-errors">

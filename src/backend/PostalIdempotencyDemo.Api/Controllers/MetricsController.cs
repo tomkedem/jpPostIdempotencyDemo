@@ -33,7 +33,7 @@ public class MetricsController : ControllerBase
     public IActionResult ResetMetrics()
     {
         _metricsService.ResetMetrics();
-        return Ok(new { message = "Metrics reset successfully", timestamp = DateTime.UtcNow });
+        return Ok(new { message = "Metrics reset successfully", timestamp = DateTime.Now });
     }
 
     [HttpGet("health")]
@@ -41,30 +41,27 @@ public class MetricsController : ControllerBase
     {
         var summary = await _metricsService.GetMetricsSummaryAsync();
         var realTimeMetrics = _metricsService.GetRealTimeMetrics();
-        
+
         return Ok(new
         {
             status = realTimeMetrics["healthStatus"],
-            uptime = realTimeMetrics["uptime"],
-            memoryUsage = realTimeMetrics["memoryUsage"],
+            uptime = realTimeMetrics["uptime"],           
             operationsPerSecond = realTimeMetrics["operationsPerSecond"],
             systemLoad = realTimeMetrics["systemLoad"],
             responseTime = new
             {
                 current = realTimeMetrics["currentResponseTime"],
-                average = summary.AverageResponseTime,
-                peak = summary.PeakResponseTime,
-                min = summary.MinResponseTime
+                average = summary.AverageExecutionTimeMs               
             },
             operations = new
             {
                 total = summary.TotalOperations,
                 successful = summary.SuccessfulOperations,
-                errors = summary.ErrorCount,
-                idempotentBlocks = summary.IdempotentBlocks,
+                // errors = summary.ErrorCount,
+                idempotentBlocks = summary.IdempotentHits,
                 successRate = summary.SuccessRate
             },
-            timestamp = DateTime.UtcNow
+            timestamp = DateTime.Now
         });
     }
 }

@@ -23,12 +23,12 @@ public class TestController : ControllerBase
         {
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             _logger.LogInformation("Using connection string: {ConnectionString}", connectionString);
-            
+
             using var connection = new SqlConnection(connectionString);
             await connection.OpenAsync();
-            
+
             _logger.LogInformation("Database connection successful");
-            return Ok(new { message = "Database connection successful", timestamp = DateTime.UtcNow, connectionString = connectionString?.Substring(0, Math.Min(50, connectionString.Length)) + "..." });
+            return Ok(new { message = "Database connection successful", timestamp = DateTime.Now, connectionString = connectionString?.Substring(0, Math.Min(50, connectionString.Length)) + "..." });
         }
         catch (Exception ex)
         {
@@ -56,7 +56,7 @@ public class TestController : ControllerBase
                 shipments.Add(new
                 {
                     id = reader["id"],
-                    barcode = reader["barcode"],                   
+                    barcode = reader["barcode"],
                     customerName = reader["customer_name"],
                     address = reader["address"],
                     weight = reader["weight"],

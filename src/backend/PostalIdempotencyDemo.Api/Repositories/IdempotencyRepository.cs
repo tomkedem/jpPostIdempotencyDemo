@@ -60,7 +60,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
             {
                 using var command = new SqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@key", key);
-                command.Parameters.AddWithValue("@now", DateTime.UtcNow);
+                command.Parameters.AddWithValue("@now", DateTime.Now);
 
                 using var reader = await command.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
@@ -102,7 +102,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                 command.Parameters.AddWithValue("@operation", entry.HttpMethod);
 
                 var result = await command.ExecuteNonQueryAsync();
-                
+
                 return result > 0;
             });
         }
@@ -133,7 +133,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
             return await _sqlExecutor.ExecuteAsync(async connection =>
             {
                 using var command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@now", DateTime.UtcNow);
+                command.Parameters.AddWithValue("@now", DateTime.Now);
 
                 var result = await command.ExecuteNonQueryAsync();
                 return result > 0;

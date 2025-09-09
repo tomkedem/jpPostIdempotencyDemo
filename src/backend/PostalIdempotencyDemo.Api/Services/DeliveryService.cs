@@ -33,13 +33,13 @@ namespace PostalIdempotencyDemo.Api.Services
                 Id = Guid.NewGuid(),
                 Barcode = request.Barcode,
                 EmployeeId = request.EmployeeId,
-                DeliveryDate = DateTime.UtcNow,
+                DeliveryDate = DateTime.Now,
                 LocationLat = request.LocationLat,
                 LocationLng = request.LocationLng,
                 RecipientName = request.RecipientName,
                 StatusId = request.DeliveryStatus,
                 Notes = request.Notes,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now
             };
             await _deliveryRepository.CreateDeliveryAsync(delivery);
             await _metricsRepository.LogMetricsAsync("create_delivery", $"/api/idempotency-demo/delivery", 0, false, null);

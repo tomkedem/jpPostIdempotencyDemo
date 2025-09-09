@@ -24,7 +24,7 @@ public class MetricsService : IMetricsService
     private static int _idempotentBlocks = 0;
     private static int _errorCount = 0;
     private static int _chaosDisabledErrors = 0; // NEW: שגיאות כאשר הגנה כבויה
-    private static DateTime _lastResetTime = DateTime.UtcNow;
+    private static DateTime _lastResetTime = DateTime.Now;
 
     public MetricsService(IMetricsRepository metricsRepository, ILogger<MetricsService> logger)
     {
@@ -59,17 +59,13 @@ public class MetricsService : IMetricsService
         return new MetricsSummaryDto
         {
             TotalOperations = dbSummary.TotalOperations,
+            IdempotentHits = dbSummary.IdempotentHits,
             SuccessfulOperations = dbSummary.SuccessfulOperations,
-            IdempotentBlocks = dbSummary.IdempotentBlocks,
-            ErrorCount = dbSummary.ErrorCount,
             ChaosDisabledErrors = dbSummary.ChaosDisabledErrors,
-            AverageResponseTime = dbSummary.AverageResponseTime, // ✅ משתמש בנתונים מהDatabase
-            SuccessRate = CalculateSuccessRate(dbSummary),
-            LastUpdated = DateTime.UtcNow,
-            SystemHealth = CalculateSystemHealth(),
-            ThroughputPerMinute = CalculateThroughput(),
-            PeakResponseTime = GetPeakResponseTime(),
-            MinResponseTime = GetMinResponseTime()
+            AverageExecutionTimeMs = dbSummary.AverageExecutionTimeMs, // ✅ משתמש בנתונים מהDatabase
+            SuccessRate = dbSummary.SuccessRate, // ✅ משתמש בחישוב מה-SQL
+            LastUpdated = DateTime.Now
+
         };
     }
 
@@ -99,7 +95,7 @@ public class MetricsService : IMetricsService
 
         // Track operation type
         _operationCounters.AddOrUpdate(operationType, 1, (key, value) => value + 1);
-        _lastOperationTimes[operationType] = DateTime.UtcNow;
+        _lastOperationTimes[operationType] = DateTime.Now;
 
         _logger.LogDebug("Operation recorded - Type: {Type}, Success: {Success}, Idempotent: {Idempotent}, ResponseTime: {ResponseTime}ms, Total: {Total}",
             operationType, wasSuccessful, wasIdempotent, responseTimeMs, _totalOperations);
@@ -112,7 +108,7 @@ public class MetricsService : IMetricsService
 
         // Track operation type
         _operationCounters.AddOrUpdate($"{operationType}_chaos_error", 1, (key, value) => value + 1);
-        _lastOperationTimes[$"{operationType}_chaos_error"] = DateTime.UtcNow;
+        _lastOperationTimes[$"{operationType}_chaos_error"] = DateTime.Now;
 
         _logger.LogWarning("Chaos disabled error recorded - Type: {Type}, Total Chaos Errors: {ChaosErrors}",
             operationType, _chaosDisabledErrors);
@@ -147,7 +143,7 @@ public class MetricsService : IMetricsService
         _errorCount = 0;
         _chaosDisabledErrors = 0; // NEW: איפוס שגיאות כאוס
         _averageResponseTime = 0.0;
-        _lastResetTime = DateTime.UtcNow;
+        _lastResetTime = DateTime.Now;
 
         _logger.LogInformation("Metrics reset at {ResetTime}", _lastResetTime);
     }
@@ -161,7 +157,7 @@ public class MetricsService : IMetricsService
             ["systemLoad"] = CalculateSystemLoad(),
             ["memoryUsage"] = GC.GetTotalMemory(false) / (1024 * 1024), // MB
             ["activeConnections"] = _operationCounters.Count,
-            ["uptime"] = DateTime.UtcNow - _lastResetTime,
+            ["uptime"] = DateTime.Now - _lastResetTime,
             ["healthStatus"] = CalculateSystemHealth()
         };
     }
@@ -175,24 +171,17 @@ public class MetricsService : IMetricsService
         return times.Length > 0 ? times.Average() : 0.0;
     }
 
-    private double CalculateSuccessRate(MetricsSummaryDto dbSummary)
-    {
-        var totalOps = dbSummary.TotalOperations;
-        var successOps = dbSummary.SuccessfulOperations;
-
-        return totalOps > 0 ? (double)successOps / totalOps * 100 : 100.0;
-    }
-
     private string CalculateSystemHealth()
     {
-        var successRate = CalculateSuccessRate(new MetricsSummaryDto());
+        // השתמש בערך קבוע כרגע, יתעדכן בעתיד מהDatabase
         var avgResponseTime = _averageResponseTime;
 
-        if (successRate >= 99 && avgResponseTime < 100)
+        // הערכה פשוטה על בסיס זמן תגובה בלבד
+        if (avgResponseTime < 100)
             return "Excellent";
-        else if (successRate >= 95 && avgResponseTime < 500)
+        else if (avgResponseTime < 500)
             return "Good";
-        else if (successRate >= 90 && avgResponseTime < 1000)
+        else if (avgResponseTime < 1000)
             return "Fair";
         else
             return "Poor";
@@ -200,7 +189,7 @@ public class MetricsService : IMetricsService
 
     private double CalculateThroughput()
     {
-        var timeSpan = DateTime.UtcNow - _lastResetTime;
+        var timeSpan = DateTime.Now - _lastResetTime;
         return timeSpan.TotalMinutes > 0 ? _totalOperations / timeSpan.TotalMinutes : 0;
     }
 
@@ -221,7 +210,7 @@ public class MetricsService : IMetricsService
 
     private double CalculateOperationsPerSecond()
     {
-        var timeSpan = DateTime.UtcNow - _lastResetTime;
+        var timeSpan = DateTime.Now - _lastResetTime;
         return timeSpan.TotalSeconds > 0 ? _totalOperations / timeSpan.TotalSeconds : 0;
     }
 

@@ -40,7 +40,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                     command.Parameters.AddWithValue("@is_idempotent_hit", isIdempotentHit);
                     command.Parameters.AddWithValue("@idempotency_key", idempotencyKey ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@is_error", isError);
-                    command.Parameters.AddWithValue("@created_at", DateTime.UtcNow);
+                    command.Parameters.AddWithValue("@created_at", DateTime.Now);
 
                     await command.ExecuteNonQueryAsync();
                 });
@@ -54,37 +54,37 @@ namespace PostalIdempotencyDemo.Api.Repositories
         public async Task<MetricsSummaryDto> GetMetricsSummaryAsync()
         {
             var summary = new MetricsSummaryDto();
-            try
+
+            await _sqlExecutor.ExecuteAsync(async connection =>
             {
-                await _sqlExecutor.ExecuteAsync(async connection =>
+                const string sql = @"
+                    SELECT 
+                        COUNT(*) AS TotalOperations,                            
+                        SUM(CASE WHEN operation_type LIKE '%idempotent_block' THEN 1 ELSE 0 END) AS IdempotentHits,
+                        SUM(CASE WHEN operation_type LIKE '%update_status' THEN 1 ELSE 0 END) AS SuccessfulOperations, 
+                        SUM(CASE WHEN operation_type LIKE '%_chaos_error' THEN 1 ELSE 0 END) AS ChaosDisabledErrors,
+                        AVG(CAST(NULLIF(execution_time_ms, 0) AS FLOAT)) AS AverageExecutionTimeMs,
+                        CAST( 
+                            
+                                (SUM(CASE WHEN operation_type LIKE '%idempotent_block' OR operation_type LIKE '%update_status' THEN 1 ELSE 0 END) * 100.0) / NULLIF(COUNT(*), 0) 
+                            
+                        AS FLOAT) AS SuccessRate                          
+                    FROM operation_metrics;";
+
+                using var command = new SqlCommand(sql, connection);
+                using var reader = await command.ExecuteReaderAsync();
+
+                if (await reader.ReadAsync())
                 {
-                    const string sql = @"
-                        SELECT 
-                            COUNT(*) AS TotalOperations,                            
-                            SUM(CASE WHEN operation_type LIKE '%idempotent_block' THEN 1 ELSE 0 END) AS IdempotentHits,
-                            SUM(CASE WHEN operation_type LIKE '%update_status' THEN 1 ELSE 0 END) AS SuccessfulOperations, 
-                            SUM(CASE WHEN operation_type LIKE '%_chaos_error' THEN 1 ELSE 0 END) AS ChaosDisabledErrors,
-                            AVG(CAST(NULLIF(execution_time_ms, 0) AS FLOAT)) AS AverageExecutionTimeMs                          
-                        FROM operation_metrics;";
+                    summary.TotalOperations = reader["TotalOperations"] as int? ?? 0;
+                    summary.IdempotentHits = reader["IdempotentHits"] as int? ?? 0;
+                    summary.SuccessfulOperations = reader["SuccessfulOperations"] as int? ?? 0;
+                    summary.ChaosDisabledErrors = reader["ChaosDisabledErrors"] as int? ?? 0;
+                    summary.AverageExecutionTimeMs = reader["AverageExecutionTimeMs"] as double? ?? 0;
+                    summary.SuccessRate = reader["SuccessRate"] as double? ?? 100.0;
+                }
+            });
 
-                    using var command = new SqlCommand(sql, connection);
-                    using var reader = await command.ExecuteReaderAsync();
-
-                    if (await reader.ReadAsync())
-                    {
-                        summary.TotalOperations = reader["TotalOperations"] as int? ?? 0;
-                        summary.IdempotentBlocks = reader["IdempotentHits"] as int? ?? 0;
-                        summary.SuccessfulOperations = reader["SuccessfulOperations"] as int? ?? 0; // ✅ פעולות תקינות מהSQL
-                        summary.ErrorCount = reader["FailedOperations"] as int? ?? 0;
-                        summary.ChaosDisabledErrors = reader["ChaosDisabledErrors"] as int? ?? 0;
-                        summary.AverageResponseTime = reader["AverageExecutionTimeMs"] as double? ?? 0;
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting metrics summary");
-            }
             return summary;
         }
     }

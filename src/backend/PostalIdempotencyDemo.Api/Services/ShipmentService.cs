@@ -22,7 +22,7 @@ public class ShipmentService : IShipmentService
         {
             // Check if barcode already exists
             var existingShipment = await _repository.GetByBarcodeAsync(request.Barcode);
-            
+
             if (existingShipment != null)
             {
                 return ServiceResult<Shipment>.Failure($"Shipment with barcode {request.Barcode} already exists", "DUPLICATE_BARCODE");
@@ -41,14 +41,14 @@ public class ShipmentService : IShipmentService
 
             var createdShipment = await _repository.CreateAsync(shipment);
 
-            _logger.LogInformation("Created shipment {ShipmentId} with barcode {Barcode} (CorrelationId: {CorrelationId})", 
+            _logger.LogInformation("Created shipment {ShipmentId} with barcode {Barcode} (CorrelationId: {CorrelationId})",
                 createdShipment.Id, createdShipment.Barcode, correlationId);
 
             return ServiceResult<Shipment>.Success(createdShipment);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating shipment with barcode {Barcode} (CorrelationId: {CorrelationId})", 
+            _logger.LogError(ex, "Error creating shipment with barcode {Barcode} (CorrelationId: {CorrelationId})",
                 request.Barcode, correlationId);
             return ServiceResult<Shipment>.Failure(ex.Message ?? "Unknown error occurred", "CREATE_ERROR");
         }
@@ -73,7 +73,7 @@ public class ShipmentService : IShipmentService
         try
         {
             var shipment = await _repository.GetByBarcodeAsync(barcode);
-            
+
             if (shipment == null)
             {
                 return ServiceResult<Shipment>.Failure($"Shipment with barcode {barcode} not found", "NOT_FOUND");
@@ -117,7 +117,7 @@ public class ShipmentService : IShipmentService
             }
 
             shipment.Status = status;
-            shipment.UpdatedAt = DateTime.UtcNow;
+            shipment.UpdatedAt = DateTime.Now;
             if (notes != null)
             {
                 shipment.Notes = notes;
@@ -125,9 +125,9 @@ public class ShipmentService : IShipmentService
 
             await _repository.UpdateAsync(shipment);
 
-            _logger.LogInformation("Updated shipment {ShipmentId} status from {OldStatus} to {NewStatus}", 
+            _logger.LogInformation("Updated shipment {ShipmentId} status from {OldStatus} to {NewStatus}",
                 shipment.Id, shipment.Status, status);
-            
+
             return ServiceResult<Shipment>.Success(shipment);
         }
         catch (Exception ex)
@@ -160,11 +160,11 @@ public class ShipmentService : IShipmentService
             }
 
             shipment.Status = ShipmentStatus.Cancelled;
-            shipment.UpdatedAt = DateTime.UtcNow;
+            shipment.UpdatedAt = DateTime.Now;
 
             await _repository.UpdateAsync(shipment);
 
-            _logger.LogInformation("Cancelled shipment {ShipmentId} with barcode {Barcode}", 
+            _logger.LogInformation("Cancelled shipment {ShipmentId} with barcode {Barcode}",
                 shipment.Id, shipment.Barcode);
             return ServiceResult.Success();
         }

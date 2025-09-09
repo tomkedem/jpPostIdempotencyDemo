@@ -80,7 +80,7 @@ namespace PostalIdempotencyDemo.Api.Services
             // שלב 1: בדיקה אם קיימת רשומה אידמפוטנטית קודמת
             var latestEntry = await _idempotencyService.GetLatestEntryByRequestPathAsync(requestPath);
 
-            if (latestEntry != null && latestEntry.IdempotencyKey == idempotencyKey && latestEntry.ExpiresAt > DateTime.UtcNow)
+            if (latestEntry != null && latestEntry.IdempotencyKey == idempotencyKey && latestEntry.ExpiresAt > DateTime.Now)
             {
                 // נמצאה רשומה תקפה עם אותו מפתח - זו בקשה כפולה
                 _logger.LogInformation("נמצאה בקשה כפולה - מחזיר תשובה שמורה. מפתח: {IdempotencyKey}", idempotencyKey);
@@ -104,8 +104,8 @@ namespace PostalIdempotencyDemo.Api.Services
                 Endpoint = requestPath,
                 HttpMethod = "POST",
                 StatusCode = 0,
-                CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddHours(expirationHours),
+                CreatedAt = DateTime.Now,
+                ExpiresAt = DateTime.Now.AddHours(expirationHours),
                 Operation = "create_delivery",
                 CorrelationId = requestPath,
                 RelatedEntityId = null
@@ -143,7 +143,7 @@ namespace PostalIdempotencyDemo.Api.Services
                 _logger.LogInformation("הגנת אידמפוטנטיות כבויה - בודק אם זו פעולה כפולה לצורכי תיעוד");
 
                 // בדיקה אם זו פעולה כפולה גם כשההגנה כבויה - מחפש לפי ברקוד
-                string correlationIdForCheck = requestPath; 
+                string correlationIdForCheck = requestPath;
                 var existingEntry = await _idempotencyService.GetLatestEntryByRequestPathAsync(correlationIdForCheck);
 
                 bool isDuplicateOperation = existingEntry != null && existingEntry.IdempotencyKey == idempotencyKey;
@@ -154,7 +154,7 @@ namespace PostalIdempotencyDemo.Api.Services
                     _logger.LogWarning("זוהתה פעולה כפולה כאשר הגנת אידמפוטנטיות כבויה - מתעד כשגיאה אבל מאפשר פעולה. ברקוד: {Barcode}", barcode);
 
                     // תיעוד כשגיאה בטבלת operation_metrics עם is_error = 1
-                    await LogChaosDisabledErrorAsync(barcode,idempotencyKey, requestPath, "duplicate_operation_without_protection");
+                    await LogChaosDisabledErrorAsync(barcode, idempotencyKey, requestPath, "duplicate_operation_without_protection");
 
                     // ביצוע הפעולה ללא תיעוד נוסף (כדי למנוע רישום כפול)
                     var duplicateResponse = await _deliveryService.UpdateDeliveryStatusDirectAsync(requestPath, request.StatusId);
@@ -171,13 +171,13 @@ namespace PostalIdempotencyDemo.Api.Services
 
                     return directResponse;
                 }
-            }           
-    
+            }
+
             _logger.LogDebug("מחפש רשומה אידמפוטנטית קיימת עבור request_path: {requestPath}", requestPath);
 
             IdempotencyEntry? latestEntry = await _idempotencyService.GetLatestEntryByRequestPathAsync(requestPath);
 
-            if (latestEntry != null && latestEntry.IdempotencyKey == idempotencyKey && latestEntry.ExpiresAt > DateTime.UtcNow)
+            if (latestEntry != null && latestEntry.IdempotencyKey == idempotencyKey && latestEntry.ExpiresAt > DateTime.Now)
             {
                 // זו בקשה כפולה - חוסמים ומתעדים בלוג
                 _logger.LogWarning("בקשה כפולה לעדכון סטטוס זוהתה וחסומה. ברקוד: {Barcode}, מפתח: {IdempotencyKey}", barcode, idempotencyKey);
@@ -211,7 +211,7 @@ namespace PostalIdempotencyDemo.Api.Services
                 StatusCode = 0,
                 CreatedAt = DateTime.Now,
                 ExpiresAt = DateTime.Now.AddHours(expirationHours),
-                Operation = "update_status",                
+                Operation = "update_status",
                 RelatedEntityId = barcode
             };
             await _idempotencyService.StoreIdempotencyEntryAsync(newEntry);
@@ -345,8 +345,8 @@ namespace PostalIdempotencyDemo.Api.Services
                     Endpoint = requestPath,
                     HttpMethod = "PATCH",
                     StatusCode = 200, // הצליח אבל ללא הגנה
-                    CreatedAt = DateTime.UtcNow,
-                    ExpiresAt = DateTime.UtcNow.AddHours(expirationHours),
+                    CreatedAt = DateTime.Now,
+                    ExpiresAt = DateTime.Now.AddHours(expirationHours),
                     Operation = "update_status_unprotected",
                     RelatedEntityId = barcode
                 };
@@ -407,8 +407,8 @@ namespace PostalIdempotencyDemo.Api.Services
                     Endpoint = requestPath,
                     HttpMethod = "POST",
                     StatusCode = 200, // הצליח אבל ללא הגנה
-                    CreatedAt = DateTime.UtcNow,
-                    ExpiresAt = DateTime.UtcNow.AddHours(expirationHours),
+                    CreatedAt = DateTime.Now,
+                    ExpiresAt = DateTime.Now.AddHours(expirationHours),
                     Operation = "create_delivery_unprotected",
                     RelatedEntityId = null
                 };

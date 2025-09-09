@@ -37,7 +37,7 @@ namespace PostalIdempotencyDemo.Api.Middleware
             //         error = "System is currently in maintenance mode",
             //         message = "The system is temporarily unavailable for maintenance. Please try again later.",
             //         statusCode = 503,
-            //         timestamp = DateTime.UtcNow
+            //         timestamp = DateTime.Now
             //     };
             //
             //     await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(response));

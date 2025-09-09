@@ -6,11 +6,11 @@ import { environment } from "../../environments/environment";
 
 export interface MetricsSummary {
   totalOperations: number;
-  successfulOperations: number;
-  idempotentBlocks: number;
-  errorCount: number;
+  idempotentHits: number;
+  successfulOperations: number;   
   chaosDisabledErrors: number; // NEW: שגיאות כאשר הגנה כבויה
-  averageResponseTime: number;
+  averageExecutionTimeMs: number;
+
   successRate: number;
   lastUpdated: string;
   systemHealth: string;
@@ -18,10 +18,6 @@ export interface MetricsSummary {
   peakResponseTime: number;
   minResponseTime: number;
 
-  // Legacy properties for backward compatibility
-  idempotentHits: number;
-  failedOperations: number;
-  averageExecutionTimeMs: number;
 }
 
 export interface RealTimeMetrics {

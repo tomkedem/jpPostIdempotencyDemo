@@ -93,11 +93,8 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     const m = this.metrics();
     if (!m) return "unknown";
 
-    const successRate =
-      m.totalOperations > 0
-        ? (m.successfulOperations / m.totalOperations) * 100
-        : 100;
-    const avgResponseTime = m.averageResponseTime || 0;
+    const successRate = m.successRate;
+    const avgResponseTime = m.averageExecutionTimeMs || 0;
 
     if (successRate >= 98 && avgResponseTime < 200) return "excellent";
     if (successRate >= 95 && avgResponseTime < 500) return "good";
@@ -149,30 +146,35 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   }
 
   private startRealTimeUpdates() {
+    
     // עדכון מדדים כל 3 שניות
     interval(3000)
       .pipe(
         startWith(0),
         switchMap(() => this.metricsService.getMetricsSummary()),
         takeUntil(this.destroy$)
-      )
+      ) 
       .subscribe({
         next: (metrics) => {
           this.metrics.set(metrics);
           this.updatePerformanceData(metrics);
+          console.log("Metrics updated:", metrics);
+          console.log("Current performance data:", metrics.averageExecutionTimeMs);
         },
         error: (error) => {
           console.error("שגיאה בטעינת מדדים:", error);
           this.addLog("error", "שגיאה בטעינת מדדים");
         },
       });
+      
+      
   }
 
   private updatePerformanceData(metrics: MetricsSummary) {
     const newPoint = {
       timestamp: Date.now(),
       successful: metrics.successfulOperations,
-      blocked: metrics.idempotentBlocks,
+      blocked: metrics.idempotentHits,
       chaosErrors: metrics.chaosDisabledErrors || 0, // NEW: שגיאות כאשר הגנה כבויה
     };
 
@@ -452,7 +454,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   getBlockedPercentage(): number {
     const metrics = this.metrics();
     if (!metrics || metrics.totalOperations === 0) return 0;
-    return (metrics.idempotentBlocks / metrics.totalOperations) * 100;
+    return (metrics.idempotentHits / metrics.totalOperations) * 100;
   }
 
   getSuccessPercentage(): number {
@@ -470,6 +472,18 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   getChaosErrorsCount(): number {
     const metrics = this.metrics();
     return metrics?.chaosDisabledErrors || 0;
+  }
+
+  getTimeSavedMs(): number {
+    const metrics = this.metrics();
+    if (!metrics) return 0;
+    
+    // חישוב זמן שנחסך: מספר החסימות האידמפוטנטיות כפול זמן התגובה הממוצע
+    // זה מייצג את הזמן שהיה מבוזבז על פעולות כפולות ללא הגנה
+    const blockedOperations = metrics.idempotentHits || 0;
+    const avgResponseTime = metrics.averageExecutionTimeMs || 0;
+    
+    return blockedOperations * avgResponseTime;
   }
 
   getRecentLogs(): LogEntry[] {

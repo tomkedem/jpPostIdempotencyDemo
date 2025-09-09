@@ -11,7 +11,7 @@ public class IdempotencyDemoResponse<T>
     public int ExecutionTimeMs { get; set; }
     public bool WasIdempotentHit { get; set; }
     public string? IdempotencyKey { get; set; }
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    public DateTime Timestamp { get; set; } = DateTime.Now;
 }
 
 
@@ -28,15 +28,15 @@ public class SignatureRequest
 {
     [Required]
     public string Barcode { get; set; } = string.Empty;
-    
+
     [Required]
     public string EmployeeId { get; set; } = string.Empty;
-    
+
     public string? SignatureData { get; set; }
-    
+
     [Range(1, 3)]
     public int SignatureType { get; set; } = 1;
-    
+
     public string? SignerName { get; set; }
 }
 

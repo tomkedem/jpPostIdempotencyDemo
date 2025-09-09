@@ -23,7 +23,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                                  VALUES (@id, @barcode, @customer_name, @address, @weight, @price, @status_id, @created_at, @notes)";
 
             shipment.Id = Guid.NewGuid();
-            shipment.CreatedAt = DateTime.UtcNow;
+            shipment.CreatedAt = DateTime.Now;
 
             await _sqlExecutor.ExecuteAsync(async connection =>
             {
@@ -94,7 +94,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
             {
                 var command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@status_id", (int)status);
-                command.Parameters.AddWithValue("@updated_at", DateTime.UtcNow);
+                command.Parameters.AddWithValue("@updated_at", DateTime.Now);
                 command.Parameters.AddWithValue("@id", id);
 
                 var rowsAffected = await command.ExecuteNonQueryAsync();
@@ -144,13 +144,13 @@ namespace PostalIdempotencyDemo.Api.Repositories
             {
                 var command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@id", shipment.Id);
-                command.Parameters.AddWithValue("@barcode", shipment.Barcode);                
+                command.Parameters.AddWithValue("@barcode", shipment.Barcode);
                 command.Parameters.AddWithValue("@customer_name", (object?)shipment.CustomerName ?? DBNull.Value);
                 command.Parameters.AddWithValue("@address", (object?)shipment.Address ?? DBNull.Value);
                 command.Parameters.AddWithValue("@weight", shipment.Weight);
                 command.Parameters.AddWithValue("@price", (object?)shipment.Price ?? DBNull.Value);
                 command.Parameters.AddWithValue("@status_id", shipment.StatusId);
-                command.Parameters.AddWithValue("@updated_at", DateTime.UtcNow);
+                command.Parameters.AddWithValue("@updated_at", DateTime.Now);
                 command.Parameters.AddWithValue("@notes", (object?)shipment.Notes ?? DBNull.Value);
 
                 var rowsAffected = await command.ExecuteNonQueryAsync();

@@ -36,7 +36,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
             var shipments = result.Data.Select(shipment => new
             {
                 id = shipment.Id,
-                barcode = shipment.Barcode,              
+                barcode = shipment.Barcode,
                 customerName = shipment.CustomerName,
                 address = shipment.Address,
                 weight = shipment.Weight,
@@ -63,7 +63,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
                 shipment = shipment == null ? null : new
                 {
                     id = shipment.Id,
-                    barcode = shipment.Barcode,                    
+                    barcode = shipment.Barcode,
                     customerName = shipment.CustomerName,
                     address = shipment.Address,
                     weight = shipment.Weight,
@@ -104,7 +104,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
             return Ok(new
             {
                 id = shipment.Id,
-                barcode = shipment.Barcode,               
+                barcode = shipment.Barcode,
                 customerName = shipment.CustomerName,
                 address = shipment.Address,
                 weight = shipment.Weight,
@@ -157,14 +157,14 @@ namespace PostalIdempotencyDemo.Api.Controllers
 
                 using var command = new SqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@id", newId);
-                command.Parameters.AddWithValue("@barcode", request.Barcode);                
+                command.Parameters.AddWithValue("@barcode", request.Barcode);
                 command.Parameters.AddWithValue("@customer_name", request.CustomerName ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@address", request.Address ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("@weight", request.Weight);
                 command.Parameters.AddWithValue("@price", request.Price);
                 command.Parameters.AddWithValue("@status_id", 1); // Created
                 command.Parameters.AddWithValue("@notes", request.Notes ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("@created_at", DateTime.UtcNow);
+                command.Parameters.AddWithValue("@created_at", DateTime.Now);
 
                 using var reader = await command.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
@@ -172,7 +172,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
                     var result = new
                     {
                         id = reader.GetGuid(0),
-                        barcode = request.Barcode,                      
+                        barcode = request.Barcode,
                         customerName = request.CustomerName,
                         address = request.Address,
                         weight = request.Weight,
@@ -199,7 +199,7 @@ namespace PostalIdempotencyDemo.Api.Controllers
 
 public class CreateShipmentRequest
 {
-    public string Barcode { get; set; } = string.Empty;    
+    public string Barcode { get; set; } = string.Empty;
     public string? CustomerName { get; set; }
     public string? Address { get; set; }
     public decimal Weight { get; set; }
