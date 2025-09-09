@@ -20,15 +20,15 @@ This guide provides step-by-step instructions for testing the Angular frontend c
 cd src/backend/PostalIdempotencyDemo.Api
 dotnet run
 ```
-The API should start on `http://localhost:5000`
+The API should start on `https://localhost:5000`
 
 ### 2. Test Backend Endpoints Manually
 ```bash
 # Test basic connectivity
-curl http://localhost:5000/api/test/connection
+curl https://localhost:5000/api/test/connection
 
 # Test delivery endpoint (POST)
-curl -X POST http://localhost:5000/api/idempotency-demo/delivery \
+curl -X POST https://localhost:5000/api/idempotency-demo/delivery \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: test-key-123" \
   -d '{
@@ -74,7 +74,7 @@ The app should start on `http://localhost:4200`
 
 ### Frontend Configuration:
 - Environment: `src/environments/environment.ts`
-- API URL: `http://localhost:5000/api`
+- API URL: `https://localhost:5000/api`
 
 ## Data Model Alignment
 
@@ -128,7 +128,7 @@ netstat -an | findstr :5000
 netstat -an | findstr :4200
 
 # Test backend health
-curl http://localhost:5000/api/test/connection
+curl https://localhost:5000/api/test/connection
 
 # View backend logs
 # Check console output where `dotnet run` is executed

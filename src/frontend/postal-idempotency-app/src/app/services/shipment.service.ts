@@ -20,7 +20,7 @@ import { ChaosService } from "./chaos.service";
   providedIn: "root",
 })
 export class ShipmentService {
-  private readonly apiUrl = "http://localhost:5000/api/idempotency-demo";
+  private readonly apiUrl = "https://localhost:5000/api/idempotency-demo";
 
   // Signals for state management
   private _loading = signal(false);

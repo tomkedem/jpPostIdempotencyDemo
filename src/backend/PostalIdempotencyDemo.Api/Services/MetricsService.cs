@@ -55,9 +55,6 @@ public class MetricsService : IMetricsService
     {
         var dbSummary = await _metricsRepository.GetMetricsSummaryAsync();
 
-        // Use current calculated average instead of old static value
-        var currentAvgResponseTime = CalculateCurrentAverageResponseTime();
-
         // Use only database metrics (no double counting with in-memory metrics)
         return new MetricsSummaryDto
         {
@@ -66,7 +63,7 @@ public class MetricsService : IMetricsService
             IdempotentBlocks = dbSummary.IdempotentBlocks,
             ErrorCount = dbSummary.ErrorCount,
             ChaosDisabledErrors = dbSummary.ChaosDisabledErrors,
-            AverageResponseTime = currentAvgResponseTime,
+            AverageResponseTime = dbSummary.AverageResponseTime, // ✅ משתמש בנתונים מהDatabase
             SuccessRate = CalculateSuccessRate(dbSummary),
             LastUpdated = DateTime.UtcNow,
             SystemHealth = CalculateSystemHealth(),

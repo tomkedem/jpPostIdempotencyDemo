@@ -60,11 +60,11 @@ namespace PostalIdempotencyDemo.Api.Repositories
                 {
                     const string sql = @"
                         SELECT 
-                            COUNT(*) AS TotalOperations,
-                            SUM(CASE WHEN is_idempotent_hit = 1 THEN 1 ELSE 0 END) AS IdempotentHits,
-                            SUM(CASE WHEN is_error = 1 AND operation_type NOT LIKE '%_chaos_error' THEN 1 ELSE 0 END) AS FailedOperations,
-                            SUM(CASE WHEN is_error = 1 AND operation_type LIKE '%_chaos_error' THEN 1 ELSE 0 END) AS ChaosDisabledErrors,
-                            AVG(CAST(execution_time_ms AS FLOAT)) AS AverageExecutionTimeMs
+                            COUNT(*) AS TotalOperations,                            
+                            SUM(CASE WHEN operation_type LIKE '%idempotent_block' THEN 1 ELSE 0 END) AS IdempotentHits,
+                            SUM(CASE WHEN operation_type LIKE '%update_status' THEN 1 ELSE 0 END) AS SuccessfulOperations, 
+                            SUM(CASE WHEN operation_type LIKE '%_chaos_error' THEN 1 ELSE 0 END) AS ChaosDisabledErrors,
+                            AVG(CAST(NULLIF(execution_time_ms, 0) AS FLOAT)) AS AverageExecutionTimeMs                          
                         FROM operation_metrics;";
 
                     using var command = new SqlCommand(sql, connection);
@@ -74,13 +74,10 @@ namespace PostalIdempotencyDemo.Api.Repositories
                     {
                         summary.TotalOperations = reader["TotalOperations"] as int? ?? 0;
                         summary.IdempotentBlocks = reader["IdempotentHits"] as int? ?? 0;
+                        summary.SuccessfulOperations = reader["SuccessfulOperations"] as int? ?? 0; // ✅ פעולות תקינות מהSQL
                         summary.ErrorCount = reader["FailedOperations"] as int? ?? 0;
-                        summary.ChaosDisabledErrors = reader["ChaosDisabledErrors"] as int? ?? 0; // NEW
+                        summary.ChaosDisabledErrors = reader["ChaosDisabledErrors"] as int? ?? 0;
                         summary.AverageResponseTime = reader["AverageExecutionTimeMs"] as double? ?? 0;
-
-                        // פעולות מוצלחות = סה"כ פעולות מינוס שגיאות כאוס בלבד
-                        // מתעלמים משגיאות רגילות - מתמקדים רק בהגנה אידמפוטנטית
-                        summary.SuccessfulOperations = summary.TotalOperations - summary.ChaosDisabledErrors;
                     }
                 });
             }
