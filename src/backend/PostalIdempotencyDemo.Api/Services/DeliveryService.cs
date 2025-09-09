@@ -93,7 +93,7 @@ namespace PostalIdempotencyDemo.Api.Services
         {
             _logger.LogDebug("רושם hit אידמפוטנטי עבור ברקוד {Barcode} עם מפתח {IdempotencyKey}", barcode, idempotencyKey);
             await _metricsRepository.LogMetricsAsync(
-                operationType: "update_delivery_status", // סוג הפעולה
+                operationType: "idempotent_block", // ✅ מתאר חסימה אידמפוטנטית
                 endpoint: requestPath, // הנתיב שנקרא
                 executionTimeMs: 0, // זמן ביצוע 0 כי זו בקשה שנחסמה
                 isIdempotentHit: true, // זה hit אידמפוטנטי
