@@ -68,9 +68,9 @@ namespace PostalIdempotencyDemo.Api.Services
             await _repository.UpdateResponseAsync(idempotencyKey, responseData, 200);
         }
 
-        public async Task<IdempotencyEntry?> GetLatestEntryByCorrelationIdAsync(string requestPath)
+        public async Task<IdempotencyEntry?> GetLatestEntryByRequestPathAsync(string requestPath)
         {
-            return await _repository.GetLatestByCorrelationIdAsync(requestPath);
+            return await _repository.GetLatestByRequestPathAsync(requestPath);
         }
     }
 }

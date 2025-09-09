@@ -4,12 +4,11 @@ namespace PostalIdempotencyDemo.Api.Services.Interfaces
 {
     public interface IIdempotencyService
     {
-        Task<IdempotencyEntry?> GetLatestEntryByCorrelationIdAsync(string requestPath);
+        string GenerateIdempotencyKey(string requestContent);
         Task<IdempotencyEntry?> GetIdempotencyEntryAsync(string idempotencyKey);
         Task<bool> StoreIdempotencyEntryAsync(IdempotencyEntry entry);
         Task CleanupExpiredEntriesAsync();
-        string GenerateIdempotencyKey(string requestContent);
-        
         Task CacheResponseAsync(string idempotencyKey, object response);
+        Task<IdempotencyEntry?> GetLatestEntryByRequestPathAsync(string requestPath);
     }
 }

@@ -58,14 +58,14 @@ public class MetricsService : IMetricsService
         // Use current calculated average instead of old static value
         var currentAvgResponseTime = CalculateCurrentAverageResponseTime();
 
-        // Combine database metrics with real-time in-memory metrics
+        // Use only database metrics (no double counting with in-memory metrics)
         return new MetricsSummaryDto
         {
-            TotalOperations = dbSummary.TotalOperations + _totalOperations,
-            SuccessfulOperations = dbSummary.SuccessfulOperations + _successfulOperations,
-            IdempotentBlocks = dbSummary.IdempotentBlocks + _idempotentBlocks,
-            ErrorCount = dbSummary.ErrorCount + _errorCount,
-            ChaosDisabledErrors = dbSummary.ChaosDisabledErrors + _chaosDisabledErrors, // NEW
+            TotalOperations = dbSummary.TotalOperations,
+            SuccessfulOperations = dbSummary.SuccessfulOperations,
+            IdempotentBlocks = dbSummary.IdempotentBlocks,
+            ErrorCount = dbSummary.ErrorCount,
+            ChaosDisabledErrors = dbSummary.ChaosDisabledErrors,
             AverageResponseTime = currentAvgResponseTime,
             SuccessRate = CalculateSuccessRate(dbSummary),
             LastUpdated = DateTime.UtcNow,
@@ -180,8 +180,8 @@ public class MetricsService : IMetricsService
 
     private double CalculateSuccessRate(MetricsSummaryDto dbSummary)
     {
-        var totalOps = dbSummary.TotalOperations + _totalOperations;
-        var successOps = dbSummary.SuccessfulOperations + _successfulOperations;
+        var totalOps = dbSummary.TotalOperations;
+        var successOps = dbSummary.SuccessfulOperations;
 
         return totalOps > 0 ? (double)successOps / totalOps * 100 : 100.0;
     }

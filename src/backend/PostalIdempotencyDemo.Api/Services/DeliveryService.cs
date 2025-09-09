@@ -37,7 +37,7 @@ namespace PostalIdempotencyDemo.Api.Services
                 LocationLat = request.LocationLat,
                 LocationLng = request.LocationLng,
                 RecipientName = request.RecipientName,
-                StatusId = request.DeliveryStatus,                
+                StatusId = request.DeliveryStatus,
                 Notes = request.Notes,
                 CreatedAt = DateTime.UtcNow
             };
@@ -67,6 +67,28 @@ namespace PostalIdempotencyDemo.Api.Services
             };
         }
 
+        public async Task<IdempotencyDemoResponse<Shipment>> UpdateDeliveryStatusDirectAsync(string barcode, int statusId)
+        {
+            // עדכון ישיר ללא תיעוד מטריקות - לשימוש כאשר כבר יש תיעוד מיוחד
+            var stopwatch = Stopwatch.StartNew();
+            var updatedShipment = await _deliveryRepository.UpdateDeliveryStatusAsync(barcode, statusId);
+            stopwatch.Stop();
+            var executionTime = (int)stopwatch.ElapsedMilliseconds;
+
+            if (updatedShipment == null)
+            {
+                return new IdempotencyDemoResponse<Shipment> { Success = false, Message = $"Shipment with barcode {barcode} not found." };
+            }
+
+            return new IdempotencyDemoResponse<Shipment>
+            {
+                Success = true,
+                Data = updatedShipment,
+                Message = "סטטוס משלוח עודכן בהצלחה",
+                ExecutionTimeMs = executionTime
+            };
+        }
+
         public async Task LogIdempotentHitAsync(string barcode, string idempotencyKey, string requestPath)
         {
             _logger.LogDebug("רושם hit אידמפוטנטי עבור ברקוד {Barcode} עם מפתח {IdempotencyKey}", barcode, idempotencyKey);
@@ -75,9 +97,10 @@ namespace PostalIdempotencyDemo.Api.Services
                 endpoint: requestPath, // הנתיב שנקרא
                 executionTimeMs: 0, // זמן ביצוע 0 כי זו בקשה שנחסמה
                 isIdempotentHit: true, // זה hit אידמפוטנטי
-                idempotencyKey: idempotencyKey // המפתח שגרם לחסימה               
+                idempotencyKey: idempotencyKey, // המפתח שגרם לחסימה               
+                isError: false
             );
-             _logger.LogInformation("Hit אידמפוטנטי נרשם בהצלחה עבור ברקוד {Barcode}", barcode);
+            _logger.LogInformation("Hit אידמפוטנטי נרשם בהצלחה עבור ברקוד {Barcode}", barcode);
         }
     }
 }

@@ -42,7 +42,7 @@ public class IdempotencyDemoController : ControllerBase
         }
 
         var idempotencyKey = idempotencyKeyValues.First()!;
-
+        
         var requestPath = HttpContext.Request.Path.Value ?? "";
 
         var result = await _orchestrationService.ProcessCreateDeliveryWithIdempotencyAsync(

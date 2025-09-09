@@ -14,20 +14,20 @@ namespace PostalIdempotencyDemo.Api.Repositories
             _sqlExecutor = sqlExecutor;
         }
 
-        // מחזיר את הרשומה האחרונה לפי correlation_id
-        public async Task<IdempotencyEntry?> GetLatestByCorrelationIdAsync(string requestPath)
+        // מחזיר את הרשומה האחרונה לפי request_path
+        public async Task<IdempotencyEntry?> GetLatestByRequestPathAsync(string requestPath)
         {
             const string sql = @"
                 SELECT TOP 1 idempotency_key, request_hash, response_body, status_code, 
-                       created_at, expires_at, correlation_id, operation, related_entity_id 
+                       created_at, expires_at, request_path, operation, related_entity_id 
                 FROM idempotency_entries 
-                WHERE correlation_id = @correlationId
+                WHERE request_path = @requestPath
                 ORDER BY created_at DESC";
 
             return await _sqlExecutor.ExecuteAsync(async connection =>
             {
                 using var command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@correlationId", requestPath);
+                command.Parameters.AddWithValue("@requestPath", requestPath);
 
                 using var reader = await command.ExecuteReaderAsync();
                 if (await reader.ReadAsync())
@@ -40,7 +40,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         StatusCode = reader.GetInt32(reader.GetOrdinal("status_code")),
                         CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
                         ExpiresAt = reader.GetDateTime(reader.GetOrdinal("expires_at")),
-                        Endpoint = reader.IsDBNull(reader.GetOrdinal("correlation_id")) ? string.Empty : reader.GetString(reader.GetOrdinal("correlation_id")),
+                        Endpoint = reader.IsDBNull(reader.GetOrdinal("request_path")) ? string.Empty : reader.GetString(reader.GetOrdinal("request_path")),
                         HttpMethod = reader.GetString(reader.GetOrdinal("operation"))
                     };
                 }
@@ -52,7 +52,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
         {
             const string sql = @"
                 SELECT idempotency_key, request_hash, response_body, status_code, 
-                       created_at, expires_at, correlation_id, operation, related_entity_id 
+                       created_at, expires_at, request_path, operation, related_entity_id 
                 FROM idempotency_entries 
                 WHERE idempotency_key = @key AND expires_at > @now";
 
@@ -73,7 +73,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         StatusCode = reader.GetInt32(reader.GetOrdinal("status_code")),
                         CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
                         ExpiresAt = reader.GetDateTime(reader.GetOrdinal("expires_at")),
-                        Endpoint = reader.IsDBNull(reader.GetOrdinal("correlation_id")) ? string.Empty : reader.GetString(reader.GetOrdinal("correlation_id")),
+                        Endpoint = reader.IsDBNull(reader.GetOrdinal("request_path")) ? string.Empty : reader.GetString(reader.GetOrdinal("request_path")),
                         HttpMethod = reader.GetString(reader.GetOrdinal("operation"))
                     };
                 }
@@ -86,8 +86,8 @@ namespace PostalIdempotencyDemo.Api.Repositories
             const string sql = @"
                 INSERT INTO idempotency_entries 
                 (idempotency_key, request_hash, response_body, status_code, 
-                 created_at, expires_at, correlation_id, operation)
-                VALUES (@key, @hash, @response, @statusCode, @createdAt, @expiresAt, @correlationId, @operation)";
+                 created_at, expires_at, request_path, operation)
+                VALUES (@key, @hash, @response, @statusCode, @createdAt, @expiresAt, @requestPath, @operation)";
 
             return await _sqlExecutor.ExecuteAsync(async connection =>
             {
@@ -98,7 +98,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                 command.Parameters.AddWithValue("@statusCode", entry.StatusCode);
                 command.Parameters.AddWithValue("@createdAt", entry.CreatedAt);
                 command.Parameters.AddWithValue("@expiresAt", entry.ExpiresAt);
-                command.Parameters.AddWithValue("@correlationId", (object?)entry.Endpoint ?? DBNull.Value);
+                command.Parameters.AddWithValue("@requestPath", (object?)entry.Endpoint ?? DBNull.Value);
                 command.Parameters.AddWithValue("@operation", entry.HttpMethod);
 
                 var result = await command.ExecuteNonQueryAsync();

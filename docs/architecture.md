@@ -198,7 +198,7 @@ erDiagram
         int status_code
         timestamp created_at
         timestamp expires_at
-        varchar correlation_id
+        varchar request_path
         varchar operation
         uuid related_entity_id FK
     }
