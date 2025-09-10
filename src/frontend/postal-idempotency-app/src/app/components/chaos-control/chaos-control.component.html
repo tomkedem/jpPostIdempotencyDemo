@@ -20,7 +20,16 @@
           idempotencyProtectionEnabled() ? "הגנה פעילה" : "הגנה כבויה"
         }}</span>
       </div>
-      
+        
+          <!-- System Health Indicator - Compact -->
+          <div class="premium-health-indicator-compact" [ngClass]="getSystemHealthClass()">
+            <div class="health-pulse"></div>
+            <mat-icon class="health-icon">{{ getSystemHealthIcon() }}</mat-icon>
+            <div class="health-details-compact">
+              <span class="health-label">{{ getSystemHealthText() }}</span>
+              <span class="health-metric">{{ metrics()?.successRate || 0 | number:'1.0-1' }}%</span>
+            </div>
+          </div>
       <!-- Compact Premium Controls Section -->
       <div class="premium-controls-compact">
         <!-- Main Simulation Control - Inline -->
@@ -47,16 +56,7 @@
             matTooltipPosition="below">
             <mat-icon>developer_mode</mat-icon>
           </button>
-          
-          <!-- System Health Indicator - Compact -->
-          <div class="premium-health-indicator-compact" [ngClass]="getSystemHealthClass()">
-            <div class="health-pulse"></div>
-            <mat-icon class="health-icon">{{ getSystemHealthIcon() }}</mat-icon>
-            <div class="health-details-compact">
-              <span class="health-label">{{ getSystemHealthText() }}</span>
-              <span class="health-metric">{{ metrics()?.successRate || 0 | number:'1.0-1' }}%</span>
-            </div>
-          </div>
+        
           
           <!-- Enhanced Time Display - Compact -->
           <div class="premium-time-display-compact">
