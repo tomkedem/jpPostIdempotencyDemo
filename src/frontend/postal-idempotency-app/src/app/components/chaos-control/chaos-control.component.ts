@@ -506,6 +506,37 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     return blockedOperations * avgResponseTime;
   }
 
+  getTimeSavedFormatted(): string {
+    const timeSavedMs = this.getTimeSavedMs();
+    
+    if (timeSavedMs === 0) return '0ms';
+    
+    // המרה ליחידות זמן מתאימות
+    const seconds = timeSavedMs / 1000;
+    const minutes = seconds / 60;
+    const hours = minutes / 60;
+    const days = hours / 24;
+    const months = days / 30;
+    const years = days / 365;
+    
+    // בחירת היחידה המתאימה ביותר
+    if (years >= 1) {
+      return `${years.toFixed(1)} שנים`;
+    } else if (months >= 1) {
+      return `${months.toFixed(1)} חודשים`;
+    } else if (days >= 1) {
+      return `${days.toFixed(1)} ימים`;
+    } else if (hours >= 1) {
+      return `${hours.toFixed(1)} שעות`;
+    } else if (minutes >= 1) {
+      return `${minutes.toFixed(1)} דקות`;
+    } else if (seconds >= 1) {
+      return `${seconds.toFixed(1)} שניות`;
+    } else {
+      return `${timeSavedMs.toFixed(0)}ms`;
+    }
+  }
+
   getRecentLogs(): LogEntry[] {
     const logs = this.logHistory();
     // הצגת 10 הרשומות האחרונות בלבד

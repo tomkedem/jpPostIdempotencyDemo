@@ -254,6 +254,9 @@
               </div>
               <div class="stat-content">
                 <div class="stat-value">
+                  {{ getTimeSavedFormatted() }}
+                </div>
+                <div class="stat-precise" *ngIf="getTimeSavedMs() >= 1000">
                   {{ getTimeSavedMs() | number : "1.0-0" }}ms
                 </div>
                 <div class="stat-label">זמן שנחסך</div>
