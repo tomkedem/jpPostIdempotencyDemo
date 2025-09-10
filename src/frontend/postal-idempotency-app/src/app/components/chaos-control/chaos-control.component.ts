@@ -604,7 +604,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     this.addLog('info', `מתחיל סימולציה ריאליסטית: ${totalScenarios} תרחישים של ${clicksPerScenario} לחיצות כפולות על ברקוד: ${barcodeToUse}`);
     
     // Create sequence of realistic scenarios
-    this.simulationSubscription = interval(50) // Faster clicks every 50ms for realism
+    this.simulationSubscription = interval(400) // Realistic user clicking speed: 400ms between clicks
       .pipe(
         take(totalClicks),
         finalize(() => {

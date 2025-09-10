@@ -83,10 +83,25 @@
     gap: 12px;
 
     .header-icon {
-      font-size: 28px;
-      color: var(--primary-color);
+      font-size: 36px;
+      /* גודל גדול יותר */
+      width: 36px;
+      height: 36px;
       margin-top: 2px;
-      /* יישור עם הטקסט */
+      position: relative;
+      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 50%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: shield-glow 3s ease-in-out infinite, shield-heartbeat 2s ease-in-out infinite;
+      filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.3));
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: scale(1.1);
+        filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.5));
+      }
     }
 
     .title-text-container {
@@ -1254,6 +1269,55 @@
         }
       }
     }
+  }
+}
+
+// אנימציות למגן הראשי
+@keyframes shield-glow {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.3)) drop-shadow(0 0 10px rgba(30, 64, 175, 0.2));
+  }
+
+  25% {
+    background-position: 50% 0%;
+    filter: drop-shadow(0 2px 6px rgba(30, 64, 175, 0.4)) drop-shadow(0 0 15px rgba(59, 130, 246, 0.3));
+  }
+
+  50% {
+    background-position: 100% 50%;
+    filter: drop-shadow(0 2px 8px rgba(96, 165, 250, 0.4)) drop-shadow(0 0 20px rgba(30, 64, 175, 0.4));
+  }
+
+  75% {
+    background-position: 50% 100%;
+    filter: drop-shadow(0 2px 6px rgba(59, 130, 246, 0.4)) drop-shadow(0 0 15px rgba(96, 165, 250, 0.3));
+  }
+}
+
+@keyframes shield-heartbeat {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  15% {
+    transform: scale(1.05);
+  }
+
+  30% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.08);
+  }
+
+  60% {
+    transform: scale(1);
   }
 }
 
