@@ -1706,32 +1706,42 @@
 // Futuristic 2026 Button - עיצוב פוטוריסטי
 .premium-simulation-btn-compact {
   position: relative;
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.98) 0%, 
-    rgba(30, 41, 59, 0.95) 50%, 
-    rgba(15, 23, 42, 0.98) 100%);
-  color: #ffffff; /* לבן בולט */
+  background: linear-gradient(135deg,
+      rgba(15, 23, 42, 0.98) 0%,
+      rgba(30, 41, 59, 0.95) 50%,
+      rgba(15, 23, 42, 0.98) 100%);
+  color: #ffffff;
+  /* לבן בולט */
   border: none;
   border-radius: 8px;
-  box-shadow: 
+  box-shadow:
     0 0 20px rgba(0, 245, 255, 0.3),
     0 0 40px rgba(0, 245, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
     inset 0 -1px 0 rgba(0, 0, 0, 0.3);
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   overflow: hidden;
-  min-width: 160px;
-  height: 28px;
-  font-weight: 700; /* משקל חזק יותר */
-  font-size: 0.8rem; /* טקסט קצת יותר גדול */
-  font-family: 'Inter', sans-serif; /* פונט יותר ברור */
+  min-width: 170px;
+  /* הקטנה מ-180px */
+  height: 32px;
+  /* הגדלה מ-28px */
+  font-weight: 700;
+  /* משקל חזק יותר */
+  font-size: 0.8rem;
+  /* טקסט קצת יותר גדול */
+  font-family: 'Inter', sans-serif;
+  /* פונט יותר ברור */
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  /* יישור מושלם בין טקסט לאייקון */
   text-transform: uppercase;
-  letter-spacing: 0.5px; /* פחות ריווח */
+  letter-spacing: 0.5px;
+  /* פחות ריווח */
   backdrop-filter: blur(12px);
-  
+  padding: 0 0.75rem;
+  /* ריפוד פנימי לשליטה טובה יותר */
+
   /* אפקט הולוגרמה */
   &::before {
     content: '';
@@ -1740,17 +1750,17 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, 
-      transparent, 
-      rgba(0, 245, 255, 0.4), 
-      transparent, 
-      rgba(0, 245, 255, 0.4), 
-      transparent);
+    background: linear-gradient(45deg,
+        transparent,
+        rgba(0, 245, 255, 0.4),
+        transparent,
+        rgba(0, 245, 255, 0.4),
+        transparent);
     border-radius: 10px;
     z-index: -1;
     animation: hologram-border 3s linear infinite;
   }
-  
+
   /* אפקט סריקה */
   &::after {
     content: '';
@@ -1760,26 +1770,28 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2), /* לבן במקום ציאן */
-      transparent);
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        /* לבן במקום ציאן */
+        transparent);
     transition: left 0.6s ease;
     z-index: 1;
   }
 
   &:hover {
-    background: linear-gradient(135deg, 
-      rgba(30, 41, 59, 0.98) 0%, 
-      rgba(51, 65, 85, 0.95) 50%, 
-      rgba(30, 41, 59, 0.98) 100%);
-    color: #00f5ff; /* ציאן בהיר ב-hover */
-    box-shadow: 
+    background: linear-gradient(135deg,
+        rgba(30, 41, 59, 0.98) 0%,
+        rgba(51, 65, 85, 0.95) 50%,
+        rgba(30, 41, 59, 0.98) 100%);
+    color: #00f5ff;
+    /* ציאן בהיר ב-hover */
+    box-shadow:
       0 0 30px rgba(0, 245, 255, 0.5),
       0 0 60px rgba(0, 245, 255, 0.2),
       0 0 100px rgba(0, 245, 255, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.3);
     transform: translateY(-1px) scale(1.02);
-    
+
     &::after {
       left: 100%;
     }
@@ -1787,35 +1799,37 @@
 
   &:active {
     transform: translateY(0) scale(0.98);
-    box-shadow: 
+    box-shadow:
       0 0 15px rgba(0, 245, 255, 0.6),
       inset 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
   &.simulation-running {
-    background: linear-gradient(135deg, 
-      rgba(127, 29, 29, 0.98) 0%, 
-      rgba(185, 28, 28, 0.95) 50%, 
-      rgba(127, 29, 29, 0.98) 100%);
-    color: #ffffff; /* לבן במקום אדום */
-    box-shadow: 
+    background: linear-gradient(135deg,
+        rgba(127, 29, 29, 0.98) 0%,
+        rgba(185, 28, 28, 0.95) 50%,
+        rgba(127, 29, 29, 0.98) 100%);
+    color: #ffffff;
+    /* לבן במקום אדום */
+    box-shadow:
       0 0 20px rgba(255, 7, 58, 0.4),
       0 0 40px rgba(255, 7, 58, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
     animation: pulse-danger 2s ease-in-out infinite;
 
     &::before {
-      background: linear-gradient(45deg, 
-        transparent, 
-        rgba(255, 7, 58, 0.6), 
-        transparent, 
-        rgba(255, 7, 58, 0.6), 
-        transparent);
+      background: linear-gradient(45deg,
+          transparent,
+          rgba(255, 7, 58, 0.6),
+          transparent,
+          rgba(255, 7, 58, 0.6),
+          transparent);
     }
 
     &:hover {
-      color: #ff073a; /* אדום נאון ב-hover */
-      box-shadow: 
+      color: #ff073a;
+      /* אדום נאון ב-hover */
+      box-shadow:
         0 0 30px rgba(255, 7, 58, 0.6),
         0 0 60px rgba(255, 7, 58, 0.3);
     }
@@ -1826,105 +1840,223 @@
   }
 
   &.simulation-ready {
-    background: linear-gradient(135deg, 
-      rgba(15, 23, 42, 0.98) 0%, 
-      rgba(30, 58, 138, 0.95) 50%, 
-      rgba(15, 23, 42, 0.98) 100%);
-    color: #ffffff; /* לבן במקום כחול */
-    box-shadow: 
+    background: linear-gradient(135deg,
+        rgba(15, 23, 42, 0.98) 0%,
+        rgba(30, 58, 138, 0.95) 50%,
+        rgba(15, 23, 42, 0.98) 100%);
+    color: #ffffff;
+    /* לבן במקום כחול */
+    box-shadow:
       0 0 20px rgba(96, 165, 250, 0.4),
       0 0 40px rgba(96, 165, 250, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
     &::before {
-      background: linear-gradient(45deg, 
-        transparent, 
-        rgba(96, 165, 250, 0.5), 
-        transparent, 
-        rgba(96, 165, 250, 0.5), 
-        transparent);
+      background: linear-gradient(45deg,
+          transparent,
+          rgba(96, 165, 250, 0.5),
+          transparent,
+          rgba(96, 165, 250, 0.5),
+          transparent);
     }
 
     &:hover {
-      color: #60a5fa; /* כחול בהיר ב-hover */
-      box-shadow: 
+      color: #60a5fa;
+      /* כחול בהיר ב-hover */
+      box-shadow:
         0 0 30px rgba(96, 165, 250, 0.6),
         0 0 60px rgba(96, 165, 250, 0.3);
     }
   }
 
   .btn-icon {
-    margin-left: 0.25rem;
-    font-size: 0.875rem;
+    margin-left: 0.1rem;
+    /* מרווח קטן מאוד */
+    font-size: 1.25rem;
+    /* הגדלת האייקון מ-0.875rem */
+    width: 1.25rem;
+    height: 1.25rem;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.8)); /* צל חזק יותר */
+    justify-content: center;
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.8));
+    /* צל חזק יותר */
     z-index: 2;
     position: relative;
+    flex-shrink: 0;
+    /* מניעת כיווץ האייקון */
   }
 
   .btn-text {
     font-family: 'Inter', sans-serif;
-    font-weight: 700; /* משקל חזק יותר */
+    font-weight: 700;
+    /* משקל חזק יותר */
     letter-spacing: 0.5px;
     display: flex;
     align-items: center;
-    text-shadow: 
+    text-shadow:
       0 0 4px rgba(0, 0, 0, 0.8),
-      0 1px 2px rgba(0, 0, 0, 0.6); /* צל טקסט חזק יותר */
+      0 1px 2px rgba(0, 0, 0, 0.6);
+    /* צל טקסט חזק יותר */
     z-index: 2;
     position: relative;
+    margin-right: 0.25rem;
+    /* הקטנה מ-0.5rem */
+    flex: 1;
+    /* תופס את כל השטח הזמין */
+    text-align: center;
+    /* מרכוז הטקסט */
   }
 
   .btn-glow-effect {
-    display: none; /* מוסתר בעיצוב החדש */
+    display: none;
+    /* מוסתר בעיצוב החדש */
   }
 }
 
 /* אנימציות פוטוריסטיות */
 @keyframes hologram-border {
-  0% { background-position: 0% 0%; }
-  100% { background-position: 100% 100%; }
+  0% {
+    background-position: 0% 0%;
+  }
+
+  100% {
+    background-position: 100% 100%;
+  }
 }
 
 @keyframes pulse-danger {
-  0%, 100% { 
-    box-shadow: 
+
+  0%,
+  100% {
+    box-shadow:
       0 0 20px rgba(255, 7, 58, 0.4),
       0 0 40px rgba(255, 7, 58, 0.2);
   }
-  50% { 
-    box-shadow: 
+
+  50% {
+    box-shadow:
       0 0 30px rgba(255, 7, 58, 0.6),
       0 0 60px rgba(255, 7, 58, 0.4);
   }
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-// Compact Debug Button
+// Compact Debug Button - Enhanced for Better Visibility
 .premium-debug-btn-compact {
   background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
   color: #8b4513;
   box-shadow: 0 2px 8px rgba(252, 182, 159, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  /* הגדלת הכפתור */
+  height: 48px;
+  /* הגדלת הכפתור */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  /* עיגול מושלם */
+  position: relative;
+  overflow: hidden;
+
+  /* אפקט הולוגרמה דק */
+  &::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    background: linear-gradient(45deg,
+        transparent,
+        rgba(252, 182, 159, 0.6),
+        transparent,
+        rgba(252, 182, 159, 0.6),
+        transparent);
+    border-radius: 50%;
+    z-index: -1;
+    animation: hologram-border 4s linear infinite;
+  }
 
   &:hover {
-    transform: translateY(-1px) scale(1.05);
-    box-shadow: 0 4px 12px rgba(252, 182, 159, 0.5);
+    transform: translateY(-2px) scale(1.08);
+    /* הגדלה יותר חזקה */
+    box-shadow:
+      0 6px 20px rgba(252, 182, 159, 0.5),
+      0 0 30px rgba(252, 182, 159, 0.3);
+    /* הוספת זוהר */
     background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
     color: white;
+
+    &::before {
+      background: linear-gradient(45deg,
+          transparent,
+          rgba(255, 255, 255, 0.5),
+          transparent,
+          rgba(255, 255, 255, 0.5),
+          transparent);
+    }
+  }
+
+  &:active {
+    transform: translateY(-1px) scale(1.02);
   }
 
   mat-icon {
-    font-size: 1.125rem;
-    animation: rotate-slightly 2s ease-in-out infinite;
+    font-size: 1.5rem;
+    /* הגדלת האייקון משמעותית */
+    width: 1.5rem;
+    height: 1.5rem;
+    animation: rotate-slightly 3s ease-in-out infinite;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+    /* צל לאייקון */
+    transition: all 0.3s ease;
+  }
+
+  /* הוספת אפקט נוסף בהובר */
+  &:hover mat-icon {
+    animation: pulse-icon 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  }
+}
+
+/* אנימציות חדשות */
+@keyframes rotate-slightly {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-5deg);
+  }
+
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes pulse-icon {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
   }
 }
 
@@ -2659,6 +2791,35 @@
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* אנימציות חדשות לכפתור הדיבוג */
+@keyframes rotate-slightly {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-5deg);
+  }
+
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes pulse-icon {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
   }
 }
 
