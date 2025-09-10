@@ -16,6 +16,7 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
+import { MatTooltipModule } from "@angular/material/tooltip";
 import {
   interval,
   switchMap,
@@ -50,6 +51,7 @@ interface LogEntry {
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
+    MatTooltipModule,
   ],
   templateUrl: "./chaos-control.component.html",
   styleUrls: ["./chaos-control.component.scss"],

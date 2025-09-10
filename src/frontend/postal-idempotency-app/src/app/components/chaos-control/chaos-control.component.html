@@ -3,8 +3,10 @@
   <header class="main-header">
     <div class="title-container">
       <mat-icon class="header-icon">security</mat-icon>
-      <h1>הגנת אידמפוטנטיות</h1>
-      <p class="subtitle">מניעת כפילויות בפעולות קריטיות</p>
+      <div class="title-text-container">
+        <h1>הגנת אידמפוטנטיות</h1>
+        <p class="subtitle">מניעת כפילויות בפעולות קריטיות</p>
+      </div>
     </div>
     <div class="status-container">
       <div
@@ -19,45 +21,78 @@
         }}</span>
       </div>
       
-      <!-- Add simulation button -->
-      <button 
-        mat-stroked-button 
-        class="simulation-button"
-        (click)="startRandomSimulation()"
-        [disabled]="false"
-        [class.simulation-running]="isSimulationRunning()">
-        <mat-icon>{{ isSimulationRunning() ? 'stop' : 'play_arrow' }}</mat-icon>
-        {{ isSimulationRunning() ? 'עצור סימולציה' : 'התחל סימולציה ' }}
-      </button>
-      
-      <!-- Debug button -->
-      <button 
-        mat-stroked-button 
-        color="warn"
-        class="debug-button"
-        (click)="debugBarcodeState()">
-        <mat-icon>bug_report</mat-icon>
-        בדוק מצב ברקוד
-      </button>
-      
-      <!-- הוספת אינדיקטור בריאות מערכת -->
-      <div class="system-health" [ngClass]="getSystemHealthClass()">
-        <mat-icon>{{ getSystemHealthIcon() }}</mat-icon>
-        <span>{{ getSystemHealthText() }}</span>
-      </div>
-      <div class="current-time">
-        {{ currentTime() | date : "HH:mm:ss" }}
+      <!-- Compact Premium Controls Section -->
+      <div class="premium-controls-compact">
+        <!-- Main Simulation Control - Inline -->
+        <div class="control-group-inline">
+          <button 
+            mat-fab 
+            extended
+            class="premium-simulation-btn-compact"
+            (click)="startRandomSimulation()"
+            [class.simulation-running]="isSimulationRunning()"
+            [class.simulation-ready]="!isSimulationRunning()">
+            <mat-icon class="btn-icon">{{ isSimulationRunning() ? 'stop_circle' : 'play_circle' }}</mat-icon>
+            <span class="btn-text">{{ isSimulationRunning() ? 'עצור' : 'הפעל דמוי' }}</span>
+            <div class="btn-glow-effect"></div>
+          </button>
+          
+          <!-- Debug Button - Smaller -->
+          <button 
+            mat-mini-fab 
+            class="premium-debug-btn-compact"
+            color="accent"
+            (click)="debugBarcodeState()"
+            matTooltip="בדיקת מצב ברקוד פעיל במערכת"
+            matTooltipPosition="below">
+            <mat-icon>developer_mode</mat-icon>
+          </button>
+          
+          <!-- System Health Indicator - Compact -->
+          <div class="premium-health-indicator-compact" [ngClass]="getSystemHealthClass()">
+            <div class="health-pulse"></div>
+            <mat-icon class="health-icon">{{ getSystemHealthIcon() }}</mat-icon>
+            <div class="health-details-compact">
+              <span class="health-label">{{ getSystemHealthText() }}</span>
+              <span class="health-metric">{{ metrics()?.successRate || 0 | number:'1.0-1' }}%</span>
+            </div>
+          </div>
+          
+          <!-- Enhanced Time Display - Compact -->
+          <div class="premium-time-display-compact">
+            <div class="time-background"></div>
+            <mat-icon class="time-icon">schedule</mat-icon>
+            <span class="time-value">{{ currentTime() | date : "HH:mm:ss" }}</span>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- Add progress indicator below header -->
-  <div class="simulation-progress" *ngIf="isSimulationRunning()">
-    <mat-progress-bar 
-      mode="determinate" 
-      [value]="simulationProgress()">
-    </mat-progress-bar>
-    <span class="progress-text">{{ simulationProgress() | number:'1.0-0' }}% הושלם ({{ currentClickCount() }}/400)</span>
+  <!-- Compact Progress Indicator -->
+  <div class="premium-simulation-progress-compact" *ngIf="isSimulationRunning()">
+    <div class="progress-container-compact">
+      <div class="progress-header-compact">
+        <div class="progress-info-compact">
+          <span class="progress-title-compact">סימולציה פעילה</span>
+          <span class="progress-stats-compact">{{ currentClickCount() }}/400</span>
+        </div>
+        <div class="progress-percentage-compact">{{ simulationProgress() | number:'1.0-0' }}%</div>
+        <div class="eta-display-compact">
+          <mat-icon>timer</mat-icon>
+          <span>{{ (400 - currentClickCount()) * 0.05 | number:'1.0-0' }}s</span>
+        </div>
+      </div>
+      
+      <div class="progress-bar-container-compact">
+        <mat-progress-bar 
+          mode="determinate" 
+          [value]="simulationProgress()"
+          class="premium-progress-bar-compact">
+        </mat-progress-bar>
+        <div class="progress-glow-compact" [style.width.%]="simulationProgress()"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Main Content Grid -->
