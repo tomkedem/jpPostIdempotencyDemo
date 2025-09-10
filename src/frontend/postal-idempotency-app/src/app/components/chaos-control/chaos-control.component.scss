@@ -69,14 +69,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing) calc(var(--spacing) * 1.5);
+  padding: var(--spacing) calc(var(--spacing) * 0.5);
   border-bottom: 1px solid var(--panel-border);
   flex-shrink: 0;
   backdrop-filter: blur(12px);
   background-color: var(--panel-bg);
   position: relative;
   z-index: 10;
-  min-height: 140px; // הגדלת גובה מינימלי לתמיכה באייקון הגדול
   overflow: visible; // וידוא שהאייקון לא ייחתך
 
   .title-container {
@@ -87,10 +86,11 @@
     min-width: 0; // Allow shrinking
 
     .header-icon {
-      font-size: 72px;
-      width: 72px;
-      height: 72px;
-      margin-top: 2px;
+      font-size: 54px;
+      width: 54px;
+      height: 54px;
+      margin-top: 1px;
+     
       position: relative;
       background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #60a5fa 100%);
       -webkit-background-clip: text;
@@ -1835,12 +1835,13 @@
     padding: calc(var(--spacing) * 0.4) calc(var(--spacing) * 0.75);
 
     .title-container {
-      gap: 8px;
+      gap: 3px;
 
       .header-icon {
-        font-size: 56px;
-        width: 56px;
-        height: 56px;
+        font-size: 42px;
+        width: 42px;
+        height: 42px;
+        
       }
 
       h1 {
