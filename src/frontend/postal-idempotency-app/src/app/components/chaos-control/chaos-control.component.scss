@@ -1706,27 +1706,34 @@
 // Elegant Premium Button - עיצוב עדין ומיוקרתי
 .premium-simulation-btn-compact {
   position: relative;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.95) 0%, 
-    rgba(248, 250, 252, 0.92) 100%);
-  color: #334155; /* אפור כהה מכובד */
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(248, 250, 252, 0.92) 100%);
+  color: #334155;
+  /* אפור כהה מכובד */
   border: 1px solid rgba(203, 213, 225, 0.6);
-  border-radius: 12px; /* פינות עדינות */
-  box-shadow: 
+  border-radius: 12px;
+  /* פינות עדינות */
+  box-shadow:
     0 2px 8px rgba(15, 23, 42, 0.08),
     0 1px 3px rgba(15, 23, 42, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  min-width: 170px;
-  height: 36px; /* גובה נוח יותר */
-  font-weight: 600; /* משקל מתון */
+  min-width: 140px;
+  /* רוחב מקוצר */
+  height: 36px;
+  /* גובה נוח יותר */
+  font-weight: 600;
+  /* משקל מתון */
   font-size: 0.875rem;
   font-family: 'Inter', sans-serif;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  text-transform: none; /* ללא אותיות גדולות */
-  letter-spacing: 0.025em; /* ריווח עדין */
+  text-transform: none;
+  /* ללא אותיות גדולות */
+  letter-spacing: 0.025em;
+  /* ריווח עדין */
   backdrop-filter: blur(8px);
   padding: 0 1rem;
 
@@ -1738,25 +1745,25 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, 
-      transparent, 
-      rgba(99, 102, 241, 0.3), 
-      transparent);
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(99, 102, 241, 0.3),
+        transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
 
   &:hover {
-    background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.98) 0%, 
-      rgba(241, 245, 249, 0.95) 100%);
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(241, 245, 249, 0.95) 100%);
     color: #1e293b;
     border-color: rgba(99, 102, 241, 0.3);
-    box-shadow: 
+    box-shadow:
       0 4px 16px rgba(15, 23, 42, 0.12),
       0 2px 6px rgba(99, 102, 241, 0.15);
     transform: translateY(-1px);
-    
+
     &::before {
       opacity: 1;
     }
@@ -1764,34 +1771,34 @@
 
   &:active {
     transform: translateY(0);
-    box-shadow: 
+    box-shadow:
       0 2px 6px rgba(15, 23, 42, 0.1),
       inset 0 1px 2px rgba(15, 23, 42, 0.1);
   }
 
   &.simulation-running {
-    background: linear-gradient(135deg, 
-      rgba(248, 113, 113, 0.95) 0%, 
-      rgba(239, 68, 68, 0.92) 100%);
+    background: linear-gradient(135deg,
+        rgba(248, 113, 113, 0.95) 0%,
+        rgba(239, 68, 68, 0.92) 100%);
     color: #ffffff;
     border-color: rgba(220, 38, 38, 0.4);
-    box-shadow: 
+    box-shadow:
       0 2px 8px rgba(239, 68, 68, 0.2),
       0 1px 3px rgba(220, 38, 38, 0.3);
 
     &::before {
-      background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.4), 
-        transparent);
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent);
       opacity: 1;
     }
 
     &:hover {
-      background: linear-gradient(135deg, 
-        rgba(239, 68, 68, 0.98) 0%, 
-        rgba(220, 38, 38, 0.95) 100%);
-      box-shadow: 
+      background: linear-gradient(135deg,
+          rgba(239, 68, 68, 0.98) 0%,
+          rgba(220, 38, 38, 0.95) 100%);
+      box-shadow:
         0 4px 16px rgba(239, 68, 68, 0.25),
         0 2px 6px rgba(220, 38, 38, 0.3);
     }
@@ -1801,37 +1808,10 @@
     }
   }
 
-  &.simulation-ready {
-    background: linear-gradient(135deg, 
-      rgba(34, 197, 94, 0.95) 0%, 
-      rgba(22, 163, 74, 0.92) 100%);
-    color: #ffffff;
-    border-color: rgba(21, 128, 61, 0.4);
-    box-shadow: 
-      0 2px 8px rgba(34, 197, 94, 0.2),
-      0 1px 3px rgba(22, 163, 74, 0.3);
-
-    &::before {
-      background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.4), 
-        transparent);
-      opacity: 1;
-    }
-
-    &:hover {
-      background: linear-gradient(135deg, 
-        rgba(22, 163, 74, 0.98) 0%, 
-        rgba(21, 128, 61, 0.95) 100%);
-      box-shadow: 
-        0 4px 16px rgba(34, 197, 94, 0.25),
-        0 2px 6px rgba(22, 163, 74, 0.3);
-    }
-  }
-
   .btn-icon {
     margin-left: 0.5rem;
-    font-size: 1.125rem; /* גודל מתון */
+    font-size: 1.125rem;
+    /* גודל מתון */
     width: 1.125rem;
     height: 1.125rem;
     transition: all 0.3s ease;
@@ -1859,15 +1839,19 @@
 
 /* אנימציות עדינות ומכובדות */
 @keyframes gentle-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.8;
     transform: scale(1);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.05);
   }
 }
+
 @keyframes hologram-border {
   0% {
     background-position: 0% 0%;
@@ -1907,17 +1891,20 @@
 // Elegant Debug Button - עיצוב עדין ומיוקרתי להתאמה
 .premium-debug-btn-compact {
   position: relative;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.95) 0%, 
-    rgba(248, 250, 252, 0.92) 100%);
-  color: #64748b; /* אפור בינוני מכובד */
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(248, 250, 252, 0.92) 100%);
+  color: #64748b;
+  /* אפור בינוני מכובד */
   border: 1px solid rgba(203, 213, 225, 0.6);
-  border-radius: 12px; /* פינות עדינות כמו הכפתור הראשי */
-  box-shadow: 
+  border-radius: 12px;
+  /* פינות עדינות כמו הכפתור הראשי */
+  box-shadow:
     0 2px 8px rgba(15, 23, 42, 0.08),
     0 1px 3px rgba(15, 23, 42, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 44px; /* קצת יותר גדול מהמקורי */
+  width: 44px;
+  /* קצת יותר גדול מהמקורי */
   height: 44px;
   display: flex;
   align-items: center;
@@ -1933,25 +1920,26 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, 
-      transparent, 
-      rgba(99, 102, 241, 0.3), 
-      transparent);
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(99, 102, 241, 0.3),
+        transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
 
   &:hover {
-    background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.98) 0%, 
-      rgba(241, 245, 249, 0.95) 100%);
-    color: #334155; /* כהה יותר בהובר */
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(241, 245, 249, 0.95) 100%);
+    color: #334155;
+    /* כהה יותר בהובר */
     border-color: rgba(99, 102, 241, 0.3);
-    box-shadow: 
+    box-shadow:
       0 4px 16px rgba(15, 23, 42, 0.12),
       0 2px 6px rgba(99, 102, 241, 0.15);
     transform: translateY(-1px);
-    
+
     &::before {
       opacity: 1;
     }
@@ -1959,18 +1947,19 @@
 
   &:active {
     transform: translateY(0);
-    box-shadow: 
+    box-shadow:
       0 2px 6px rgba(15, 23, 42, 0.1),
       inset 0 1px 2px rgba(15, 23, 42, 0.1);
   }
 
   mat-icon {
-    font-size: 1.25rem; /* גודל מתאים */
+    font-size: 1.25rem;
+    /* גודל מתאים */
     width: 1.25rem;
     height: 1.25rem;
     transition: all 0.3s ease;
     opacity: 0.8;
-    
+
     /* אנימציה עדינה בהובר */
     &:hover {
       opacity: 1;
@@ -1982,7 +1971,7 @@
   &:focus {
     outline: none;
     border-color: rgba(99, 102, 241, 0.5);
-    box-shadow: 
+    box-shadow:
       0 2px 8px rgba(15, 23, 42, 0.08),
       0 0 0 3px rgba(99, 102, 241, 0.1);
   }
