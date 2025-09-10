@@ -1333,13 +1333,16 @@
 
   .stat-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    /* שינוי ליישור לראש כדי למנוע חיתוך */
     gap: 0.75rem;
     padding: 1rem;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
     border-radius: 12px;
     border: 1px solid rgba(99, 102, 241, 0.2);
     transition: all 0.3s ease;
+    min-height: 80px;
+    /* גובה מינימלי כדי למנוע דחיסה */
 
     &:hover {
       transform: translateY(-2px);
@@ -1377,6 +1380,10 @@
       background: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
       border-radius: 12px;
       color: white;
+      margin-top: 4px;
+      /* מרווח עליון קטן ליישור עם הטקסט */
+      flex-shrink: 0;
+      /* מניעת כיווץ האייקון */
 
       mat-icon {
         font-size: 24px;
@@ -1387,12 +1394,18 @@
 
     .stat-content {
       flex: 1;
+      padding-top: 2px;
+      /* מרווח עליון קטן */
 
       .stat-value {
         font-size: 1.5rem;
         font-weight: 700;
         color: var(--text-primary);
         margin-bottom: 0.25rem;
+        line-height: 1.3;
+        /* גובה שורה מתאים למניעת חיתוך */
+        overflow: visible;
+        /* מניעת חיתוך טקסט */
       }
 
       .stat-precise {
@@ -1690,51 +1703,96 @@
   gap: 1rem;
 }
 
-// Compact Simulation Button
+// Professional Simulation Button - עיצוב מקצועי
 .premium-simulation-btn-compact {
   position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--panel-bg);
+  color: var(--text-color);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 
+              0 0 0 2px rgba(99, 102, 241, 0.6); /* מסגרת עבה וחזקה יותר */
+  transition: all 0.2s ease;
   overflow: hidden;
-  min-width: 180px;
-  height: 40px;
-  font-weight: 600;
-  font-size: 0.875rem;
+  min-width: 160px;
+  height: 28px;
+  font-weight: 500;
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* הסרת כל האפקטים המצועצעים */
+  backdrop-filter: none;
+
+  &::before {
+    display: none; /* הסרת אפקט הברק */
+  }
 
   &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    background: var(--panel-header-bg);
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15),
+                0 0 0 2px rgba(59, 130, 246, 0.8); /* מסגרת עבה וחזקה ב-hover */
+    transform: none; /* הסרת ההזזה */
+  }
+
+  &:active {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) inset,
+                0 0 0 2px rgba(37, 99, 235, 1); /* מסגרת עבה וחזקה ב-active */
+    transform: translateY(1px);
   }
 
   &.simulation-running {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    animation: pulse-glow-compact 2s ease-in-out infinite;
+    background: var(--danger-color);
+    color: white;
+    border-color: var(--danger-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2),
+                0 0 0 2px rgba(239, 68, 68, 0.7); /* מסגרת אדומה עבה */
+    animation: none; /* הסרת האנימציה המצועצעת */
+
+    &:hover {
+      background: hsl(var(--danger-hue), 80%, 55%);
+      border-color: hsl(var(--danger-hue), 80%, 55%);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15),
+                  0 0 0 2px rgba(220, 38, 38, 0.9);
+    }
 
     .btn-icon {
-      animation: pulse-scale 1.5s ease-in-out infinite;
+      animation: none; /* הסרת אנימציית האייקון */
     }
   }
 
   &.simulation-ready {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: var(--primary-color); /* שינוי מירוק לכחול ראשי */
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2),
+                0 0 0 2px rgba(59, 130, 246, 0.7); /* מסגרת כחולה עבה */
 
     &:hover {
-      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      background: var(--primary-color-dark);
+      border-color: var(--primary-color-dark);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15),
+                  0 0 0 2px rgba(37, 99, 235, 0.9);
     }
   }
 
   .btn-icon {
     margin-left: 0.25rem;
-    font-size: 1.25rem;
-    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    transition: none; /* הסרת אנימציות */
+    display: flex;
+    align-items: center;
   }
 
   .btn-text {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: 0;
+    display: flex;
+    align-items: center;
   }
 
   .btn-glow-effect {
