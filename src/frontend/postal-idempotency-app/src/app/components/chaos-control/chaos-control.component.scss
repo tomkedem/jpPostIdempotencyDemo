@@ -955,7 +955,7 @@
   .grid-column {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing);
+    gap: calc(var(--spacing) * 0.5);
     min-width: 0;
   }
 }
@@ -1002,7 +1002,7 @@
   }
 
   .panel-content {
-    padding: var(--spacing);
+    padding: calc(var(--spacing) * 0.5);
     overflow-y: auto;
     flex-grow: 1;
   }
@@ -1053,7 +1053,7 @@
 .control-panel .panel-content {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--spacing) * 1.2);
+  gap: calc(var(--spacing) * 0.5);
 
   .control-row {
     display: flex;
