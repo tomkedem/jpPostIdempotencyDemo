@@ -122,6 +122,10 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
       }
     });
 
+    // Debug: Check service instance
+    console.log('🔧 ChaosControl Constructor - ShipmentService instance:', this.shipmentService);
+    console.log('🔧 ChaosControl Constructor - Service ID:', (this.shipmentService as any)._serviceId || 'no-id');
+
     // Initialize the component
     this.loadInitialSettings();
     this.startRealTimeUpdates();
@@ -173,8 +177,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
         next: (metrics) => {
           this.metrics.set(metrics);
           this.updatePerformanceData(metrics);
-          console.log("Metrics updated:", metrics);
-          console.log("Current performance data:", metrics.averageExecutionTimeMs);
+          
         },
         error: (error) => {
           console.error("שגיאה בטעינת מדדים:", error);
@@ -510,18 +513,44 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   // Simulation methods
   startRandomSimulation(): void {
     if (this.isSimulationRunning()) {
+      console.log('🛑 Stop button clicked - stopping simulation');
+      this.addLog('warn', 'עוצר סימולציה...');
       this.stopSimulation();
       return;
     }
 
-    // Check if there's a current barcode to use
+    // Enhanced debugging for barcode retrieval
+    console.log('🔍 === BARCODE DEBUGGING START ===');
+    
+    // Check current barcode from service
     const currentBarcode = this.shipmentService.currentBarcode();
-    if (!currentBarcode) {
+    console.log('🔍 Current barcode from service signal:', currentBarcode);
+    
+    // Check localStorage backup
+    const localStorageBarcode = localStorage.getItem('lastSearchedBarcode');
+    console.log('🔍 Barcode from localStorage:', localStorageBarcode);
+    
+    // Check service state
+    console.log('🔍 ShipmentService complete state:', {
+      loading: this.shipmentService.loading(),
+      error: this.shipmentService.error(),
+      lastResponse: this.shipmentService.lastResponse(),
+      currentBarcodeSignal: this.shipmentService.currentBarcode()
+    });
+    
+    // Try to get barcode from either source
+    const barcodeToUse = currentBarcode || localStorageBarcode;
+    console.log('🔍 Final barcode to use:', barcodeToUse);
+    console.log('🔍 === BARCODE DEBUGGING END ===');
+    
+    if (!barcodeToUse) {
       this.addLog('warn', 'לא נמצא ברקוד פעיל. אנא חפש משלוח תחילה בעמוד "חיפוש משלוח"');
-      console.warn('No current barcode available for simulation');
+      console.warn('❌ No current barcode available for simulation from any source');
       return;
     }
 
+    console.log('▶️ Start button clicked - starting simulation with barcode:', barcodeToUse);
+    this.addLog('info', `מתחיל סימולציה עם ברקוד: ${barcodeToUse}`);
     this.isSimulationRunning.set(true);
     this.simulationProgress.set(0);
     this.currentClickCount.set(0);
@@ -530,49 +559,73 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     const statuses = [
       { name: 'delivered', id: 2 },        // נמסר
       { name: 'failed', id: 3 },           // לא נמסר  
-      { name: 'partially_delivered', id: 6 } // נמסר חלקי (assuming this status exists)
+      { name: 'partially_delivered', id: 4 } // נמסר חלקי
     ];
-    const totalClicks = 400;
     
-    console.log(`🎮 Starting random simulation - 400 clicks on barcode: ${currentBarcode}`);
-    this.addLog('info', `מתחיל סימולציה של 400 לחיצות אקראיות על ברקוד: ${currentBarcode}`);
+    // דמוי 50 "תרחישים" של לחיצות ברצף - כל תרחיש הוא 8 לחיצות על אותו סטטוס
+    const totalScenarios = 50; // 50 תרחישים
+    const clicksPerScenario = 8; // 8 לחיצות בכל תרחיש
+    const totalClicks = totalScenarios * clicksPerScenario; // 400 לחיצות סה"כ
     
-    // Create sequence of 400 random clicks
-    this.simulationSubscription = interval(100) // Click every 100ms
+    console.log(`🎮 Starting realistic simulation - ${totalScenarios} scenarios of ${clicksPerScenario} duplicate clicks each on barcode: ${barcodeToUse}`);
+    this.addLog('info', `מתחיל סימולציה ריאליסטית: ${totalScenarios} תרחישים של ${clicksPerScenario} לחיצות כפולות על ברקוד: ${barcodeToUse}`);
+    
+    // Create sequence of realistic scenarios
+    this.simulationSubscription = interval(50) // Faster clicks every 50ms for realism
       .pipe(
         take(totalClicks),
         finalize(() => {
           this.isSimulationRunning.set(false);
           this.simulationProgress.set(0);
           this.currentClickCount.set(0);
-          console.log('✅ Simulation completed - 400 clicks executed');
-          this.addLog('success', 'סימולציה הושלמה בהצלחה - 400 לחיצות בוצעו');
+          console.log(`✅ Simulation completed - ${totalScenarios} realistic scenarios executed`);
+          this.addLog('success', `סימולציה הושלמה בהצלחה - ${totalScenarios} תרחישים ריאליסטיים בוצעו`);
         })
       )
       .subscribe(async (index) => {
         try {
-          // Choose random status
-          const randomStatusObj = statuses[Math.floor(Math.random() * statuses.length)];
-          
-          // Use current barcode from shipment service instead of random
-          const currentBarcode = this.shipmentService.currentBarcode();
-          if (!currentBarcode) {
-            console.warn('No barcode available from search, skipping simulation click');
+          // Use the barcode we determined at the start of simulation
+          const simulationBarcode = barcodeToUse;
+          if (!simulationBarcode) {
+            console.warn('No barcode available, skipping simulation click');
             return;
           }
+
+          // Calculate which scenario and click within scenario we're on
+          const scenarioIndex = Math.floor(index / clicksPerScenario);
+          const clickInScenario = index % clicksPerScenario;
           
-          // Execute the operation
-          await this.shipmentService.updateDeliveryStatus(currentBarcode, randomStatusObj.id);
+          // For each new scenario, choose a random status that will be repeated 8 times
+          let statusObj: { name: string; id: number };
+          if (clickInScenario === 0) {
+            // First click of new scenario - choose new random status
+            statusObj = statuses[Math.floor(Math.random() * statuses.length)];
+            // Store the status for this scenario (you could use a class property if needed)
+            (this as any).currentScenarioStatus = statusObj;
+          } else {
+            // Subsequent clicks in same scenario - use same status as first click
+            statusObj = (this as any).currentScenarioStatus || statuses[0];
+          }
+          
+          // Execute the operation with the same status as the scenario
+          await this.shipmentService.updateDeliveryStatus(simulationBarcode, statusObj.id);
           
           // Update progress
           const currentCount = index + 1;
           this.currentClickCount.set(currentCount);
           this.simulationProgress.set((currentCount / totalClicks) * 100);
           
-          // Log progress every 100 clicks
-          if (currentCount % 100 === 0) {
-            console.log(`📊 Simulation progress: ${currentCount}/${totalClicks}`);
-            this.addLog('info', `התקדמות סימולציה: ${currentCount}/${totalClicks} לחיצות`);
+          // Log progress for each new scenario
+          if (clickInScenario === 0) {
+            console.log(`📊 Starting scenario ${scenarioIndex + 1}/${totalScenarios}: ${clicksPerScenario} clicks on status "${statusObj.name}" (${statusObj.id})`);
+            this.addLog('info', `תרחיש ${scenarioIndex + 1}/${totalScenarios}: ${clicksPerScenario} לחיצות על סטטוס "${this.getStatusNameInHebrew(statusObj.id)}"`);
+          }
+          
+          // Log overall progress every 10 scenarios
+          if (currentCount % (clicksPerScenario * 10) === 0) {
+            const completedScenarios = currentCount / clicksPerScenario;
+            console.log(`📈 Progress: ${completedScenarios}/${totalScenarios} scenarios completed`);
+            this.addLog('info', `התקדמות: ${completedScenarios}/${totalScenarios} תרחישים הושלמו`);
           }
         } catch (error) {
           console.error('Simulation error:', error);
@@ -581,20 +634,63 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
       });
   }
 
+  private getStatusNameInHebrew(statusId: number): string {
+    switch (statusId) {
+      case 2: return 'נמסר';
+      case 3: return 'לא נמסר';
+      case 4: return 'נמסר חלקי';
+      default: return 'לא ידוע';
+    }
+  }
+
   private stopSimulation(): void {
+    console.log('⏹️ Stopping simulation...');
+    
     if (this.simulationSubscription) {
       this.simulationSubscription.unsubscribe();
       this.simulationSubscription = undefined;
+      console.log('🗑️ Simulation subscription unsubscribed');
     }
+    
     this.isSimulationRunning.set(false);
     this.simulationProgress.set(0);
     this.currentClickCount.set(0);
-    console.log('⏹️ Simulation stopped');
+    
+    console.log('✅ Simulation stopped successfully');
     this.addLog('warn', 'סימולציה הופסקה על ידי המשתמש');
   }
 
   clearLogs(): void {
     this.logHistory.set([]);
     this.addLog("info", "לוג נוקה על ידי המשתמש");
+  }
+
+  // Debug method to check barcode state manually
+  debugBarcodeState(): void {
+    console.log('🔧 === MANUAL BARCODE DEBUG ===');
+    console.log('🔧 Service instance:', this.shipmentService);
+    console.log('🔧 Service instance ID:', (this.shipmentService as any)._serviceId || 'no-id');
+    console.log('🔧 Service constructor name:', this.shipmentService.constructor.name);
+    console.log('🔧 Current barcode signal value:', this.shipmentService.currentBarcode());
+    console.log('🔧 Service loading:', this.shipmentService.loading());
+    console.log('🔧 Service error:', this.shipmentService.error());
+    console.log('🔧 Service lastResponse:', this.shipmentService.lastResponse());
+    console.log('🔧 localStorage barcode:', localStorage.getItem('lastSearchedBarcode'));
+    
+    // Check all localStorage keys
+    console.log('🔧 All localStorage keys:', Object.keys(localStorage));
+    
+    // Try to trigger currentBarcode getter directly
+    try {
+      const currentBarcodeValue = this.shipmentService.currentBarcode();
+      console.log('🔧 Direct currentBarcode() call result:', currentBarcodeValue);
+    } catch (error) {
+      console.error('🔧 Error calling currentBarcode():', error);
+    }
+    
+    console.log('🔧 === END MANUAL DEBUG ===');
+    
+    const barcodeDisplay = this.shipmentService.currentBarcode() || localStorage.getItem('lastSearchedBarcode') || 'לא נמצא';
+    this.addLog('info', `Debug: ברקוד נוכחי = ${barcodeDisplay}, localStorage = ${localStorage.getItem('lastSearchedBarcode')}`);
   }
 }

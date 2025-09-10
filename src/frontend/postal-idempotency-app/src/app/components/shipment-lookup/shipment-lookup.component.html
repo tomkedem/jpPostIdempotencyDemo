@@ -42,6 +42,18 @@
           </mat-form-field>
         </div>
       </form>
+      <!-- Add clear barcode button -->
+      <div class="clear-barcode-section" style="margin-top: 16px; text-align: center;">
+        <button 
+          mat-stroked-button 
+          color="warn" 
+          type="button"
+          (click)="clearStoredBarcode()"
+          style="font-size: 0.9rem;">
+          <mat-icon>delete</mat-icon>
+          נקה ברקוד שמור
+        </button>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

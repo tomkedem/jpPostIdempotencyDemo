@@ -21,6 +21,7 @@ import { ChaosService } from "./chaos.service";
 })
 export class ShipmentService {
   private readonly apiUrl = "https://localhost:5000/api/idempotency-demo";
+  private readonly _serviceId = Math.random().toString(36).substr(2, 9); // Unique service ID
 
   // Signals for state management
   private _loading = signal(false);
@@ -34,7 +35,16 @@ export class ShipmentService {
   readonly lastResponse = this._lastResponse.asReadonly();
   readonly currentBarcode = this._currentBarcode.asReadonly();
 
-  constructor(private http: HttpClient, private chaosService: ChaosService) {}
+  constructor(private http: HttpClient, private chaosService: ChaosService) {
+    console.log('📦 ShipmentService constructor called with ID:', this._serviceId);
+    
+    // Restore barcode from localStorage if exists
+    const savedBarcode = localStorage.getItem('lastSearchedBarcode');
+    if (savedBarcode) {
+      console.log('📦 Restoring barcode from localStorage:', savedBarcode);
+      this._currentBarcode.set(savedBarcode);
+    }
+  }
 
   async createDelivery(
     request: CreateDeliveryRequest
@@ -68,7 +78,11 @@ export class ShipmentService {
   ): Promise<{ shipment: Shipment | null; delivery: any | null }> {
     this._loading.set(true);
     this._error.set(null);
+    
+    console.log(`📦 Service ${this._serviceId}: Setting barcode in getShipmentAndDeliveryByBarcode:`, barcode);
     this._currentBarcode.set(barcode); // Store the current barcode
+    localStorage.setItem('lastSearchedBarcode', barcode); // Backup storage
+    console.log(`📦 Service ${this._serviceId}: Barcode stored - signal:`, this._currentBarcode(), 'localStorage:', localStorage.getItem('lastSearchedBarcode'));
     
     try {
       const response = await firstValueFrom(
@@ -77,6 +91,7 @@ export class ShipmentService {
         )
       );
       this._lastResponse.set(response);
+      console.log(`📦 Service ${this._serviceId}: Response received, barcode still:`, this._currentBarcode());
       return response;
     } catch (error) {
       const errorMessage = this.handleError(error);
@@ -84,6 +99,7 @@ export class ShipmentService {
       throw new Error(errorMessage);
     } finally {
       this._loading.set(false);
+      console.log(`📦 Service ${this._serviceId}: Request completed, final barcode:`, this._currentBarcode());
     }
   }
 
@@ -95,7 +111,11 @@ export class ShipmentService {
   async getShipmentByBarcode(barcode: string): Promise<Shipment> {
     this._loading.set(true);
     this._error.set(null);
+    
+    console.log(`📦 Service ${this._serviceId}: Setting barcode in getShipmentByBarcode:`, barcode);
     this._currentBarcode.set(barcode); // Store the current barcode
+    localStorage.setItem('lastSearchedBarcode', barcode); // Backup storage
+    console.log(`📦 Service ${this._serviceId}: Barcode stored - signal:`, this._currentBarcode(), 'localStorage:', localStorage.getItem('lastSearchedBarcode'));
 
     try {
       const response = await firstValueFrom(
@@ -104,6 +124,7 @@ export class ShipmentService {
         )
       );
       this._lastResponse.set(response);
+      console.log(`📦 Service ${this._serviceId}: Response received, barcode still:`, this._currentBarcode());
       return response;
     } catch (error) {
       const errorMessage = this.handleError(error);
@@ -111,6 +132,7 @@ export class ShipmentService {
       throw new Error(errorMessage);
     } finally {
       this._loading.set(false);
+      console.log(`📦 Service ${this._serviceId}: Request completed, final barcode:`, this._currentBarcode());
     }
   }
 

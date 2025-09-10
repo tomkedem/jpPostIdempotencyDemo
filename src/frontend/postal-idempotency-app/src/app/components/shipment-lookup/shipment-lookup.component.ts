@@ -63,6 +63,10 @@ export class ShipmentLookupComponent implements OnInit {
         [Validators.required, Validators.pattern(/^[A-Za-z0-9]{13}$/)],
       ],
     });
+    
+    // Debug: Check service instance
+    console.log('🔍 ShipmentLookup Constructor - ShipmentService instance:', this.shipmentService);
+    console.log('🔍 ShipmentLookup Constructor - Service ID:', (this.shipmentService as any)._serviceId || 'no-id');
   }
 
   ngOnInit(): void {}
@@ -75,10 +79,13 @@ export class ShipmentLookupComponent implements OnInit {
 
       const barcode = this.lookupForm.value.barcode;
       this.lastSearchedBarcode = barcode;
+      
+      console.log('🔍 ShipmentLookup: Starting search for barcode:', barcode);
+      console.log('🔍 ShipmentLookup: Service instance ID:', (this.shipmentService as any)._serviceId);
 
       try {
-        const result =
-          await this.shipmentService.getShipmentAndDeliveryByBarcode(barcode);
+        const result = await this.shipmentService.getShipmentAndDeliveryByBarcode(barcode);
+        console.log('🔍 ShipmentLookup: Search completed, checking barcode in service:', this.shipmentService.currentBarcode());
         console.log("Shipment found:", result.shipment);
         console.log("Delivery found:", result.delivery);
         this.shipment.set(result.shipment);
@@ -90,6 +97,7 @@ export class ShipmentLookupComponent implements OnInit {
         });
       } finally {
         this.isLoading.set(false);
+        console.log('🔍 ShipmentLookup: Final service barcode:', this.shipmentService.currentBarcode());
       }
       console.log("Last delivery:", this.delivery());
     }
@@ -183,5 +191,17 @@ export class ShipmentLookupComponent implements OnInit {
       default:
         return "gray";
     }
+  }
+
+  clearStoredBarcode(): void {
+    localStorage.removeItem('lastSearchedBarcode');
+    // Reset the service signal as well
+    (this.shipmentService as any)._currentBarcode?.set(null);
+    
+    console.log('🧹 Cleared stored barcode from localStorage and service');
+    this.snackBar.open('ברקוד שמור נוקה', 'סגור', {
+      duration: 2000,
+      panelClass: ['success-snackbar'],
+    });
   }
 }

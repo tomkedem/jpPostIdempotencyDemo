@@ -24,9 +24,20 @@
         mat-stroked-button 
         class="simulation-button"
         (click)="startRandomSimulation()"
-        [disabled]="isSimulationRunning()">
+        [disabled]="false"
+        [class.simulation-running]="isSimulationRunning()">
         <mat-icon>{{ isSimulationRunning() ? 'stop' : 'play_arrow' }}</mat-icon>
-        {{ isSimulationRunning() ? 'עוצר סימולציה...' : 'סימולציה אקראית (400 לחיצות)' }}
+        {{ isSimulationRunning() ? 'עצור סימולציה' : 'התחל סימולציה ' }}
+      </button>
+      
+      <!-- Debug button -->
+      <button 
+        mat-stroked-button 
+        color="warn"
+        class="debug-button"
+        (click)="debugBarcodeState()">
+        <mat-icon>bug_report</mat-icon>
+        בדוק מצב ברקוד
       </button>
       
       <!-- הוספת אינדיקטור בריאות מערכת -->
