@@ -15,6 +15,7 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
 import {
   interval,
   switchMap,
@@ -24,10 +25,13 @@ import {
   Subject,
   takeUntil,
   Observable,
+  Subscription,
 } from "rxjs";
+import { take, finalize } from "rxjs/operators";
 
 import { ChaosService, ChaosSettings } from "../../services/chaos.service";
 import { MetricsService, MetricsSummary } from "../../services/metrics.service";
+import { ShipmentService } from "../../services/shipment.service";
 
 interface LogEntry {
   timestamp: number;
@@ -45,6 +49,7 @@ interface LogEntry {
     MatSlideToggleModule,
     MatButtonModule,
     MatIconModule,
+    MatProgressBarModule,
   ],
   templateUrl: "./chaos-control.component.html",
   styleUrls: ["./chaos-control.component.scss"],
@@ -66,6 +71,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   // Inject services using modern Angular 20 approach
   chaosService = inject(ChaosService); // Made public for template access
   private metricsService = inject(MetricsService);
+  private shipmentService = inject(ShipmentService);
 
   // --- State Signals (Angular 20 style) ---
   idempotencyProtectionEnabled = signal(true);
@@ -73,6 +79,12 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   private initialSettings = signal<Partial<ChaosSettings>>({});
   metrics = signal<MetricsSummary | null>(null);
   logHistory = signal<LogEntry[]>([]);
+
+  // Simulation properties
+  isSimulationRunning = signal(false);
+  simulationProgress = signal(0);
+  currentClickCount = signal(0);
+  private simulationSubscription?: Subscription;
 
   // --- Derived Signals using computed ---
   isProtectionActive = computed(() => this.idempotencyProtectionEnabled());
@@ -129,6 +141,9 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
     }
+
+    // Stop simulation if running
+    this.stopSimulation();
   }
 
   private loadInitialSettings() {
@@ -490,6 +505,92 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     const logs = this.logHistory();
     // הצגת 10 הרשומות האחרונות בלבד
     return logs.slice(-10).reverse();
+  }
+
+  // Simulation methods
+  startRandomSimulation(): void {
+    if (this.isSimulationRunning()) {
+      this.stopSimulation();
+      return;
+    }
+
+    // Check if there's a current barcode to use
+    const currentBarcode = this.shipmentService.currentBarcode();
+    if (!currentBarcode) {
+      this.addLog('warn', 'לא נמצא ברקוד פעיל. אנא חפש משלוח תחילה בעמוד "חיפוש משלוח"');
+      console.warn('No current barcode available for simulation');
+      return;
+    }
+
+    this.isSimulationRunning.set(true);
+    this.simulationProgress.set(0);
+    this.currentClickCount.set(0);
+    
+    // Array of possible delivery statuses with their corresponding IDs
+    const statuses = [
+      { name: 'delivered', id: 2 },        // נמסר
+      { name: 'failed', id: 3 },           // לא נמסר  
+      { name: 'partially_delivered', id: 6 } // נמסר חלקי (assuming this status exists)
+    ];
+    const totalClicks = 400;
+    
+    console.log(`🎮 Starting random simulation - 400 clicks on barcode: ${currentBarcode}`);
+    this.addLog('info', `מתחיל סימולציה של 400 לחיצות אקראיות על ברקוד: ${currentBarcode}`);
+    
+    // Create sequence of 400 random clicks
+    this.simulationSubscription = interval(100) // Click every 100ms
+      .pipe(
+        take(totalClicks),
+        finalize(() => {
+          this.isSimulationRunning.set(false);
+          this.simulationProgress.set(0);
+          this.currentClickCount.set(0);
+          console.log('✅ Simulation completed - 400 clicks executed');
+          this.addLog('success', 'סימולציה הושלמה בהצלחה - 400 לחיצות בוצעו');
+        })
+      )
+      .subscribe(async (index) => {
+        try {
+          // Choose random status
+          const randomStatusObj = statuses[Math.floor(Math.random() * statuses.length)];
+          
+          // Use current barcode from shipment service instead of random
+          const currentBarcode = this.shipmentService.currentBarcode();
+          if (!currentBarcode) {
+            console.warn('No barcode available from search, skipping simulation click');
+            return;
+          }
+          
+          // Execute the operation
+          await this.shipmentService.updateDeliveryStatus(currentBarcode, randomStatusObj.id);
+          
+          // Update progress
+          const currentCount = index + 1;
+          this.currentClickCount.set(currentCount);
+          this.simulationProgress.set((currentCount / totalClicks) * 100);
+          
+          // Log progress every 100 clicks
+          if (currentCount % 100 === 0) {
+            console.log(`📊 Simulation progress: ${currentCount}/${totalClicks}`);
+            this.addLog('info', `התקדמות סימולציה: ${currentCount}/${totalClicks} לחיצות`);
+          }
+        } catch (error) {
+          console.error('Simulation error:', error);
+          // Continue simulation even if individual calls fail
+        }
+      });
+  }
+
+  private stopSimulation(): void {
+    if (this.simulationSubscription) {
+      this.simulationSubscription.unsubscribe();
+      this.simulationSubscription = undefined;
+    }
+    this.isSimulationRunning.set(false);
+    this.simulationProgress.set(0);
+    this.currentClickCount.set(0);
+    console.log('⏹️ Simulation stopped');
+    this.addLog('warn', 'סימולציה הופסקה על ידי המשתמש');
   }
 
   clearLogs(): void {

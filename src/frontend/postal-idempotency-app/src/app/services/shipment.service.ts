@@ -26,11 +26,13 @@ export class ShipmentService {
   private _loading = signal(false);
   private _error = signal<string | null>(null);
   private _lastResponse = signal<any>(null);
+  private _currentBarcode = signal<string | null>(null);
 
   // Public readonly signals
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
   readonly lastResponse = this._lastResponse.asReadonly();
+  readonly currentBarcode = this._currentBarcode.asReadonly();
 
   constructor(private http: HttpClient, private chaosService: ChaosService) {}
 
@@ -66,6 +68,8 @@ export class ShipmentService {
   ): Promise<{ shipment: Shipment | null; delivery: any | null }> {
     this._loading.set(true);
     this._error.set(null);
+    this._currentBarcode.set(barcode); // Store the current barcode
+    
     try {
       const response = await firstValueFrom(
         this.http.get<{ shipment: Shipment | null; delivery: any | null }>(
@@ -91,6 +95,7 @@ export class ShipmentService {
   async getShipmentByBarcode(barcode: string): Promise<Shipment> {
     this._loading.set(true);
     this._error.set(null);
+    this._currentBarcode.set(barcode); // Store the current barcode
 
     try {
       const response = await firstValueFrom(

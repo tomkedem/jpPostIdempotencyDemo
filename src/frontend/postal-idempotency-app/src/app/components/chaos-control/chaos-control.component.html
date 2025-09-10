@@ -18,6 +18,17 @@
           idempotencyProtectionEnabled() ? "הגנה פעילה" : "הגנה כבויה"
         }}</span>
       </div>
+      
+      <!-- Add simulation button -->
+      <button 
+        mat-stroked-button 
+        class="simulation-button"
+        (click)="startRandomSimulation()"
+        [disabled]="isSimulationRunning()">
+        <mat-icon>{{ isSimulationRunning() ? 'stop' : 'play_arrow' }}</mat-icon>
+        {{ isSimulationRunning() ? 'עוצר סימולציה...' : 'סימולציה אקראית (400 לחיצות)' }}
+      </button>
+      
       <!-- הוספת אינדיקטור בריאות מערכת -->
       <div class="system-health" [ngClass]="getSystemHealthClass()">
         <mat-icon>{{ getSystemHealthIcon() }}</mat-icon>
@@ -28,6 +39,15 @@
       </div>
     </div>
   </header>
+
+  <!-- Add progress indicator below header -->
+  <div class="simulation-progress" *ngIf="isSimulationRunning()">
+    <mat-progress-bar 
+      mode="determinate" 
+      [value]="simulationProgress()">
+    </mat-progress-bar>
+    <span class="progress-text">{{ simulationProgress() | number:'1.0-0' }}% הושלם ({{ currentClickCount() }}/400)</span>
+  </div>
 
   <!-- Main Content Grid -->
   <main class="main-grid">
