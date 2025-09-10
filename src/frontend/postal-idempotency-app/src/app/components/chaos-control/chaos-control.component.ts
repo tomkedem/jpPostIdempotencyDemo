@@ -471,6 +471,22 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  getSystemHealthTrendText(): string {
+    const status = this.systemHealthStatus();
+    switch (status) {
+      case "excellent":
+        return "יציב";
+      case "good":
+        return "תקין";
+      case "fair":
+        return "מעורער";
+      case "poor":
+        return "לא יציב";
+      default:
+        return "לא ידוע";
+    }
+  }
+
   getBlockedPercentage(): number {
     const metrics = this.metrics();
     if (!metrics || metrics.totalOperations === 0) return 0;

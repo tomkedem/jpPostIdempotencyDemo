@@ -610,11 +610,14 @@
 // ==============================================
 
 .system-health-banner {
-  padding: 0 0 0 calc(var(--spacing) * 3); /* רווח שמאלי גדול */
+  padding: 0 0 0 calc(var(--spacing) * 3);
+  /* רווח שמאלי גדול */
   margin-bottom: var(--spacing);
   display: flex;
-  justify-content: flex-start; /* יישור שמאלה */
-  margin-left: calc(var(--spacing) * 1); /* מרווח נוסף מהקצה השמאלי */
+  justify-content: flex-start;
+  /* יישור שמאלה */
+  margin-left: calc(var(--spacing) * 1);
+  /* מרווח נוסף מהקצה השמאלי */
 }
 
 .premium-health-indicator-prominent {
@@ -663,7 +666,8 @@
   }
 
   .health-metric-below {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
+    /* הגדלת האחוזים */
     opacity: 0.9;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
@@ -682,25 +686,44 @@
     flex: 1;
 
     .health-title {
-      font-weight: 800;
-      font-size: 1.125rem; /* הגדלת הכותרת להיות בולטת יותר */
-      opacity: 0.9;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      line-height: 1;
+      font-weight: 600;
+      /* הפחתת עובי הפונט */
+      font-size: 1.125rem;
+      /* הגדלת הכותרת להיות בולטת יותר */
+      opacity: 1;
+      /* הסרת שקיפות */
+      text-transform: none;
+      /* הסרת אותיות גדולות */
+      letter-spacing: normal;
+      /* הסרת רווח בין אותיות */
+      line-height: 1.2;
+      /* הגדלת גובה שורה לקריאות */
+      font-family: 'Inter', sans-serif;
+      /* פונט אחיד */
     }
 
     .health-status {
-      font-weight: 600;
-      font-size: 0.875rem; /* הקטנת הסטטוס כדי שהכותרת תהיה בולטת */
-      line-height: 1.1;
-      background: rgba(255, 255, 255, 0.75); /* רקע בהיר מאוד */
-      padding: 0.25rem 0.6rem; /* ריפוד פנימי */
-      border-radius: 8px; /* פינות עגולות */
-      border: 1px solid rgba(255, 255, 255, 0.85); /* מסגרת בהירה יותר */
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); /* צל עדין יותר */
-      backdrop-filter: blur(5px); /* טשטוש רקע */
-      display: inline-block; /* כדי שהרקע יתאים לגודל הטקסט */
+      font-weight: 500;
+      /* פונט רגיל יותר */
+      font-size: 0.875rem;
+      /* הקטנת הסטטוס כדי שהכותרת תהיה בולטת */
+      line-height: 1.2;
+      font-family: 'Inter', sans-serif;
+      /* פונט אחיד */
+      background: rgba(255, 255, 255, 0.75);
+      /* רקע בהיר מאוד */
+      padding: 0.25rem 0.6rem;
+      /* ריפוד פנימי */
+      border-radius: 8px;
+      /* פינות עגולות */
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      /* מסגרת בהירה יותר */
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      /* צל עדין יותר */
+      backdrop-filter: blur(5px);
+      /* טשטוש רקע */
+      display: inline-block;
+      /* כדי שהרקע יתאים לגודל הטקסט */
     }
   }
 
@@ -717,7 +740,8 @@
     }
 
     .trend-text {
-      font-size: 0.75rem;
+      font-size: 0.875rem;
+      /* הגדלת האחוזים */
       font-weight: 600;
       font-family: 'JetBrains Mono', monospace;
     }
@@ -1644,7 +1668,8 @@
   .system-health-banner {
     padding: 0 var(--spacing);
     margin-bottom: calc(var(--spacing) * 0.75);
-    margin-left: 0; /* הסרת margin במובייל */
+    margin-left: 0;
+    /* הסרת margin במובייל */
     justify-content: center;
     /* חזרה למרכז במובייל */
 
@@ -1660,18 +1685,35 @@
 
       .health-details-prominent {
         .health-title {
-          font-size: 1rem; /* כותרת גדולה יותר במובייל */
+          font-size: 1rem;
+          /* כותרת גדולה יותר במובייל */
+          font-family: 'Inter', sans-serif;
+          /* פונט אחיד */
+          font-weight: 600;
+          text-transform: none;
+          letter-spacing: normal;
         }
 
         .health-status {
-          font-size: 0.8rem; /* סטטוס קטן יותר במובייל */
-          background: rgba(255, 255, 255, 0.7); /* רקע בהיר מאוד */
-          padding: 0.2rem 0.5rem; /* ריפוד קטן יותר למובייל */
-          border-radius: 6px; /* פינות עגולות */
-          border: 1px solid rgba(255, 255, 255, 0.8); /* מסגרת בהירה יותר */
-          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06); /* צל עדין יותר */
-          backdrop-filter: blur(4px); /* טשטוש רקע */
-          display: inline-block; /* כדי שהרקע יתאים לגודל הטקסט */
+          font-size: 0.8rem;
+          /* סטטוס קטן יותר במובייל */
+          font-family: 'Inter', sans-serif;
+          /* פונט אחיד */
+          font-weight: 500;
+          background: rgba(255, 255, 255, 0.7);
+          /* רקע בהיר מאוד */
+          padding: 0.2rem 0.5rem;
+          /* ריפוד קטן יותר למובייל */
+          border-radius: 6px;
+          /* פינות עגולות */
+          border: 1px solid rgba(255, 255, 255, 0.8);
+          /* מסגרת בהירה יותר */
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+          /* צל עדין יותר */
+          backdrop-filter: blur(4px);
+          /* טשטוש רקע */
+          display: inline-block;
+          /* כדי שהרקע יתאים לגודל הטקסט */
         }
       }
 
@@ -1782,18 +1824,35 @@
         align-items: center;
 
         .health-title {
-          font-size: 0.875rem; /* כותרת גדולה יותר אפילו במסכים קטנים */
+          font-size: 0.875rem;
+          /* כותרת גדולה יותר אפילו במסכים קטנים */
+          font-family: 'Inter', sans-serif;
+          /* פונט אחיד */
+          font-weight: 600;
+          text-transform: none;
+          letter-spacing: normal;
         }
 
         .health-status {
-          font-size: 0.75rem; /* סטטוס קטן יותר במסכים קטנים */
-          background: rgba(255, 255, 255, 0.65); /* רקע בהיר מאוד */
-          padding: 0.15rem 0.4rem; /* ריפוד קטן מאוד */
-          border-radius: 5px; /* פינות עגולות קטנות */
-          border: 1px solid rgba(255, 255, 255, 0.75); /* מסגרת בהירה יותר */
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); /* צל עדין יותר */
-          backdrop-filter: blur(3px); /* טשטוש רקע */
-          display: inline-block; /* כדי שהרקע יתאים לגודל הטקסט */
+          font-size: 0.75rem;
+          /* סטטוס קטן יותר במסכים קטנים */
+          font-family: 'Inter', sans-serif;
+          /* פונט אחיד */
+          font-weight: 500;
+          background: rgba(255, 255, 255, 0.65);
+          /* רקע בהיר מאוד */
+          padding: 0.15rem 0.4rem;
+          /* ריפוד קטן מאוד */
+          border-radius: 5px;
+          /* פינות עגולות קטנות */
+          border: 1px solid rgba(255, 255, 255, 0.75);
+          /* מסגרת בהירה יותר */
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+          /* צל עדין יותר */
+          backdrop-filter: blur(3px);
+          /* טשטוש רקע */
+          display: inline-block;
+          /* כדי שהרקע יתאים לגודל הטקסט */
         }
       }
 

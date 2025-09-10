@@ -5,7 +5,7 @@
       <mat-icon class="header-icon">security</mat-icon>
       <div class="title-text-container">
         <h1>הגנת אידמפוטנטיות</h1>
-        <p class="subtitle">מניעת כפילויות בפעולות קריטיות</p>
+        <p class="subtitle">מניעת כפילויות קריטיות</p>
       </div>
     </div>
      <!-- Critical System Health Indicator - Prominent Position -->
@@ -22,7 +22,7 @@
       </div>
       <div class="health-trend-indicator">
         <mat-icon class="trend-icon">trending_up</mat-icon>
-        <span class="trend-text">יציב</span>
+        <span class="trend-text">{{ getSystemHealthTrendText() }}</span>
       </div>
     </div>
   </div>
