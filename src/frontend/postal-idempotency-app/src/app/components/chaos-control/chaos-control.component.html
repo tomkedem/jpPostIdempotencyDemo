@@ -8,6 +8,24 @@
         <p class="subtitle">מניעת כפילויות בפעולות קריטיות</p>
       </div>
     </div>
+     <!-- Critical System Health Indicator - Prominent Position -->
+  <div class="system-health-banner">
+    <div class="premium-health-indicator-prominent" [ngClass]="getSystemHealthClass()">
+      <div class="health-pulse"></div>
+      <div class="health-icon-container">
+        <mat-icon class="health-icon">{{ getSystemHealthIcon() }}</mat-icon>
+        <span class="health-metric-below">{{ metrics()?.successRate || 0 | number:'1.0-1' }}%</span>
+      </div>
+      <div class="health-details-prominent">
+        <span class="health-title">בריאות מערכת</span>
+        <span class="health-status">{{ getSystemHealthText() }}</span>
+      </div>
+      <div class="health-trend-indicator">
+        <mat-icon class="trend-icon">trending_up</mat-icon>
+        <span class="trend-text">יציב</span>
+      </div>
+    </div>
+  </div>
     <div class="status-container">
       <div
         class="system-status-indicator"
@@ -21,14 +39,6 @@
         }}</span>
       </div>
         
-          <!-- System Health Indicator - Compact -->
-          <div class="premium-health-indicator-compact" [ngClass]="getSystemHealthClass()">
-            <div class="health-pulse"></div>
-            <mat-icon class="health-icon">{{ getSystemHealthIcon() }}</mat-icon>
-            <div class="health-details-compact">
-              <span class="health-label">{{ getSystemHealthText() }}</span>
-            </div>
-          </div>
       <!-- Compact Premium Controls Section -->
       <div class="premium-controls-compact">
         <!-- Main Simulation Control - Inline -->
@@ -67,6 +77,8 @@
       </div>
     </div>
   </header>
+
+ 
 
   <!-- Compact Progress Indicator -->
   <div class="premium-simulation-progress-compact" *ngIf="isSimulationRunning()">
