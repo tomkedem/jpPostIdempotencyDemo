@@ -603,68 +603,78 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     console.log(`🎮 Starting realistic simulation - ${totalScenarios} scenarios of ${clicksPerScenario} duplicate clicks each on barcode: ${barcodeToUse}`);
     this.addLog('info', `מתחיל סימולציה ריאליסטית: ${totalScenarios} תרחישים של ${clicksPerScenario} לחיצות כפולות על ברקוד: ${barcodeToUse}`);
     
-    // Create sequence of realistic scenarios
-    this.simulationSubscription = interval(400) // Realistic user clicking speed: 400ms between clicks
-      .pipe(
-        take(totalClicks),
-        finalize(() => {
-          this.isSimulationRunning.set(false);
-          this.simulationProgress.set(0);
-          this.currentClickCount.set(0);
-          console.log(`✅ Simulation completed - ${totalScenarios} realistic scenarios executed`);
-          this.addLog('success', `סימולציה הושלמה בהצלחה - ${totalScenarios} תרחישים ריאליסטיים בוצעו`);
-        })
-      )
-      .subscribe(async (index) => {
-        try {
-          // Use the barcode we determined at the start of simulation
-          const simulationBarcode = barcodeToUse;
-          if (!simulationBarcode) {
-            console.warn('No barcode available, skipping simulation click');
-            return;
-          }
+    // Create sequence of realistic scenarios with human-like random timing
+    let currentClickIndex = 0;
+    
+    const executeNextClick = async () => {
+      if (currentClickIndex >= totalClicks || !this.isSimulationRunning()) {
+        // Simulation complete or stopped
+        this.isSimulationRunning.set(false);
+        this.simulationProgress.set(0);
+        this.currentClickCount.set(0);
+        console.log(`✅ Simulation completed - ${totalScenarios} realistic scenarios executed`);
+        this.addLog('success', `סימולציה הושלמה בהצלחה - ${totalScenarios} תרחישים ריאליסטיים בוצעו`);
+        return;
+      }
 
-          // Calculate which scenario and click within scenario we're on
-          const scenarioIndex = Math.floor(index / clicksPerScenario);
-          const clickInScenario = index % clicksPerScenario;
-          
-          // For each new scenario, choose a random status that will be repeated 8 times
-          let statusObj: { name: string; id: number };
-          if (clickInScenario === 0) {
-            // First click of new scenario - choose new random status
-            statusObj = statuses[Math.floor(Math.random() * statuses.length)];
-            // Store the status for this scenario (you could use a class property if needed)
-            (this as any).currentScenarioStatus = statusObj;
-          } else {
-            // Subsequent clicks in same scenario - use same status as first click
-            statusObj = (this as any).currentScenarioStatus || statuses[0];
-          }
-          
-          // Execute the operation with the same status as the scenario
-          await this.shipmentService.updateDeliveryStatus(simulationBarcode, statusObj.id);
-          
-          // Update progress
-          const currentCount = index + 1;
-          this.currentClickCount.set(currentCount);
-          this.simulationProgress.set((currentCount / totalClicks) * 100);
-          
-          // Log progress for each new scenario
-          if (clickInScenario === 0) {
-            console.log(`📊 Starting scenario ${scenarioIndex + 1}/${totalScenarios}: ${clicksPerScenario} clicks on status "${statusObj.name}" (${statusObj.id})`);
-            this.addLog('info', `תרחיש ${scenarioIndex + 1}/${totalScenarios}: ${clicksPerScenario} לחיצות על סטטוס "${this.getStatusNameInHebrew(statusObj.id)}"`);
-          }
-          
-          // Log overall progress every 10 scenarios
-          if (currentCount % (clicksPerScenario * 10) === 0) {
-            const completedScenarios = currentCount / clicksPerScenario;
-            console.log(`📈 Progress: ${completedScenarios}/${totalScenarios} scenarios completed`);
-            this.addLog('info', `התקדמות: ${completedScenarios}/${totalScenarios} תרחישים הושלמו`);
-          }
-        } catch (error) {
-          console.error('Simulation error:', error);
-          // Continue simulation even if individual calls fail
+      try {
+        // Use the barcode we determined at the start of simulation
+        const simulationBarcode = barcodeToUse;
+        if (!simulationBarcode) {
+          console.warn('No barcode available, skipping simulation click');
+          return;
         }
-      });
+
+        // Calculate which scenario and click within scenario we're on
+        const scenarioIndex = Math.floor(currentClickIndex / clicksPerScenario);
+        const clickInScenario = currentClickIndex % clicksPerScenario;
+        
+        // For each new scenario, choose a random status that will be repeated 8 times
+        let statusObj: { name: string; id: number };
+        if (clickInScenario === 0) {
+          // First click of new scenario - choose new random status
+          statusObj = statuses[Math.floor(Math.random() * statuses.length)];
+          // Store the status for this scenario
+          (this as any).currentScenarioStatus = statusObj;
+        } else {
+          // Subsequent clicks in same scenario - use same status as first click
+          statusObj = (this as any).currentScenarioStatus || statuses[0];
+        }
+        
+        // Execute the operation with the same status as the scenario
+        await this.shipmentService.updateDeliveryStatus(simulationBarcode, statusObj.id);
+        
+        // Update progress
+        const currentCount = currentClickIndex + 1;
+        this.currentClickCount.set(currentCount);
+        this.simulationProgress.set((currentCount / totalClicks) * 100);
+        
+        // Log progress for each new scenario
+        if (clickInScenario === 0) {
+          console.log(`📊 Starting scenario ${scenarioIndex + 1}/${totalScenarios}: ${clicksPerScenario} clicks on status "${statusObj.name}" (${statusObj.id})`);
+          this.addLog('info', `תרחיש ${scenarioIndex + 1}/${totalScenarios}: ${clicksPerScenario} לחיצות על סטטוס "${this.getStatusNameInHebrew(statusObj.id)}"`);
+        }
+        
+        // Log overall progress every 10 scenarios
+        if (currentCount % (clicksPerScenario * 10) === 0) {
+          const completedScenarios = currentCount / clicksPerScenario;
+          console.log(`📈 Progress: ${completedScenarios}/${totalScenarios} scenarios completed`);
+          this.addLog('info', `התקדמות: ${completedScenarios}/${totalScenarios} תרחישים הושלמו`);
+        }
+      } catch (error) {
+        console.error('Simulation error:', error);
+        // Continue simulation even if individual calls fail
+      }
+      
+      currentClickIndex++;
+      
+      // Schedule next click with human-like random delay (200-800ms)
+      const randomDelay = 200 + Math.random() * 600; // Random between 200-800ms
+      setTimeout(executeNextClick, randomDelay);
+    };
+    
+    // Start the first click
+    executeNextClick();
   }
 
   private getStatusNameInHebrew(statusId: number): string {
