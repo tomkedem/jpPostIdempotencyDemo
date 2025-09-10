@@ -630,7 +630,8 @@
   backdrop-filter: blur(15px);
   border: 2px solid rgba(255, 255, 255, 0.3);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  /* שינוי מ-hidden ל-visible */
   transition: all 0.3s ease;
   min-width: 240px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -658,11 +659,26 @@
     align-items: center;
     gap: 0.375rem;
     z-index: 1;
+    min-height: 3rem;
+    /* הוספת גובה מינימלי */
+    min-width: 3rem;
+    /* הוספת רוחב מינימלי */
+    justify-content: center;
+    /* מרכוז אנכי */
   }
 
   .health-icon {
     font-size: 1.75rem;
     filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+    line-height: 1;
+    /* מניעת חיתוך */
+    width: 1.75rem;
+    /* רוחב מפורש */
+    height: 1.75rem;
+    /* גובה מפורש */
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .health-metric-below {
