@@ -286,15 +286,102 @@
     }
 
     .current-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-      color: #64748b;
-      background: rgba(255, 255, 255, 0.8);
-      padding: 0.5rem 1rem;
-      border-radius: 0.75rem;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(226, 232, 240, 0.6);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron', 'JetBrains Mono', 'Courier New', monospace;
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #00ff88;
+      background:
+        radial-gradient(circle at center, rgba(0, 255, 136, 0.03) 0%, transparent 70%),
+        linear-gradient(135deg,
+          rgba(0, 0, 0, 0.95) 0%,
+          rgba(20, 20, 20, 0.98) 30%,
+          rgba(0, 0, 0, 0.95) 100%);
+      padding: 1rem 1.5rem;
+      border-radius: 0;
+      border: none;
       white-space: nowrap;
+      min-width: 180px;
+      height: 50px;
+      box-shadow:
+        inset 0 0 20px rgba(0, 255, 136, 0.1),
+        0 0 30px rgba(0, 255, 136, 0.2),
+        0 4px 15px rgba(0, 0, 0, 0.5);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      overflow: hidden;
+
+      /* מסגרת נאון חיצונית */
+      &::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg,
+            #00ff88 0%,
+            #ff0080 25%,
+            #8000ff 50%,
+            #0080ff 75%,
+            #00ff88 100%);
+        background-size: 300% 300%;
+        animation: neon-border-flow 4s linear infinite;
+        z-index: -1;
+      }
+
+      /* רקע נאון פנימי */
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          repeating-linear-gradient(90deg,
+            transparent 0px,
+            rgba(0, 255, 136, 0.03) 1px,
+            transparent 2px,
+            transparent 30px),
+          repeating-linear-gradient(0deg,
+            transparent 0px,
+            rgba(0, 255, 136, 0.02) 1px,
+            transparent 2px,
+            transparent 4px);
+        animation: digital-grid 2s linear infinite;
+        pointer-events: none;
+      }
+
+      /* טקסט עם אפקט זוהר */
+      color: #00ff88;
+      text-shadow: 0 0 5px #00ff88,
+      0 0 10px #00ff88,
+      0 0 15px #00ff88,
+      0 0 20px #00ff88;
+
+      &:hover {
+        transform: scale(1.05);
+        color: #ff0080;
+        text-shadow:
+          0 0 8px #ff0080,
+          0 0 15px #ff0080,
+          0 0 25px #ff0080,
+          0 0 35px #ff0080;
+        box-shadow:
+          inset 0 0 30px rgba(255, 0, 128, 0.15),
+          0 0 50px rgba(255, 0, 128, 0.3),
+          0 8px 25px rgba(0, 0, 0, 0.6);
+      }
+
+      /* אינדיקטור דיגיטלי */
+      &:before {
+        animation-duration: 2s;
+      }
     }
   }
 
@@ -3665,5 +3752,147 @@
       width: 16px;
       height: 16px;
     }
+  }
+}
+
+// ==============================================
+// REVOLUTIONARY 2025 CYBERPUNK ANIMATIONS
+// ==============================================
+
+/* מסגרת נאון זורמת */
+@keyframes neon-border-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* רשת דיגיטלית נעה */
+@keyframes digital-grid {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-4px);
+  }
+}
+
+/* זוהר נאון פועם */
+@keyframes neon-pulse {
+
+  0%,
+  100% {
+    text-shadow:
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor,
+      0 0 20px currentColor;
+  }
+
+  50% {
+    text-shadow:
+      0 0 10px currentColor,
+      0 0 20px currentColor,
+      0 0 30px currentColor,
+      0 0 40px currentColor,
+      0 0 50px currentColor;
+  }
+}
+
+/* הבהוב דיגיטלי */
+@keyframes digital-flicker {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  98% {
+    opacity: 1;
+  }
+
+  99% {
+    opacity: 0.98;
+  }
+
+  99.5% {
+    opacity: 1;
+  }
+}
+
+/* סריקה הולוגרפית */
+@keyframes hologram-scan {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+
+  100% {
+    transform: translateX(300%) skewX(-15deg);
+  }
+}
+
+// ==============================================
+// FORCE CYBERPUNK CLOCK STYLE - HIGH PRIORITY
+// ==============================================
+
+:host ::ng-deep .current-time,
+:host .current-time,
+.main-header .status-container .current-time {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: 'Orbitron', 'JetBrains Mono', 'Courier New', monospace !important;
+  font-weight: 900 !important;
+  font-size: 1.1rem !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  color: #00ff88 !important;
+  background:
+    radial-gradient(circle at center, rgba(0, 255, 136, 0.1) 0%, transparent 70%),
+    linear-gradient(135deg,
+      rgba(0, 0, 0, 0.98) 0%,
+      rgba(10, 10, 10, 1) 50%,
+      rgba(0, 0, 0, 0.98) 100%) !important;
+  padding: 1rem 1.5rem !important;
+  border-radius: 8px !important;
+  border: 2px solid #00ff88 !important;
+  white-space: nowrap !important;
+  min-width: 200px !important;
+  height: 60px !important;
+  box-shadow:
+    inset 0 0 20px rgba(0, 255, 136, 0.3),
+    0 0 40px rgba(0, 255, 136, 0.6),
+    0 8px 20px rgba(0, 0, 0, 0.8) !important;
+  transition: all 0.4s ease !important;
+
+  /* טקסט עם אפקט זוהר חזק */
+  text-shadow:
+    0 0 10px #00ff88,
+    0 0 20px #00ff88,
+    0 0 30px #00ff88,
+    0 0 40px #00ff88 !important;
+
+  &:hover {
+    transform: scale(1.1) !important;
+    color: #ff0080 !important;
+    border-color: #ff0080 !important;
+    text-shadow:
+      0 0 15px #ff0080,
+      0 0 25px #ff0080,
+      0 0 35px #ff0080,
+      0 0 45px #ff0080 !important;
+    box-shadow:
+      inset 0 0 30px rgba(255, 0, 128, 0.3),
+      0 0 60px rgba(255, 0, 128, 0.8),
+      0 12px 30px rgba(0, 0, 0, 0.9) !important;
   }
 }
