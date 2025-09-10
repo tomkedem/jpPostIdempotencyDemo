@@ -1793,8 +1793,58 @@
   }
 
   .quick-stats {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    /* שינוי לעמודה במובייל */
+    gap: 0.6rem;
+
+    .stat-item {
+      flex: none;
+      /* ביטול flex במובייל */
+      width: 100%;
+      /* רוחב מלא לכל כרטיס */
+      min-width: auto;
+      padding: 0.75rem 1rem;
+      /* padding גדול יותר במובייל */
+      min-height: 70px;
+      overflow: visible;
+
+      .stat-icon {
+        width: 40px;
+        height: 40px;
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      .stat-content {
+        padding-top: 0;
+
+        .stat-value {
+          font-size: 1.25rem;
+          /* פונט גדול יותר במובייל */
+          line-height: 1.3;
+          margin-bottom: 0.2rem;
+          overflow: visible;
+        }
+
+        .stat-label {
+          font-size: 0.8rem;
+          /* פונט גדול יותר לקריאות טובה */
+          line-height: 1.2;
+          word-wrap: break-word;
+        }
+
+        .stat-precise {
+          font-size: 0.7rem;
+          /* פונט גדול יותר */
+          line-height: 1.2;
+        }
+      }
+    }
   }
 
   .premium-simulation-btn-compact {
@@ -1851,7 +1901,7 @@
 }
 
 // Small mobile devices
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .main-header {
     padding: calc(var(--spacing) * 0.4) calc(var(--spacing) * 0.75);
 
@@ -1933,6 +1983,61 @@
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
+  }
+
+  .quick-stats {
+    display: flex;
+    flex-direction: column;
+    /* עמודה במובייל קטן */
+    gap: 0.75rem;
+
+    .stat-item {
+      flex: none;
+      width: 100%;
+      padding: 1rem;
+      /* padding נוח למובייל קטן */
+      min-height: 80px;
+      /* גובה נוח לטקסט */
+      overflow: visible;
+
+      .stat-icon {
+        width: 44px;
+        height: 44px;
+
+        mat-icon {
+          font-size: 22px;
+          width: 22px;
+          height: 22px;
+        }
+      }
+
+      .stat-content {
+        padding-top: 0;
+
+        .stat-value {
+          font-size: 1.4rem;
+          /* פונט גדול וברור */
+          line-height: 1.4;
+          margin-bottom: 0.3rem;
+          overflow: visible;
+          word-wrap: break-word;
+        }
+
+        .stat-label {
+          font-size: 0.9rem;
+          /* פונט גדול לקריאות מעולה */
+          line-height: 1.3;
+          word-wrap: break-word;
+          overflow: visible;
+        }
+
+        .stat-precise {
+          font-size: 0.75rem;
+          line-height: 1.3;
+          overflow: visible;
+        }
+      }
+    }
   }
 
   .premium-simulation-btn-compact {
@@ -2057,10 +2162,9 @@
 
 // Quick Stats Styling
 .quick-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 
   .stat-item {
     display: flex;
@@ -2073,7 +2177,11 @@
     border: 1px solid rgba(99, 102, 241, 0.2);
     transition: all 0.3s ease;
     min-height: 80px;
-    /* גובה מינימלי כדי למנוע דחיסה */
+    /* גובה מינימלי מוגדל כדי למנוע דחיסה */
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
+    /* מניעת חיתוך כללי */
 
     &:hover {
       transform: translateY(-2px);
@@ -2127,16 +2235,20 @@
       flex: 1;
       padding-top: 2px;
       /* מרווח עליון קטן */
+      overflow: visible;
+      /* מניעת חיתוך */
 
       .stat-value {
         font-size: 1.5rem;
         font-weight: 700;
         color: var(--text-primary);
         margin-bottom: 0.25rem;
-        line-height: 1.3;
-        /* גובה שורה מתאים למניעת חיתוך */
+        line-height: 1.4;
+        /* גובה שורה משופר למניעת חיתוך */
         overflow: visible;
         /* מניעת חיתוך טקסט */
+        word-wrap: break-word;
+        /* מניעת חיתוך מילים */
       }
 
       .stat-precise {
@@ -2147,12 +2259,22 @@
         margin-bottom: 0.25rem;
         font-weight: 400;
         letter-spacing: 0.5px;
+        line-height: 1.3;
+        /* גובה שורה מותאם */
+        overflow: visible;
+        /* מניעת חיתוך */
       }
 
       .stat-label {
         font-size: 0.875rem;
         color: var(--text-secondary);
         font-weight: 500;
+        line-height: 1.3;
+        /* גובה שורה מותאם */
+        overflow: visible;
+        /* מניעת חיתוך */
+        word-wrap: break-word;
+        /* מניעת חיתוך מילים */
       }
     }
   }
