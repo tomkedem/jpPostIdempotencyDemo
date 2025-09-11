@@ -139,29 +139,52 @@
           </div>
         </div>
       </div>
-
+      <!-- Enhanced Real-time Performance Chart - Premium Version -->
+          <div class="performance-chart-premium">
+            <div class="chart-header-premium">
+              <div class="chart-title-container">
+                <div class="chart-icon-wrapper">
+                  <mat-icon class="chart-icon">trending_up</mat-icon>
+                  <div class="icon-glow"></div>
+                </div>
+                <div class="title-text">
+                  <h4>מגמות ביצועים</h4>
+                  <span class="subtitle">עדכון בזמן אמת</span>
+                </div>
+                <div class="chart-legend-inline">
+                  <div class="legend-item" matTooltip="בקשות שהושלמו בהצלחה" matTooltipPosition="above">
+                    <div class="legend-dot success">
+                      <div class="dot-pulse"></div>
+                    </div>
+                  </div>
+                  <div class="legend-item" matTooltip="בקשות שנחסמו על ידי מנגנון Idempotency" matTooltipPosition="above">
+                    <div class="legend-dot blocked">
+                      <div class="dot-pulse"></div>
+                    </div>
+                  </div>
+                  <div class="legend-item" matTooltip="שגיאות שנגרמו מכאוס אינג'יניירינג" matTooltipPosition="above">
+                    <div class="legend-dot chaos-errors">
+                      <div class="dot-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chart-container-premium">
+              <div class="chart-background">
+                <div class="grid-lines"></div>
+                <div class="glow-effect"></div>
+              </div>
+              <canvas #performanceChart width="400" height="120"></canvas>
+            </div>
+          </div>
       <!-- Demo Guide -->
       <div class="panel guide-panel">
         <div class="panel-header">
           <mat-icon>integration_instructions</mat-icon>
           <h2>מדריך הדגמה</h2>
         </div>
-        <div class="panel-content">
-          <!-- Real-time Performance Chart - Compact Version -->
-          <div class="performance-chart-compact">
-            <div class="chart-header-compact">
-              <h4>מגמות ביצועים</h4>
-              <div class="chart-legend-compact">
-                <span class="legend-dot success"></span>
-                <span class="legend-dot blocked"></span>
-                <span class="legend-dot chaos-errors"></span>
-              </div>
-            </div>
-            <div class="chart-container-compact">
-              <canvas #performanceChart width="300" height="80"></canvas>
-            </div>
-          </div>
-
+        <div class="panel-content">  
           <ol class="guide-steps">
             <li class="step">
               <div class="step-number">1</div>

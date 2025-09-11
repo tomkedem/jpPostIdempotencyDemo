@@ -1,0 +1,19 @@
+/* Grid lines fix for performance chart */
+.performance-chart-premium {
+    .chart-container-premium {
+        overflow: hidden !important;
+
+        .chart-background {
+            overflow: hidden !important;
+
+            .grid-lines {
+                top: 2rem !important;
+                left: 2rem !important;
+                right: 2rem !important;
+                bottom: 2rem !important;
+                border-radius: 8px !important;
+                overflow: hidden !important;
+            }
+        }
+    }
+}
