@@ -187,207 +187,6 @@
       }
     }
 
-    .simulation-button {
-      border: 2px solid #6366f1;
-      color: #6366f1;
-      font-weight: 500;
-      padding: 0.75rem 1.25rem;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
-
-      &:hover:not(:disabled) {
-        background-color: #6366f1;
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
-      }
-
-      &:disabled {
-        border-color: #92400e;
-        color: #92400e;
-        cursor: not-allowed;
-        background-color: rgba(245, 158, 11, 0.1);
-      }
-
-      .mat-icon {
-        margin-left: 0.5rem;
-        font-size: 1.2rem;
-        vertical-align: middle;
-      }
-    }
-
-    .system-health {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 1rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      white-space: nowrap;
-
-      &.health-excellent {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);
-        border: 1px solid rgba(16, 185, 129, 0.4);
-        color: #059669;
-
-        mat-icon {
-          color: #065f46;
-          animation: healthPulse 3s ease-in-out infinite;
-        }
-      }
-
-      &.health-good {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%);
-        border: 1px solid rgba(59, 130, 246, 0.4);
-        color: #2563eb;
-
-        mat-icon {
-          color: #1d4ed8;
-        }
-      }
-
-      &.health-fair {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%);
-        border: 1px solid rgba(245, 158, 11, 0.4);
-        color: #d97706;
-
-        mat-icon {
-          color: #92400e;
-          animation: warningBlink 2s ease-in-out infinite;
-        }
-      }
-
-      &.health-poor {
-        background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.3) 100%);
-        border: 1px solid rgba(239, 68, 68, 0.4);
-        color: #dc2626;
-
-        mat-icon {
-          color: #991b1b;
-          animation: errorShake 1s ease-in-out infinite;
-        }
-      }
-
-      &.health-unknown {
-        background: linear-gradient(135deg, rgba(107, 114, 128, 0.2) 0%, rgba(75, 85, 99, 0.3) 100%);
-        border: 1px solid rgba(107, 114, 128, 0.4);
-        color: #6b7280;
-
-        mat-icon {
-          color: #9ca3af;
-        }
-      }
-    }
-
-  }
-
-  .performance-chart {
-    margin-bottom: 2rem;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    backdrop-filter: blur(20px);
-
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-
-      h3 {
-        margin: 0;
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #1e293b;
-      }
-
-      .chart-legend {
-        display: flex;
-        gap: 1.5rem;
-        margin: 0.75rem 0;
-        padding: 1rem 1.5rem;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
-        border-radius: 0.75rem;
-        border: 3px solid rgba(34, 197, 94, 0.3);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(10px);
-
-        .legend-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-size: 1rem;
-          font-weight: 600;
-          color: #374151;
-          padding: 0.5rem 0.75rem;
-          border-radius: 0.5rem;
-          background: rgba(248, 250, 252, 0.7);
-          border: 1px solid rgba(226, 232, 240, 0.6);
-
-          .legend-color {
-            width: 18px;
-            height: 18px;
-            border-radius: 6px;
-            border: 3px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-
-            &.success {
-              background: #22c55e;
-              /* ירוק בהיר יותר */
-              border-color: #dcfce7;
-              box-shadow: 0 2px 6px rgba(34, 197, 94, 0.4);
-            }
-
-            &.blocked {
-              background: #991b1b;
-              /* אדום-כתום להדגשת חסימה */
-              border-color: #fecaca;
-              box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
-            }
-          }
-
-          strong {
-            color: #1f2937;
-
-            &.green-text {
-              color: #16a34a;
-              font-weight: 900;
-              text-shadow: 1px 1px 2px rgba(22, 163, 74, 0.3);
-              font-size: 1.1em;
-            }
-
-            &.red-text {
-              color: #dc2626;
-              font-weight: 900;
-              text-shadow: 1px 1px 2px rgba(220, 38, 38, 0.3);
-              font-size: 1.1em;
-            }
-          }
-        }
-      }
-    }
-
-    .chart-container {
-      position: relative;
-      height: 150px;
-      border-radius: 0.5rem;
-      overflow: hidden;
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-      border: 1px solid rgba(226, 232, 240, 0.6);
-
-      canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-    }
   }
 
   .panel-actions {
@@ -790,7 +589,7 @@
 
     .health-icon {
       color: #065f46;
-      animation: healthPulse 3s ease-in-out infinite;
+      animation: health-pulse 3s ease-in-out infinite;
     }
   }
 
@@ -853,20 +652,6 @@
   }
 }
 
-@keyframes healthPulse {
-
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-}
-
 @keyframes warningBlink {
 
   0%,
@@ -898,39 +683,6 @@
 // ==============================================
 // Simulation Progress
 // ==============================================
-
-.simulation-progress {
-  margin: 0 var(--spacing);
-  padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  backdrop-filter: blur(10px);
-
-  ::ng-deep .mat-progress-bar {
-    height: 8px;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-
-    .mat-progress-bar-fill::after {
-      background: linear-gradient(90deg, #6366f1 0%, #065f46 100%);
-    }
-
-    .mat-progress-bar-buffer {
-      background-color: rgba(99, 102, 241, 0.1);
-    }
-  }
-
-  .progress-text {
-    font-size: 0.9rem;
-    color: #6b7280;
-    font-weight: 500;
-    display: block;
-    text-align: center;
-    font-family: var(--font-mono);
-  }
-}
 
 // ==============================================
 // Main Grid
@@ -1014,43 +766,6 @@
 // ==============================================
 // Specific Panel Styles
 // ==============================================
-
-// Metrics Info Section (below header)
-.metrics-info-section {
-  padding: 0.75rem var(--spacing);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(16, 185, 129, 0.03) 100%);
-  border-bottom: 1px solid var(--panel-border);
-
-  .update-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    opacity: 0.8;
-    font-weight: 400;
-    transition: opacity 0.3s ease;
-    justify-content: flex-end;
-    /* יישור לימין */
-
-    &:hover {
-      opacity: 1;
-    }
-
-    mat-icon {
-      font-size: 14px;
-      width: 14px;
-      height: 14px;
-      color: #6366f1;
-      opacity: 0.7;
-    }
-
-    span {
-      line-height: 1.3;
-      color: #64748b;
-    }
-  }
-}
 
 // --- Control Panel ---
 .control-panel .panel-content {
@@ -1593,18 +1308,6 @@
 
   60% {
     transform: scale(1);
-  }
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    opacity: 0.6;
-  }
-
-  50% {
-    opacity: 1;
   }
 }
 
@@ -2269,201 +1972,6 @@
   }
 }
 
-// Enhanced Terminal Styling
-.terminal-container {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #404040;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-
-  .terminal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    background: linear-gradient(135deg, #333333 0%, #404040 100%);
-    border-bottom: 1px solid #555555;
-
-    .terminal-title {
-      color: #ffffff;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-
-    .terminal-info {
-      color: #065f46;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      background: rgba(16, 185, 129, 0.1);
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-  }
-
-  .terminal-content.recent-logs {
-    height: 300px;
-    padding: 1rem;
-    background: #1a1a1a;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-
-    .log-entry {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-      border-left: 3px solid transparent;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.05);
-      }
-
-      .log-timestamp {
-        color: #6b7280;
-        font-weight: 500;
-        min-width: 80px;
-      }
-
-      .log-level {
-        font-weight: 700;
-        min-width: 60px;
-        text-align: center;
-        padding: 0.125rem 0.375rem;
-        border-radius: 4px;
-        font-size: 0.75rem;
-      }
-
-      .log-message {
-        color: #e5e7eb;
-        flex: 1;
-      }
-
-      &.log-info {
-        border-left-color: #1d4ed8;
-
-        .log-level {
-          background: rgba(59, 130, 246, 0.2);
-          color: #60a5fa;
-        }
-      }
-
-      &.log-success {
-        border-left-color: #065f46;
-
-        .log-level {
-          background: rgba(16, 185, 129, 0.2);
-          color: #34d399;
-        }
-      }
-
-      &.log-warning {
-        border-left-color: #92400e;
-
-        .log-level {
-          background: rgba(245, 158, 11, 0.2);
-          color: #fbbf24;
-        }
-      }
-
-      &.log-error {
-        border-left-color: #991b1b;
-
-        .log-level {
-          background: rgba(239, 68, 68, 0.2);
-          color: #f87171;
-        }
-      }
-    }
-  }
-
-  .terminal-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    background: linear-gradient(135deg, #2d2d2d 0%, #333333 100%);
-    border-top: 1px solid #555555;
-
-    .terminal-status {
-      color: #065f46;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      &::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        background: #065f46;
-        border-radius: 50%;
-        animation: pulse 2s infinite;
-      }
-    }
-
-    .clear-logs-btn {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #f87171;
-      font-size: 0.75rem;
-      padding: 0.375rem 0.75rem;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-
-      &:hover {
-        background: rgba(239, 68, 68, 0.2);
-        border-color: rgba(239, 68, 68, 0.5);
-        transform: translateY(-1px);
-      }
-
-      mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-        margin-right: 0.25rem;
-      }
-    }
-  }
-}
-
-.terminal-controls {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-
-  .terminal-button {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-
-    &.red {
-      background: #991b1b;
-      box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
-    }
-
-    &.yellow {
-      background: #92400e;
-      box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
-    }
-
-    &.green {
-      background: #065f46;
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
-    }
-  }
-}
-
 // Update Status Panel
 .update-status-panel {
   height: 100%;
@@ -3101,19 +2609,6 @@
   }
 }
 
-// Compact Animation
-@keyframes pulse-glow-compact {
-
-  0%,
-  100% {
-    box-shadow: 0 4px 16px rgba(240, 147, 251, 0.3);
-  }
-
-  50% {
-    box-shadow: 0 6px 20px rgba(240, 147, 251, 0.6);
-  }
-}
-
 .control-group {
   display: flex;
   align-items: center;
@@ -3219,13 +2714,6 @@
   mat-icon {
     animation: rotate-slightly 2s ease-in-out infinite;
   }
-}
-
-// Control Divider
-.control-divider {
-  width: 2px;
-  height: 40px;
-  background: linear-gradient(to bottom, transparent, rgba(102, 126, 234, 0.3), transparent);
 }
 
 // Premium Health Indicator
@@ -3521,22 +3009,6 @@
   }
 }
 
-@keyframes rotate-slightly {
-
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-
-  25% {
-    transform: rotate(5deg);
-  }
-
-  75% {
-    transform: rotate(-5deg);
-  }
-}
-
 @keyframes health-pulse {
 
   0%,
@@ -3580,33 +3052,6 @@
 }
 
 /* אנימציות חדשות לכפתור הדיבוג */
-@keyframes rotate-slightly {
-
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-
-  25% {
-    transform: rotate(-5deg);
-  }
-
-  75% {
-    transform: rotate(5deg);
-  }
-}
-
-@keyframes pulse-icon {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.1);
-  }
-}
 
 // ==============================================
 // RESPONSIVE DESIGN
@@ -3661,88 +3106,8 @@
 // REVOLUTIONARY 2025 CYBERPUNK ANIMATIONS
 // ==============================================
 
-/* מסגרת נאון זורמת */
-@keyframes neon-border-flow {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* רשת דיגיטלית נעה */
-@keyframes digital-grid {
-  0% {
-    transform: translateY(0);
-  }
-
-  100% {
-    transform: translateY(-4px);
-  }
-}
-
-/* זוהר נאון פועם */
-@keyframes neon-pulse {
-
-  0%,
-  100% {
-    text-shadow:
-      0 0 5px currentColor,
-      0 0 10px currentColor,
-      0 0 15px currentColor,
-      0 0 20px currentColor;
-  }
-
-  50% {
-    text-shadow:
-      0 0 10px currentColor,
-      0 0 20px currentColor,
-      0 0 30px currentColor,
-      0 0 40px currentColor,
-      0 0 50px currentColor;
-  }
-}
-
-/* הבהוב דיגיטלי */
-@keyframes digital-flicker {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  98% {
-    opacity: 1;
-  }
-
-  99% {
-    opacity: 0.98;
-  }
-
-  99.5% {
-    opacity: 1;
-  }
-}
-
-/* סריקה הולוגרפית */
-@keyframes hologram-scan {
-  0% {
-    transform: translateX(-100%) skewX(-15deg);
-  }
-
-  100% {
-    transform: translateX(300%) skewX(-15deg);
-  }
-}
-
 // ==============================================
-// � LUXURY PREMIUM ANIMATIONS 2025 �
+// ✨ LUXURY PREMIUM ANIMATIONS 2025 ✨
 // ==============================================
 
 /* זרימת גבול זהב יוקרתי */
@@ -3925,189 +3290,6 @@
 }
 
 
-/* דופק אנרגיה לאייקון */
-@keyframes icon-energy-pulse {
-
-  0%,
-  100% {
-    text-shadow:
-      0 0 5px #00ff88,
-      0 0 10px #00ff88,
-      0 0 15px #00ff88,
-      0 0 20px #00ff88;
-  }
-
-  50% {
-    text-shadow:
-      0 0 10px #00ff88,
-      0 0 20px #00ff88,
-      0 0 30px #00ff88,
-      0 0 40px #00ff88,
-      0 0 50px #00ff88;
-  }
-}
-
-/* הבהוב קוואנטי לטקסט */
-@keyframes text-quantum-flicker {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  97% {
-    opacity: 1;
-  }
-
-  98% {
-    opacity: 0.95;
-  }
-
-  99% {
-    opacity: 1;
-  }
-
-  99.5% {
-    opacity: 0.98;
-  }
-}
-
-/* עיוות הולוגרפי לטקסט */
-@keyframes text-hologram-distort {
-
-  0%,
-  100% {
-    transform: skewX(0deg);
-    letter-spacing: 0.15em;
-  }
-
-  25% {
-    transform: skewX(1deg);
-    letter-spacing: 0.18em;
-  }
-
-  50% {
-    transform: skewX(0deg);
-    letter-spacing: 0.12em;
-  }
-
-  75% {
-    transform: skewX(-1deg);
-    letter-spacing: 0.16em;
-  }
-}
-
-/* גליץ' 1 */
-@keyframes text-glitch-1 {
-
-  0%,
-  100% {
-    transform: translate(0);
-    opacity: 0.8;
-  }
-
-  10% {
-    transform: translate(-2px, 1px);
-    opacity: 0.6;
-  }
-
-  20% {
-    transform: translate(-1px, -1px);
-    opacity: 0.7;
-  }
-
-  30% {
-    transform: translate(1px, 2px);
-    opacity: 0.5;
-  }
-
-  40% {
-    transform: translate(1px, -1px);
-    opacity: 0.8;
-  }
-
-  50% {
-    transform: translate(-1px, 2px);
-    opacity: 0.6;
-  }
-
-  60% {
-    transform: translate(-3px, 1px);
-    opacity: 0.7;
-  }
-
-  70% {
-    transform: translate(2px, 1px);
-    opacity: 0.5;
-  }
-
-  80% {
-    transform: translate(-1px, -1px);
-    opacity: 0.8;
-  }
-
-  90% {
-    transform: translate(2px, 2px);
-    opacity: 0.6;
-  }
-}
-
-/* גליץ' 2 */
-@keyframes text-glitch-2 {
-
-  0%,
-  100% {
-    transform: translate(0);
-    opacity: 0.7;
-  }
-
-  15% {
-    transform: translate(2px, -1px);
-    opacity: 0.5;
-  }
-
-  25% {
-    transform: translate(-1px, 2px);
-    opacity: 0.6;
-  }
-
-  35% {
-    transform: translate(-2px, -2px);
-    opacity: 0.4;
-  }
-
-  45% {
-    transform: translate(3px, 1px);
-    opacity: 0.7;
-  }
-
-  55% {
-    transform: translate(-2px, -1px);
-    opacity: 0.5;
-  }
-
-  65% {
-    transform: translate(1px, -2px);
-    opacity: 0.6;
-  }
-
-  75% {
-    transform: translate(-3px, 2px);
-    opacity: 0.4;
-  }
-
-  85% {
-    transform: translate(2px, -1px);
-    opacity: 0.7;
-  }
-
-  95% {
-    transform: translate(-1px, 1px);
-    opacity: 0.5;
-  }
-}
-
-
 
 /* גל יוקרתי על כל האלמנטים */
 .control-group-inline,
@@ -4266,6 +3448,3 @@
     }
   }
 }
-
-
-
