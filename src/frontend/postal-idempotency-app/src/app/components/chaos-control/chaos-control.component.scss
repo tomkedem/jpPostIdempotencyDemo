@@ -295,15 +295,15 @@
       flex-wrap: wrap; // Allow wrapping if needed
       justify-content: space-between; // Keep same alignment
       padding: 0.0625rem 1rem !important; // Keep similar padding
-      min-height: 32px !important; // Force same height
-      max-height: 32px !important; // Force same height
+      min-height: 38px !important; // Increase height for larger mobile font
+      max-height: 38px !important; // Increase height for larger mobile font
       gap: 0.25rem; // Minimal gap
     }
 
     @media (max-width: 480px) {
       padding: 0.0625rem 0.5rem !important; // Keep consistent padding
-      min-height: 28px !important; // Slightly smaller for very small screens
-      max-height: 28px !important;
+      min-height: 34px !important; // Increase height for small mobile
+      max-height: 34px !important;
       gap: 0.125rem; // Even smaller gap
     }
 
@@ -458,6 +458,19 @@
         border: 1px solid rgba(251, 191, 36, 0.3);
         margin-right: -10px; // Move icon slightly to the left
 
+        // Mobile adjustments
+        @media (max-width: 768px) {
+          width: 22px !important;
+          height: 22px !important;
+          margin-right: -5px; // Less margin in mobile
+        }
+
+        @media (max-width: 480px) {
+          width: 20px !important;
+          height: 20px !important;
+          margin-right: -3px; // Even less margin in small mobile
+        }
+
         .chart-icon {
           font-size: 15px !important;
           width: 15px !important;
@@ -465,7 +478,19 @@
           color: #fbbf24;
           filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.5));
           animation: chart-icon-pulse 2s ease-in-out infinite;
-         
+
+          // Mobile adjustments
+          @media (max-width: 768px) {
+            font-size: 13px !important;
+            width: 13px !important;
+            height: 13px !important;
+          }
+
+          @media (max-width: 480px) {
+            font-size: 11px !important;
+            width: 11px !important;
+            height: 11px !important;
+          }
         }
 
         .icon-glow {
@@ -481,8 +506,8 @@
           opacity: 0;
           animation: icon-glow-pulse 3s ease-in-out infinite;
           z-index: -1;
-        
-          
+
+
         }
       }
 
@@ -507,13 +532,14 @@
           // Mobile responsive
           @media (max-width: 768px) {
             font-size: 0.9rem !important;
-            white-space: normal;
-            text-align: center;
+            white-space: nowrap; // Keep text on one line in mobile
+            text-align: left; // Align left instead of center
+            margin: 0.4rem !important; // Increase margin for better vertical centering
           }
 
           @media (max-width: 480px) {
             font-size: 0.85rem !important;
-            margin: 0.15rem !important;
+            margin: 0.3rem !important; // Adjust margin for small mobile
           }
         }
 
