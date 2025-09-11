@@ -133,12 +133,73 @@ namespace PostalIdempotencyDemo.Api.Services
             string requestPath
             )
         {
-
             _logger.LogInformation("מעבד עדכון סטטוס משלוח {Barcode} עם הגנה אידמפוטנטית. מפתח: {IdempotencyKey}", requestPath, idempotencyKey);
 
             // שלב 0: בדיקה אם הגנת אידמפוטנטיות מופעלת
             bool isIdempotencyEnabled = await IsIdempotencyEnabledAsync();
-            if (!isIdempotencyEnabled)
+            if (isIdempotencyEnabled)
+            {
+                _logger.LogDebug("מחפש רשומה אידמפוטנטית קיימת עבור request_path: {requestPath}", requestPath);
+
+                IdempotencyEntry? latestEntry = await _idempotencyService.GetLatestEntryByRequestPathAsync(requestPath);
+
+                if (latestEntry != null && latestEntry.IdempotencyKey == idempotencyKey && latestEntry.ExpiresAt > DateTime.Now)
+                {
+                    // זו בקשה כפולה - חוסמים ומתעדים בלוג
+                    _logger.LogWarning("בקשה כפולה לעדכון סטטוס זוהתה וחסומה. ברקוד: {Barcode}, מפתח: {IdempotencyKey}", barcode, idempotencyKey);
+
+                    if (latestEntry.ResponseData != null)
+                    {
+                        // תיעוד hit אידמפוטנטי בטבלת operation_metrics
+                        await _deliveryService.LogIdempotentHitAsync(barcode, idempotencyKey, requestPath);
+
+                        // החזרת הודעה עקבית על חסימה
+                        return new IdempotencyDemoResponse<Shipment>
+                        {
+                            Success = true,
+                            Data = null,
+                            Message = "העדכון נחסם בגלל מפתח אידמפונטנטי, סטטוס לא שונה."
+                        };
+                    }
+                }
+
+                // יצירת רשומה אידמפוטנטית חדשה
+                _logger.LogDebug("יוצר רשומה אידמפוטנטית חדשה לעדכון סטטוס");
+                var expirationHours = await GetIdempotencyExpirationHoursAsync();
+
+                var newEntry = new IdempotencyEntry
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    IdempotencyKey = idempotencyKey,
+                    RequestHash = ComputeSha256Hash(JsonSerializer.Serialize(request)),
+                    Endpoint = requestPath,
+                    HttpMethod = "PATCH",
+                    StatusCode = 0,
+                    CreatedAt = DateTime.Now,
+                    ExpiresAt = DateTime.Now.AddHours(expirationHours),
+                    Operation = "update_status",
+                    RelatedEntityId = barcode
+                };
+                await _idempotencyService.StoreIdempotencyEntryAsync(newEntry);
+
+                // עדכון הסטטוס בפועל
+                _logger.LogInformation("מעדכן סטטוס משלוח {Barcode} לסטטוס {StatusId}", barcode, request.StatusId);
+                var response = await _deliveryService.UpdateDeliveryStatusAsync(barcode, request.StatusId, requestPath);
+
+                // שמירת התשובה למקרה של בקשות כפולות עתידיות
+                await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
+
+                if (!response.Success)
+                {
+                    _logger.LogWarning("עדכון סטטוס נכשל עבור ברקוד {Barcode}: {Message}", barcode, response.Message);
+                }
+                else
+                {
+                    _logger.LogInformation("סטטוס משלוח {Barcode} עודכן בהצלחה", barcode);
+                }
+                return response;
+            }
+            else
             {
                 _logger.LogInformation("הגנת אידמפוטנטיות כבויה - בודק אם זו פעולה כפולה לצורכי תיעוד");
 
@@ -172,67 +233,7 @@ namespace PostalIdempotencyDemo.Api.Services
                     return directResponse;
                 }
             }
-
-            _logger.LogDebug("מחפש רשומה אידמפוטנטית קיימת עבור request_path: {requestPath}", requestPath);
-
-            IdempotencyEntry? latestEntry = await _idempotencyService.GetLatestEntryByRequestPathAsync(requestPath);
-
-            if (latestEntry != null && latestEntry.IdempotencyKey == idempotencyKey && latestEntry.ExpiresAt > DateTime.Now)
-            {
-                // זו בקשה כפולה - חוסמים ומתעדים בלוג
-                _logger.LogWarning("בקשה כפולה לעדכון סטטוס זוהתה וחסומה. ברקוד: {Barcode}, מפתח: {IdempotencyKey}", barcode, idempotencyKey);
-
-                if (latestEntry.ResponseData != null)
-                {
-                    // תיעוד hit אידמפוטנטי בטבלת operation_metrics
-                    await _deliveryService.LogIdempotentHitAsync(barcode, idempotencyKey, requestPath);
-
-                    // החזרת הודעה עקבית על חסימה
-                    return new IdempotencyDemoResponse<Shipment>
-                    {
-                        Success = true,
-                        Data = null,
-                        Message = "העדכון נחסם בגלל מפתח אידמפונטנטי, סטטוס לא שונה."
-                    };
-                }
-            }
-
-            // יצירת רשומה אידמפוטנטית חדשה
-            _logger.LogDebug("יוצר רשומה אידמפוטנטית חדשה לעדכון סטטוס");
-            var expirationHours = await GetIdempotencyExpirationHoursAsync();
-
-            var newEntry = new IdempotencyEntry
-            {
-                Id = Guid.NewGuid().ToString(),
-                IdempotencyKey = idempotencyKey,
-                RequestHash = ComputeSha256Hash(JsonSerializer.Serialize(request)),
-                Endpoint = requestPath,
-                HttpMethod = "PATCH",
-                StatusCode = 0,
-                CreatedAt = DateTime.Now,
-                ExpiresAt = DateTime.Now.AddHours(expirationHours),
-                Operation = "update_status",
-                RelatedEntityId = barcode
-            };
-            await _idempotencyService.StoreIdempotencyEntryAsync(newEntry);
-
-            // עדכון הסטטוס בפועל
-            _logger.LogInformation("מעדכן סטטוס משלוח {Barcode} לסטטוס {StatusId}", barcode, request.StatusId);
-            var response = await _deliveryService.UpdateDeliveryStatusAsync(barcode, request.StatusId, requestPath);
-
-            // שמירת התשובה למקרה של בקשות כפולות עתידיות
-            await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
-
-            if (!response.Success)
-            {
-                _logger.LogWarning("עדכון סטטוס נכשל עבור ברקוד {Barcode}: {Message}", barcode, response.Message);
-            }
-            else
-            {
-                _logger.LogInformation("סטטוס משלוח {Barcode} עודכן בהצלחה", barcode);
-            }
-
-            return response;
+            //return response;
         }
 
         /// <summary>
