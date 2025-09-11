@@ -7,6 +7,7 @@ import {
   ElementRef,
   AfterViewInit,
   OnDestroy,
+  HostListener,
   inject,
 } from "@angular/core";
 import { CommonModule, DatePipe } from "@angular/common";
@@ -54,7 +55,7 @@ interface LogEntry {
     MatTooltipModule,
   ],
   templateUrl: "./chaos-control.component.html",
-  styleUrls: ["./chaos-control.component.scss"],
+  styleUrls: ["./chaos-control.component.scss", "./grid-fix.scss"],
 })
 export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   @ViewChild("terminalContent") private terminalContentRef!: ElementRef;
@@ -146,6 +147,11 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     // Clear any pending save timeout
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
+    }
+
+    // Clear resize timeout
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
     }
 
     // Stop simulation if running
@@ -279,17 +285,65 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
 
   private initializeChart() {
     if (this.chartRef?.nativeElement) {
-      const context = this.chartRef.nativeElement.getContext("2d");
-      this.chartContext = context || undefined;
+      const canvas = this.chartRef.nativeElement;
+      
+      // Set responsive canvas size based on container
+      const container = canvas.parentElement;
+      if (container) {
+        const containerRect = container.getBoundingClientRect();
+        const pixelRatio = window.devicePixelRatio || 1;
+        
+        // Calculate size excluding margins (0.5rem each side = 1rem total)
+        const baseSize = 16; // 1rem in pixels (typical)
+        const canvasWidth = Math.max(300, containerRect.width - baseSize);
+        const canvasHeight = Math.max(120, containerRect.height - baseSize);
+        
+        // Set display size
+        canvas.style.width = `${canvasWidth}px`;
+        canvas.style.height = `${canvasHeight}px`;
+        
+        // Set actual size for high DPI displays
+        canvas.width = canvasWidth * pixelRatio;
+        canvas.height = canvasHeight * pixelRatio;
+        
+        // Scale context for high DPI
+        const context = canvas.getContext("2d");
+        if (context) {
+          context.scale(pixelRatio, pixelRatio);
+          this.chartContext = context;
+        }
+      } else {
+        // Fallback to default context
+        const context = canvas.getContext("2d");
+        this.chartContext = context || undefined;
+      }
+      
       this.drawChart();
     }
   }
+
+  @HostListener('window:resize', ['$event'])
+  onWindowResize() {
+    // Debounce resize events
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
+    this.resizeTimeout = setTimeout(() => {
+      this.initializeChart();
+    }, 100);
+  }
+
+  private resizeTimeout: any;
 
   private drawChart() {
     if (!this.chartContext) return;
 
     const canvas = this.chartRef.nativeElement;
     const ctx = this.chartContext;
+
+    // Get display size (not the actual canvas size which is scaled for high DPI)
+    const displayWidth = parseInt(canvas.style.width || '360');
+    const displayHeight = parseInt(canvas.style.height || '120');
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -300,31 +354,32 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
 
     // Vertical grid lines
     for (let i = 0; i <= 10; i++) {
-      const x = (canvas.width / 10) * i;
+      const x = (displayWidth / 10) * i;
       ctx.beginPath();
       ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
+      ctx.lineTo(x, displayHeight);
       ctx.stroke();
     }
 
     // Horizontal grid lines
     for (let i = 0; i <= 5; i++) {
-      const y = (canvas.height / 5) * i;
+      const y = (displayHeight / 5) * i;
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
+      ctx.lineTo(displayWidth, y);
       ctx.stroke();
     }
 
     // Draw performance data if available
     if (this.performanceData.length > 1) {
-      this.drawPerformanceLine(ctx, canvas);
+      this.drawPerformanceLine(ctx, displayWidth, displayHeight);
     }
   }
 
   private drawPerformanceLine(
     ctx: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement
+    width: number,
+    height: number
   ) {
     const maxValue =
       Math.max(
@@ -337,8 +392,8 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     ctx.beginPath();
 
     this.performanceData.forEach((point, index) => {
-      const x = (canvas.width / (this.performanceData.length - 1)) * index;
-      const y = canvas.height - (point.successful / maxValue) * canvas.height;
+      const x = (width / (this.performanceData.length - 1)) * index;
+      const y = height - (point.successful / maxValue) * height;
 
       if (index === 0) {
         ctx.moveTo(x, y);
@@ -354,8 +409,8 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     ctx.beginPath();
 
     this.performanceData.forEach((point, index) => {
-      const x = (canvas.width / (this.performanceData.length - 1)) * index;
-      const y = canvas.height - (point.blocked / maxValue) * canvas.height;
+      const x = (width / (this.performanceData.length - 1)) * index;
+      const y = height - (point.blocked / maxValue) * height;
 
       if (index === 0) {
         ctx.moveTo(x, y);
@@ -371,8 +426,8 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     ctx.beginPath();
 
     this.performanceData.forEach((point, index) => {
-      const x = (canvas.width / (this.performanceData.length - 1)) * index;
-      const y = canvas.height - (point.chaosErrors / maxValue) * canvas.height;
+      const x = (width / (this.performanceData.length - 1)) * index;
+      const y = height - (point.chaosErrors / maxValue) * height;
 
       if (index === 0) {
         ctx.moveTo(x, y);

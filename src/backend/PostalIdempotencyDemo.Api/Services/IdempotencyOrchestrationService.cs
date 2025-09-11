@@ -215,7 +215,7 @@ namespace PostalIdempotencyDemo.Api.Services
                     _logger.LogWarning("זוהתה פעולה כפולה כאשר הגנת אידמפוטנטיות כבויה - מתעד כשגיאה אבל מאפשר פעולה. ברקוד: {Barcode}", barcode);
                     // עדכון הסטטוס בפועל
                     _logger.LogInformation("מעדכן סטטוס משלוח {Barcode} לסטטוס {StatusId}", barcode, request.StatusId);
-                    IdempotencyDemoResponse<Shipment> duplicateResponse = await _deliveryService.UpdateDeliveryStatusAsync("update_status_chaos_error",barcode, request.StatusId, requestPath);
+                    IdempotencyDemoResponse<Shipment> duplicateResponse = await _deliveryService.UpdateDeliveryStatusAsync("update_status_Idempotency_disabled",barcode, request.StatusId, requestPath);
                      await CreateTrackingEntryAsync(barcode, request, idempotencyKey, requestPath);
                     return duplicateResponse;
                 }
@@ -223,7 +223,7 @@ namespace PostalIdempotencyDemo.Api.Services
                 {
                     // עדכון הסטטוס בפועל
                     _logger.LogInformation("מעדכן סטטוס משלוח {Barcode} לסטטוס {StatusId}", barcode, request.StatusId);
-                    IdempotencyDemoResponse<Shipment> directResponse = await _deliveryService.UpdateDeliveryStatusAsync("update_status",barcode, request.StatusId, requestPath);
+                    IdempotencyDemoResponse<Shipment> directResponse = await _deliveryService.UpdateDeliveryStatusAsync("update_status_Idempotency_disabled_F",barcode, request.StatusId, requestPath);
 
                     // פעולה ראשונה - יצירת רשומה למעקב לפני הביצוע
                     await CreateTrackingEntryAsync(barcode, request, idempotencyKey, requestPath);
