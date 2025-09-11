@@ -42,22 +42,29 @@ namespace PostalIdempotencyDemo.Api.Services
                 CreatedAt = DateTime.Now
             };
             await _deliveryRepository.CreateDeliveryAsync(delivery);
-            await _metricsRepository.LogMetricsAsync("create_delivery", $"/api/idempotency-demo/delivery", 0, false, null);
+            await _metricsRepository.LogMetricsAsync("create_delivery", $"/api/idempotency-demo/delivery", 0, false, null, false);
             return new IdempotencyDemoResponse<Delivery> { Success = true, Data = delivery };
         }
 
-        public async Task<IdempotencyDemoResponse<Shipment>> UpdateDeliveryStatusAsync(string barcode, int statusId, string requestPath)
+        public async Task<IdempotencyDemoResponse<Shipment>> UpdateDeliveryStatusAsync(string operationType, string barcode, int statusId, string requestPath)
         {
             var stopwatch = Stopwatch.StartNew();
             var updatedShipment = await _deliveryRepository.UpdateDeliveryStatusAsync(barcode, statusId);
             stopwatch.Stop();
             var executionTime = (int)stopwatch.ElapsedMilliseconds;
+            bool isError = false;
+
+            if (operationType == "update_status_chaos_error")
+            {
+                isError = true;
+            }
+
             if (updatedShipment == null)
             {
-                await _metricsRepository.LogMetricsAsync("update_status", $"{requestPath}", executionTime, false, null);
+                await _metricsRepository.LogMetricsAsync(operationType, $"{requestPath}", executionTime, false, null, isError);
                 return new IdempotencyDemoResponse<Shipment> { Success = false, Message = $"Shipment with barcode {barcode} not found." };
             }
-            await _metricsRepository.LogMetricsAsync("update_status", $"{requestPath}", executionTime, false, null);
+            await _metricsRepository.LogMetricsAsync(operationType, $"{requestPath}", executionTime, false, null, isError);
             return new IdempotencyDemoResponse<Shipment>
             {
                 Success = true,

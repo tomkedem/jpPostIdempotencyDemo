@@ -184,7 +184,7 @@ namespace PostalIdempotencyDemo.Api.Services
 
                 // עדכון הסטטוס בפועל
                 _logger.LogInformation("מעדכן סטטוס משלוח {Barcode} לסטטוס {StatusId}", barcode, request.StatusId);
-                var response = await _deliveryService.UpdateDeliveryStatusAsync(barcode, request.StatusId, requestPath);
+                var response = await _deliveryService.UpdateDeliveryStatusAsync("update_status", barcode, request.StatusId, requestPath);
 
                 // שמירת התשובה למקרה של בקשות כפולות עתידיות
                 await _idempotencyService.CacheResponseAsync(idempotencyKey, response);
@@ -205,7 +205,7 @@ namespace PostalIdempotencyDemo.Api.Services
 
                 // בדיקה אם זו פעולה כפולה גם כשההגנה כבויה - מחפש לפי ברקוד
                 string correlationIdForCheck = requestPath;
-                var existingEntry = await _idempotencyService.GetLatestEntryByRequestPathAsync(correlationIdForCheck);
+                IdempotencyEntry? existingEntry = await _idempotencyService.GetLatestEntryByRequestPathAsync(correlationIdForCheck);
 
                 bool isDuplicateOperation = existingEntry != null && existingEntry.IdempotencyKey == idempotencyKey;
 
@@ -213,22 +213,24 @@ namespace PostalIdempotencyDemo.Api.Services
                 {
                     // זוהתה פעולה כפולה - מתעדים כשגיאה אבל מאפשרים את הפעולה
                     _logger.LogWarning("זוהתה פעולה כפולה כאשר הגנת אידמפוטנטיות כבויה - מתעד כשגיאה אבל מאפשר פעולה. ברקוד: {Barcode}", barcode);
-
-                    // תיעוד כשגיאה בטבלת operation_metrics עם is_error = 1
-                    await LogChaosDisabledErrorAsync(barcode, idempotencyKey, requestPath, "duplicate_operation_without_protection");
-
-                    // ביצוע הפעולה ללא תיעוד נוסף (כדי למנוע רישום כפול)
-                    var duplicateResponse = await _deliveryService.UpdateDeliveryStatusDirectAsync(requestPath, request.StatusId);
+                    // עדכון הסטטוס בפועל
+                    _logger.LogInformation("מעדכן סטטוס משלוח {Barcode} לסטטוס {StatusId}", barcode, request.StatusId);
+                    IdempotencyDemoResponse<Shipment> duplicateResponse = await _deliveryService.UpdateDeliveryStatusAsync("update_status_chaos_error",barcode, request.StatusId, requestPath);
+                     await CreateTrackingEntryAsync(barcode, request, idempotencyKey, requestPath);
                     return duplicateResponse;
                 }
                 else
                 {
+                    // עדכון הסטטוס בפועל
+                    _logger.LogInformation("מעדכן סטטוס משלוח {Barcode} לסטטוס {StatusId}", barcode, request.StatusId);
+                    IdempotencyDemoResponse<Shipment> directResponse = await _deliveryService.UpdateDeliveryStatusAsync("update_status",barcode, request.StatusId, requestPath);
+
                     // פעולה ראשונה - יצירת רשומה למעקב לפני הביצוע
                     await CreateTrackingEntryAsync(barcode, request, idempotencyKey, requestPath);
 
                     // ביצוע הפעולה עם תיעוד רגיל
                     _logger.LogInformation("הגנת אידמפוטנטיות כבויה - מעבד בקשה ישירות ללא הגנה");
-                    var directResponse = await _deliveryService.UpdateDeliveryStatusAsync(barcode, request.StatusId, requestPath);
+                   // var directResponse = await _deliveryService.UpdateDeliveryStatusAsync(barcode, request.StatusId, requestPath);
 
                     return directResponse;
                 }
