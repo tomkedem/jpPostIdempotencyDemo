@@ -285,8 +285,27 @@
         rgba(245, 158, 11, 0.05) 100%);
     border-bottom: 1px solid rgba(251, 191, 36, 0.2);
     position: relative;
-    min-height: 32px !important;
-    max-height: 32px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    flex-wrap: wrap;
+
+    // Mobile responsive
+    @media (max-width: 768px) {
+      flex-direction: row; // Keep horizontal layout
+      flex-wrap: wrap; // Allow wrapping if needed
+      justify-content: space-between; // Keep same alignment
+      padding: 0.0625rem 1rem !important; // Keep similar padding
+      min-height: 32px !important; // Force same height
+      max-height: 32px !important; // Force same height
+      gap: 0.25rem; // Minimal gap
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.0625rem 0.5rem !important; // Keep consistent padding
+      min-height: 28px !important; // Slightly smaller for very small screens
+      max-height: 28px !important;
+      gap: 0.125rem; // Even smaller gap
+    }
 
     &::after {
       content: '';
@@ -307,6 +326,19 @@
       gap: 0.5rem;
       align-items: center;
       margin-right: 0.5rem;
+      flex-shrink: 0;
+
+      // Mobile responsive
+      @media (max-width: 768px) {
+        margin-right: 0;
+        gap: 0.25rem; // Smaller gap to fit in height
+        flex-shrink: 1; // Allow shrinking
+      }
+
+      @media (max-width: 480px) {
+        gap: 0.125rem; // Even smaller gap
+        margin-left: 0.25rem; // Small margin to separate from title
+      }
 
       .legend-item {
         display: flex;
@@ -318,6 +350,17 @@
         border: 1px solid rgba(251, 191, 36, 0.2);
         transition: all 0.3s ease;
         cursor: pointer;
+
+        // Mobile responsive
+        @media (max-width: 768px) {
+          padding: 0.125rem; // Smaller padding
+          border-radius: 6px;
+        }
+
+        @media (max-width: 480px) {
+          padding: 0.0625rem; // Even smaller padding
+          border-radius: 4px;
+        }
 
         &:hover {
           background: rgba(15, 23, 42, 0.8);
@@ -331,6 +374,17 @@
           border-radius: 50%;
           position: relative;
           border: 1px solid rgba(255, 255, 255, 0.3);
+
+          // Mobile responsive
+          @media (max-width: 768px) {
+            width: 8px;
+            height: 8px;
+          }
+
+          @media (max-width: 480px) {
+            width: 6px;
+            height: 6px;
+          }
 
           .dot-pulse {
             position: absolute;
@@ -375,7 +429,20 @@
     .chart-title-container {
       display: flex;
       align-items: center;
-      gap: 0.5rem !important;
+      gap: 0.75rem !important;
+      flex: 1;
+      min-width: 0; // Allow text to shrink
+
+      // Mobile responsive
+      @media (max-width: 768px) {
+        flex: 1; // Take available space
+        justify-content: flex-start; // Keep left alignment
+        gap: 0.25rem !important; // Smaller gap
+      }
+
+      @media (max-width: 480px) {
+        gap: 0.125rem !important; // Even smaller gap
+      }
 
       .chart-icon-wrapper {
         position: relative;
@@ -389,6 +456,7 @@
             rgba(245, 158, 11, 0.2) 100%);
         border-radius: 8px;
         border: 1px solid rgba(251, 191, 36, 0.3);
+        margin-right: -10px; // Move icon slightly to the left
 
         .chart-icon {
           font-size: 15px !important;
@@ -397,6 +465,7 @@
           color: #fbbf24;
           filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.5));
           animation: chart-icon-pulse 2s ease-in-out infinite;
+         
         }
 
         .icon-glow {
@@ -412,13 +481,18 @@
           opacity: 0;
           animation: icon-glow-pulse 3s ease-in-out infinite;
           z-index: -1;
+        
+          
         }
       }
 
       .title-text {
+        flex: 1;
+        min-width: 0; // Allow text to shrink
+
         h4 {
-          margin: 0.5rem !important;
-          font-size: 0.85rem !important;
+          margin: 0.3rem !important;
+          font-size: 1rem !important;
           font-weight: 600 !important;
           line-height: 1 !important;
           background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
@@ -426,6 +500,21 @@
           -webkit-text-fill-color: transparent;
           background-clip: text;
           text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          // Mobile responsive
+          @media (max-width: 768px) {
+            font-size: 0.9rem !important;
+            white-space: normal;
+            text-align: center;
+          }
+
+          @media (max-width: 480px) {
+            font-size: 0.85rem !important;
+            margin: 0.15rem !important;
+          }
         }
 
         .subtitle {
@@ -1554,18 +1643,26 @@
 }
 
 // --- Guide Panel ---
+.guide-panel {
+  margin-top: -20px; // Move the guide panel up
+
+  .panel-content {
+    padding: calc(var(--spacing) * 0.3); // Reduce internal padding
+  }
+}
+
 .guide-panel .guide-steps {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing);
+  gap: calc(var(--spacing) * 0.5); // Reduce spacing between steps by half
 
   .step {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px; // Reduce gap between step number and content
 
     .step-number {
       flex-shrink: 0;
@@ -1584,8 +1681,8 @@
     .step-content {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      padding-top: 4px;
+      gap: 2px; // Reduce gap between title and description
+      padding-top: 2px; // Reduce top padding
 
       strong {
         font-weight: 600;
@@ -4087,5 +4184,62 @@
         }
       }
     }
+  }
+}
+
+/* Mobile Animation Reduction - Disable heavy animations on mobile for better performance and less eye strain */
+@media (max-width: 768px) {
+
+  // Disable all pulse and glow animations on mobile
+  * {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.15s !important; // Keep minimal transitions for interactions
+  }
+
+  // Only keep essential hover/click feedback
+  .legend-item:hover,
+  .chart-title-container:hover,
+  button:hover {
+    transition-duration: 0.2s !important;
+  }
+
+  // Disable specific problematic animations
+  .dot-pulse,
+  .health-pulse,
+  .icon-glow,
+  .glow-effect,
+  .chart-background .glow-effect {
+    animation: none !important;
+    opacity: 0.3 !important; // Keep visual elements but remove animation
+  }
+
+  // Disable border flow animation
+  .chart-header-premium::after {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+
+  // Disable chart glow animation
+  .performance-chart-premium {
+    animation: none !important;
+  }
+}
+
+/* Respect user's motion preferences - Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .dot-pulse,
+  .health-pulse,
+  .icon-glow,
+  .glow-effect {
+    animation: none !important;
   }
 }

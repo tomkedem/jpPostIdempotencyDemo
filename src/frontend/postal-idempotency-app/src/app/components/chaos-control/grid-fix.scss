@@ -74,5 +74,24 @@
         object-fit: contain !important;
         image-rendering: -webkit-optimize-contrast !important;
         image-rendering: crisp-edges !important;
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            top: 0.25rem !important;
+            left: 0.25rem !important;
+            right: 0.25rem !important;
+            bottom: 0.25rem !important;
+            width: calc(100% - 0.5rem) !important;
+            height: calc(100% - 0.5rem) !important;
+        }
+
+        @media (max-width: 480px) {
+            top: 0.125rem !important;
+            left: 0.125rem !important;
+            right: 0.125rem !important;
+            bottom: 0.125rem !important;
+            width: calc(100% - 0.25rem) !important;
+            height: calc(100% - 0.25rem) !important;
+        }
     }
 }
