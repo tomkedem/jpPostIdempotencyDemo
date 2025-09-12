@@ -4269,3 +4269,56 @@
     animation: none !important;
   }
 }
+
+// ============= DATA CLEANUP BUTTONS STYLING =============
+
+.panel-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  .reset-memory-btn {
+    color: #2196F3; // Blue for memory-only reset
+
+    &:hover {
+      background-color: rgba(33, 150, 243, 0.1);
+      color: #1976D2;
+    }
+  }
+
+  .reset-complete-btn {
+    color: #FF5722; // Red/Orange for dangerous operation
+
+    &:hover {
+      background-color: rgba(255, 87, 34, 0.1);
+      color: #D84315;
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    // Add warning glow effect
+    mat-icon {
+      filter: drop-shadow(0 0 2px rgba(255, 87, 34, 0.3));
+    }
+
+    &:hover mat-icon {
+      filter: drop-shadow(0 0 4px rgba(255, 87, 34, 0.6));
+      animation: warningPulse 2s infinite;
+    }
+  }
+}
+
+@keyframes warningPulse {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(255, 87, 34, 0.6));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 8px rgba(255, 87, 34, 0.8));
+  }
+}

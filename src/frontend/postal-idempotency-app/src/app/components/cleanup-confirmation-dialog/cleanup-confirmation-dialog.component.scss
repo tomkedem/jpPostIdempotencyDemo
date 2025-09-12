@@ -1,0 +1,534 @@
+// ============= CLEANUP CONFIRMATION DIALOG - PREMIUM STYLING =============
+
+.cleanup-dialog {
+    width: 100%;
+    max-width: 550px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border: 1px solid rgba(255, 87, 34, 0.2);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 80px rgba(255, 87, 34, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+    &.step-first {
+        border-color: rgba(255, 193, 7, 0.3);
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.3),
+            0 0 80px rgba(255, 193, 7, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    &.step-second {
+        border-color: rgba(244, 67, 54, 0.4);
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.4),
+            0 0 100px rgba(244, 67, 54, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+}
+
+// ============= HEADER SECTION =============
+
+.dialog-header {
+    padding: 2rem 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 87, 34, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    margin: 0;
+    direction: rtl; // יישור RTL לכותרת
+
+    .step-first & {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.05) 100%);
+    }
+}
+
+.warning-icon-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1rem;
+
+    .warning-icon {
+        font-size: 4rem;
+        width: 4rem;
+        height: 4rem;
+        color: #FF5722;
+        filter: drop-shadow(0 0 10px rgba(255, 87, 34, 0.5));
+
+        .step-first & {
+            color: #FFC107;
+            filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.5));
+        }
+
+        .step-second & {
+            color: #F44336;
+            filter: drop-shadow(0 0 15px rgba(244, 67, 54, 0.7));
+            animation: dangerPulse 2s infinite;
+        }
+    }
+
+    .icon-pulse {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 5rem;
+        height: 5rem;
+        border: 2px solid rgba(255, 87, 34, 0.3);
+        border-radius: 50%;
+        animation: iconPulse 2s infinite;
+
+        .step-first & {
+            border-color: rgba(255, 193, 7, 0.3);
+        }
+
+        .step-second & {
+            border-color: rgba(244, 67, 54, 0.4);
+            animation: dangerPulse 1.5s infinite;
+        }
+    }
+}
+
+.dialog-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.5px;
+    text-align: center;
+    direction: rtl;
+}
+
+.dialog-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    line-height: 1.5;
+    text-align: center;
+    direction: rtl;
+}
+
+// ============= CONTENT SECTION =============
+
+.dialog-content {
+    padding: 1.5rem 2rem;
+    background: transparent;
+    margin: 0;
+    direction: rtl; // יישור RTL לתוכן
+    text-align: right; // יישור טקסט לימין
+}
+
+.warning-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, rgba(255, 87, 34, 0.15) 0%, rgba(244, 67, 54, 0.1) 100%);
+    border: 1px solid rgba(255, 87, 34, 0.3);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+    direction: rtl; // יישור RTL לבאנר
+    text-align: right;
+
+    mat-icon {
+        color: #FF9800;
+        font-size: 1.25rem;
+        order: 2;
+    }
+
+    span {
+        color: #ffffff;
+        order: 1;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+}
+
+// ============= DATA TYPES (FIRST STEP) =============
+
+.data-types {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.data-type-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    direction: rtl; // יישור RTL לפריטי הנתונים
+    text-align: right;
+
+    &:hover {
+        background: linear-gradient(135deg, rgba(255, 87, 34, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
+        border-color: rgba(255, 87, 34, 0.3);
+        transform: translateY(-2px);
+    }
+
+    mat-icon {
+        color: #FF9800;
+        font-size: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    .data-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        .data-label {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .data-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+        }
+    }
+}
+
+// ============= PREVIEW STATS (SECOND STEP) =============
+
+.preview-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #F44336, #FF5722);
+    }
+
+    .stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        background: rgba(244, 67, 54, 0.2);
+        border-radius: 8px;
+
+        mat-icon {
+            color: #F44336;
+            font-size: 1.25rem;
+        }
+    }
+
+    .stat-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        .stat-value {
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+    }
+}
+
+// ============= FINAL WARNING =============
+
+.final-warning {
+    margin-top: 1.5rem;
+}
+
+.countdown-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.15) 0%, rgba(211, 47, 47, 0.1) 100%);
+    border: 2px solid rgba(244, 67, 54, 0.4);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(244, 67, 54, 0.1) 50%, transparent 70%);
+        animation: shimmer 3s infinite;
+    }
+
+    .countdown-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        background: rgba(244, 67, 54, 0.2);
+        border: 2px solid #F44336;
+        border-radius: 50%;
+        position: relative;
+
+        mat-icon {
+            color: #F44336;
+            font-size: 1.5rem;
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 2px solid rgba(244, 67, 54, 0.3);
+            border-radius: 50%;
+            animation: dangerPulse 2s infinite;
+        }
+    }
+
+    .countdown-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        .countdown-title {
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .countdown-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+    }
+}
+
+// ============= DIALOG ACTIONS =============
+
+.dialog-actions {
+    display: flex;
+    flex-direction: row-reverse; // RTL - כפתור אישור בצד ימין
+    gap: 1rem;
+    padding: 1.5rem 2rem 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    margin: 0;
+}
+
+.cancel-btn {
+    flex: 1;
+    height: 3rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3); // גבול יותר בולט
+    color: rgba(255, 255, 255, 0.95); // טקסט יותר בולט
+    background: rgba(255, 255, 255, 0.05); // רקע קל
+    transition: all 0.3s ease;
+    min-width: 120px; // רוחב מינימלי
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    mat-icon {
+        margin-right: 0.5rem;
+    }
+}
+
+.confirm-btn {
+    flex: 1;
+    height: 3rem;
+    font-weight: 600;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &.danger {
+        background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
+        box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+
+        &:hover {
+            background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-glow {
+            animation: dangerGlow 2s infinite;
+        }
+    }
+
+    &:not(.danger):hover {
+        background: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+    }
+
+    mat-icon {
+        margin-right: 0.5rem;
+    }
+
+    .btn-glow {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s ease;
+    }
+
+    &:hover .btn-glow {
+        left: 100%;
+    }
+}
+
+// ============= ANIMATIONS =============
+
+@keyframes iconPulse {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.7;
+    }
+}
+
+@keyframes dangerPulse {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        border-color: rgba(244, 67, 54, 0.4);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 0.6;
+        border-color: rgba(244, 67, 54, 0.7);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes dangerGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 5px rgba(244, 67, 54, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(244, 67, 54, 0.6);
+    }
+}
+
+// ============= RESPONSIVE DESIGN =============
+
+@media (max-width: 768px) {
+    .cleanup-dialog {
+        max-width: 90vw;
+        margin: 1rem;
+    }
+
+    .dialog-header {
+        padding: 1.5rem 1.5rem 1rem;
+
+        .warning-icon {
+            font-size: 3rem;
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .dialog-title {
+            font-size: 1.5rem;
+        }
+    }
+
+    .dialog-content {
+        padding: 1rem 1.5rem;
+    }
+
+    .preview-stats {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .dialog-actions {
+        flex-direction: column;
+        padding: 1rem 1.5rem 1.5rem;
+
+        .cancel-btn,
+        .confirm-btn {
+            width: 100%;
+        }
+    }
+}
+
+// ============= DARK THEME ENHANCEMENTS =============
+
+.mat-mdc-dialog-container {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}

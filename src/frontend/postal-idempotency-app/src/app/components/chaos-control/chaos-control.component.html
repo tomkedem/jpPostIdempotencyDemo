@@ -233,9 +233,18 @@
             <button
               mat-icon-button
               (click)="resetMetrics()"
-              title="איפוס מדדים"
+              title="איפוס מדדים (זיכרון בלבד)"
+              class="reset-memory-btn"
             >
               <mat-icon>refresh</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="completeResetWithDbCleanup()"
+              title="איפוס מלא + מחיקת בסיס נתונים"
+              class="reset-complete-btn"
+            >
+              <mat-icon>delete_forever</mat-icon>
             </button>
             <button mat-icon-button (click)="exportMetrics()" title="ייצוא דוח">
               <mat-icon>download</mat-icon>

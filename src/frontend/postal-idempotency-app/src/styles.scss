@@ -7,23 +7,48 @@
 @tailwind utilities;
 
 /* Global styles */
-html, body { 
-  height: 100%; 
+html,
+body {
+  height: 100%;
   direction: rtl;
 }
 
-body { 
-  margin: 0; 
+body {
+  margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
 /* RTL fixes for Angular Material */
+
+// ===== תיקון דיאלוגים של Angular Material =====
+.cleanup-dialog-backdrop {
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+
+.cleanup-dialog-panel {
+  .mat-mdc-dialog-container {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+  }
+
+  .mat-mdc-dialog-surface {
+    background: transparent !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+  }
+}
+
 .mat-form-field-label {
   text-align: right;
 }
 
-.mat-button, .mat-raised-button {
+.mat-button,
+.mat-raised-button {
   font-family: inherit;
 }
 
@@ -34,17 +59,17 @@ body {
   padding: 8px 16px;
   border-radius: 20px;
   display: inline-block;
-  
+
   &.status-primary {
     background: linear-gradient(45deg, #4caf50, #66bb6a) !important;
     color: white;
   }
-  
+
   &.status-accent {
     background: linear-gradient(45deg, #ff9800, #ffb74d) !important;
     color: white;
   }
-  
+
   &.status-warn {
     background: linear-gradient(45deg, #f44336, #ef5350) !important;
     color: white;
@@ -62,7 +87,7 @@ body {
   margin: 16px 0;
   padding: 16px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .status-success {

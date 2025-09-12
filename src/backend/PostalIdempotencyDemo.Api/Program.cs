@@ -27,6 +27,7 @@ builder.Services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
 builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
 builder.Services.AddScoped<IMetricsRepository, MetricsRepository>();
 builder.Services.AddScoped<ISettingsRepository, SettingsRepository>();
+builder.Services.AddScoped<IDataCleanupRepository, DataCleanupRepository>();
 builder.Services.AddScoped<ISqlExecutor, SqlExecutor>();
 
 // Register services
@@ -37,6 +38,7 @@ builder.Services.AddScoped<IIdempotencyOrchestrationService, IdempotencyOrchestr
 builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 builder.Services.AddScoped<IChaosService, ChaosService>();
 builder.Services.AddScoped<IRetryService, RetryService>();
+builder.Services.AddScoped<IDataCleanupService, DataCleanupService>();
 
 // Register HttpClient and HttpClientService
 builder.Services.AddHttpClient<IHttpClientService, HttpClientService>();
@@ -46,7 +48,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins("http://localhost:4200", "http://localhost:4201")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

@@ -13,6 +13,10 @@ import {
 import { CommonModule, DatePipe } from "@angular/common";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { ReactiveFormsModule } from "@angular/forms";
+import { HttpClient } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
+import { CleanupConfirmationDialogComponent } from '../cleanup-confirmation-dialog/cleanup-confirmation-dialog.component';
+import { DataCleanupService, CleanupPreview } from '../../services/data-cleanup.service';
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
@@ -75,6 +79,8 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   chaosService = inject(ChaosService); // Made public for template access
   private metricsService = inject(MetricsService);
   private shipmentService = inject(ShipmentService);
+  private dataCleanupService = inject(DataCleanupService);
+  private dialog = inject(MatDialog);
 
   // --- State Signals (Angular 20 style) ---
   idempotencyProtectionEnabled = signal(true);
@@ -806,5 +812,112 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     
     const barcodeDisplay = this.shipmentService.currentBarcode() || localStorage.getItem('lastSearchedBarcode') || 'לא נמצא';
     this.addLog('info', `Debug: ברקוד נוכחי = ${barcodeDisplay}, localStorage = ${localStorage.getItem('lastSearchedBarcode')}`);
+  }
+
+  // ============= DATA CLEANUP FUNCTIONALITY =============
+  
+  /**
+   * Complete database cleanup with modern dialog and double confirmation
+   */
+  completeResetWithDbCleanup() {
+    // First step - Show warning dialog
+    const firstDialogRef = this.dialog.open(CleanupConfirmationDialogComponent, {
+      width: '550px',
+      maxWidth: '90vw',
+      disableClose: true,
+      hasBackdrop: true,
+      backdropClass: 'cleanup-dialog-backdrop',
+      panelClass: 'cleanup-dialog-panel',
+      data: {
+        step: 'first'
+      }
+    });
+
+    firstDialogRef.afterClosed().subscribe(firstResult => {
+      if (!firstResult) {
+        this.addLog('info', 'מחיקת בסיס נתונים בוטלה על ידי המשתמש בשלב הראשון');
+        return;
+      }
+
+      // Get cleanup preview for second step
+      this.addLog('info', '📊 מקבל פרטי מחיקה...');
+      this.dataCleanupService.getCleanupPreview().subscribe({
+        next: (previewResponse) => {
+          this.addLog('success', '✅ פרטי מחיקה התקבלו בהצלחה');
+          const preview = previewResponse.preview;
+          
+          // Second step - Show detailed confirmation
+          const secondDialogRef = this.dialog.open(CleanupConfirmationDialogComponent, {
+            width: '550px',
+            maxWidth: '90vw',
+            disableClose: true,
+            hasBackdrop: true,
+            backdropClass: 'cleanup-dialog-backdrop',
+            panelClass: 'cleanup-dialog-panel',
+            data: {
+              step: 'second',
+              preview: preview
+            }
+          });
+
+          secondDialogRef.afterClosed().subscribe(secondResult => {
+            if (!secondResult) {
+              this.addLog('info', 'מחיקת בסיס נתונים בוטלה על ידי המשתמש בשלב השני');
+              return;
+            }
+
+            // Execute the cleanup
+            this.executeCompleteCleanup();
+          });
+        },
+        error: (error) => {
+          console.error('Cleanup preview error:', error);
+          this.addLog('error', `[ERROR] שגיאה בקבלת פרטי המחיקה: ${error.message || error.statusText || 'שגיאה לא מוכרת'}`);
+          
+          // You could optionally show a fallback dialog or retry mechanism here
+          if (error.status === 0) {
+            this.addLog('error', 'השרת לא מגיב - בדוק שהבק-אנד רץ');
+          } else if (error.status >= 400 && error.status < 500) {
+            this.addLog('error', 'שגיאת לקוח - בדוק את הבקשה');
+          } else if (error.status >= 500) {
+            this.addLog('error', 'שגיאת שרת - בדוק לוגים בבק-אנד');
+          }
+        }
+      });
+    });
+  }
+
+  private executeCompleteCleanup() {
+    this.addLog('warn', '🔄 מתחיל תהליך מחיקה מלאה...');
+    
+    // Generate confirmation token
+    this.dataCleanupService.generateConfirmationToken().subscribe({
+      next: (tokenResponse) => {
+        this.addLog('info', `🔑 נוצר טוקן אישור (תוקף: ${tokenResponse.expiresInMinutes} דקות)`);
+        
+        // Execute cleanup with token
+        this.dataCleanupService.executeCompleteCleanup({ 
+          confirmationToken: tokenResponse.confirmationToken 
+        }).subscribe({
+          next: (response) => {
+            // Reset in-memory metrics
+            this.performanceData = [];
+            this.drawChart();
+            
+            this.addLog('success', '✅ מחיקה מלאה הושלמה בהצלחה!');
+            this.addLog('success', response.message);
+            this.addLog('warn', '⚠️ כל הנתונים ההיסטוריים נמחקו לצמיתות');
+          },
+          error: (error) => {
+            console.error('Cleanup execution error:', error);
+            this.addLog('error', `❌ שגיאה במחיקה: ${error.error?.error || error.message}`);
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Token generation error:', error);
+        this.addLog('error', '❌ שגיאה ביצירת טוקן אישור');
+      }
+    });
   }
 }
