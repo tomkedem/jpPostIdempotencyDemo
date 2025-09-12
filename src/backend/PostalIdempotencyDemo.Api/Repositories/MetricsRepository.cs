@@ -62,7 +62,7 @@ namespace PostalIdempotencyDemo.Api.Repositories
                         COUNT(*) AS TotalOperations,                            
                         SUM(CASE WHEN operation_type LIKE '%idempotent_block' THEN 1 ELSE 0 END) AS IdempotentHits,
                         SUM(CASE WHEN operation_type LIKE '%update_status' THEN 1 ELSE 0 END) AS SuccessfulOperations, 
-                        SUM(CASE WHEN operation_type LIKE '%_chaos_error' THEN 1 ELSE 0 END) AS ChaosDisabledErrors,
+                        SUM(CASE WHEN operation_type LIKE '%update_status_Idempotency_disabled' THEN 1 ELSE 0 END) AS ChaosDisabledErrors,
                         AVG(CAST(NULLIF(execution_time_ms, 0) AS FLOAT)) AS AverageExecutionTimeMs,
                         CAST( 
                             
