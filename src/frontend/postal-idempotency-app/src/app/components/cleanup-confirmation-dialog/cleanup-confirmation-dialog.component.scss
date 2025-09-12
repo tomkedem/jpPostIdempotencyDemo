@@ -132,6 +132,9 @@
     justify-content: center;
     margin-bottom: 0.7rem;
     animation: iconFloat var(--md-sys-motion-duration-long-4) infinite ease-in-out;
+    min-height: 5.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
 
     .warning-icon {
         position: absolute;
@@ -139,9 +142,9 @@
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 3;
-        font-size: 2rem;
-        height: 2rem;
-        width: 2rem;
+        font-size: 2.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
         margin: 0;
         color: var(--md-sys-color-warning);
         filter: drop-shadow(0 0 15px rgba(255, 152, 0, 0.5));
@@ -149,12 +152,14 @@
         overflow: visible;
     }
 
-    .step-first .warning-icon {
+    &.step-first .warning-icon,
+    .step-first & .warning-icon {
         color: var(--md-sys-color-warning);
         filter: drop-shadow(0 0 20px rgba(255, 193, 7, 0.6));
     }
 
-    .step-second .warning-icon {
+    &.step-second .warning-icon,
+    .step-second & .warning-icon {
         color: var(--md-sys-color-error);
         filter: drop-shadow(0 0 25px rgba(244, 67, 54, 0.8));
         animation: dangerPulse var(--md-sys-motion-duration-long-2) infinite;
