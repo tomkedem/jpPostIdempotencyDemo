@@ -32,7 +32,7 @@ export interface CleanupRequest {
   providedIn: 'root'
 })
 export class DataCleanupService {
-  private readonly apiUrl = `${environment.apiUrl}/api/DataCleanup`;
+  private readonly apiUrl = `${environment.apiUrl}/DataCleanup`;
 
   constructor(private http: HttpClient) {}
 

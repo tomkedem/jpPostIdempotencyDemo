@@ -70,7 +70,7 @@ export interface SystemHealth {
   providedIn: "root",
 })
 export class MetricsService {
-  private apiUrl = `${environment.apiUrl}/api/Metrics`;
+  private apiUrl = `${environment.apiUrl}/Metrics`;
 
   constructor(private http: HttpClient) {}
 
