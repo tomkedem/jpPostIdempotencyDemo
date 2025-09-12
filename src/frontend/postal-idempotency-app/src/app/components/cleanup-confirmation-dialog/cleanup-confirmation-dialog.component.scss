@@ -74,24 +74,31 @@
         border-color: rgba(255, 193, 7, 0.2);
         box-shadow: var(--md-sys-elevation-level-4), 0 0 60px rgba(255, 193, 7, 0.10);
     }
+
     &.step-second {
         border-color: rgba(244, 67, 54, 0.3);
         box-shadow: var(--md-sys-elevation-level-4), 0 0 80px rgba(244, 67, 54, 0.13);
     }
+
     .glass-backdrop {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(145deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 50%, rgba(0,0,0,0.02) 100%);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(0, 0, 0, 0.02) 100%);
         z-index: -1;
     }
+
     // התוכן יהיה scrollable אם חורג מהגובה
-    > .dialog-header, > .dialog-content, > .dialog-actions, > footer {
+    >.dialog-header,
+    >.dialog-content,
+    >.dialog-actions,
+    >footer {
         flex-shrink: 0;
     }
-    > .dialog-content {
+
+    >.dialog-content {
         overflow-y: auto;
         max-height: 45vh;
         min-height: 120px;
@@ -108,9 +115,11 @@
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     direction: rtl;
+
     .step-first & {
         background: linear-gradient(135deg, rgba(255, 193, 7, 0.07) 0%, rgba(255, 152, 0, 0.03) 100%);
     }
+
     .step-second & {
         background: linear-gradient(135deg, rgba(244, 67, 54, 0.10) 0%, rgba(211, 47, 47, 0.04) 100%);
     }
@@ -224,6 +233,7 @@
     text-align: center;
     direction: rtl;
     position: relative;
+
     .title-primary {
         display: block;
         background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
@@ -232,6 +242,7 @@
         -webkit-text-fill-color: transparent;
         animation: textShimmer 3s ease-in-out infinite;
     }
+
     .title-underline {
         height: 2px;
         width: 40%;
@@ -239,6 +250,7 @@
         background: linear-gradient(90deg, transparent 0%, var(--md-sys-color-warning) 50%, transparent 100%);
         border-radius: 2px;
         animation: underlineGlow var(--md-sys-motion-duration-long-2) infinite ease-in-out;
+
         .step-second & {
             background: linear-gradient(90deg, transparent 0%, var(--md-sys-color-error) 50%, transparent 100%);
         }
