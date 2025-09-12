@@ -134,25 +134,30 @@
     animation: iconFloat var(--md-sys-motion-duration-long-4) infinite ease-in-out;
 
     .warning-icon {
-        font-size: 1.7rem;
-        font-size: 1.18rem;
-        height: 1.7rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3;
+        font-size: 2rem;
+        height: 2rem;
+        width: 2rem;
+        margin: 0;
         color: var(--md-sys-color-warning);
         filter: drop-shadow(0 0 15px rgba(255, 152, 0, 0.5));
-        z-index: 2;
-        position: relative;
         transition: all var(--md-sys-motion-duration-medium-3) var(--md-sys-motion-easing-emphasized);
+        overflow: visible;
+    }
 
-        .step-first & {
-            color: var(--md-sys-color-warning);
-            filter: drop-shadow(0 0 20px rgba(255, 193, 7, 0.6));
-        }
+    .step-first .warning-icon {
+        color: var(--md-sys-color-warning);
+        filter: drop-shadow(0 0 20px rgba(255, 193, 7, 0.6));
+    }
 
-        .step-second & {
-            color: var(--md-sys-color-error);
-            filter: drop-shadow(0 0 25px rgba(244, 67, 54, 0.8));
-            animation: dangerPulse var(--md-sys-motion-duration-long-2) infinite;
-        }
+    .step-second .warning-icon {
+        color: var(--md-sys-color-error);
+        filter: drop-shadow(0 0 25px rgba(244, 67, 54, 0.8));
+        animation: dangerPulse var(--md-sys-motion-duration-long-2) infinite;
     }
 
     // Enhanced Pulse Ring System
