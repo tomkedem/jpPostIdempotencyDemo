@@ -1,3 +1,4 @@
+import { computed } from "@angular/core";
 import { Injectable, signal } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, catchError, tap, throwError } from "rxjs";
@@ -13,6 +14,13 @@ export interface ChaosSettings {
   providedIn: "root",
 })
 export class ChaosService {
+  /**
+   * טען מחדש את ההגדרות מהשרת (public)
+   */
+  reloadSettings() {
+    this.loadInitialSettings();
+  }
+  isSettingsLoaded = signal(false);
   private chaosSettings = signal<ChaosSettings>({
     useIdempotencyKey: true,   
     idempotencyExpirationHours: 24   
@@ -26,10 +34,12 @@ export class ChaosService {
   }
 
   private loadInitialSettings() {
+    this.isSettingsLoaded.set(false);
     this.http
       .get<ChaosSettings>(`${environment.apiUrl}/chaos/settings`)
       .subscribe((settings) => {
         this.chaosSettings.set(settings);
+        this.isSettingsLoaded.set(true);
       });
   }
 

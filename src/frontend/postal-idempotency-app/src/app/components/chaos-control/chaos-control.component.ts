@@ -21,6 +21,7 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import {
   interval,
@@ -56,12 +57,30 @@ interface LogEntry {
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
-    MatTooltipModule,
+  MatTooltipModule,
+  MatProgressSpinnerModule,
   ],
   templateUrl: "./chaos-control.component.html",
   styleUrls: ["./chaos-control.component.scss", "./grid-fix.scss"],
 })
 export class ChaosControlComponent implements AfterViewInit, OnDestroy {
+  reloadChaosSettings() {
+    this.chaosService.reloadSettings();
+  }
+  // אפקט קבוע שמעדכן את ה-state המקומי בכל שינוי ב-settings
+  private _settingsEffect = effect(() => {
+    const currentSettings = this.chaosService.settings();
+    if (this.chaosService.isSettingsLoaded()) {
+      this.initialSettings.set({
+        useIdempotencyKey: currentSettings.useIdempotencyKey,
+        idempotencyExpirationHours: currentSettings.idempotencyExpirationHours,
+      });
+      this.idempotencyProtectionEnabled.set(currentSettings.useIdempotencyKey);
+      this.expirationHours.set(currentSettings.idempotencyExpirationHours);
+      // console.log('🔄 Chaos settings updated from server:', currentSettings);
+    }
+  });
+  isSettingsLoaded;
   // Particle effect state
   particles: Array<{x: number, y: number, delay: number, color: string}> = [];
   // --- Animation State for Data Deletion ---
@@ -129,6 +148,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   });
 
   constructor() {
+  this.isSettingsLoaded = this.chaosService.isSettingsLoaded;
     // Effect to scroll terminal down when new logs are added
     effect(() => {
       if (this.logHistory().length && this.terminalContentRef) {

@@ -75,56 +75,55 @@
       </div>
     </div>
   </div>
-    <div class="status-container">
-      <div
-        class="system-status-indicator"
-        [ngClass]="
-          idempotencyProtectionEnabled() ? 'status-active' : 'status-inactive'
-        "
-      >
-        <div class="status-light"></div>
-        <span>{{
-          idempotencyProtectionEnabled() ? "הגנה פעילה" : "הגנה כבויה"
-        }}</span>
-      </div>
-        
-      <!-- Compact Premium Controls Section -->
-      <div class="premium-controls-compact">
-        <!-- Main Simulation Control - Inline -->
-        <div class="control-group-inline">
-          <button 
-            mat-fab 
-            extended
-            class="premium-simulation-btn-compact"
-            (click)="startRandomSimulation()"
-            [class.simulation-running]="isSimulationRunning()"
-            [class.simulation-ready]="!isSimulationRunning()">
-            <mat-icon class="btn-icon">{{ isSimulationRunning() ? 'stop_circle' : 'play_circle' }}</mat-icon>
-            <span class="btn-text">{{ isSimulationRunning() ? 'עצור סימולציה' : 'הפעל סימולציה' }}</span>
-            <div class="btn-glow-effect"></div>
-          </button>
-          
-          <!-- Debug Button - Smaller -->
-          <button 
-            mat-mini-fab 
-            class="premium-debug-btn-compact"
-            color="accent"
-            (click)="debugBarcodeState()"
-            matTooltip="בדיקת מצב ברקוד פעיל במערכת"
-            matTooltipPosition="below">
-            <mat-icon>developer_mode</mat-icon>
-          </button>
-        
-          
-          <!-- Enhanced Time Display - Compact -->
-          <div class="premium-time-display-compact">
-            <div class="time-background"></div>
-            <mat-icon class="time-icon">schedule</mat-icon>
-            <span class="time-value">{{ currentTime() | date : "HH:mm:ss" }}</span>
+        <div class="status-container">
+          <div
+            class="system-status-indicator"
+            [ngClass]="
+              idempotencyProtectionEnabled() ? 'status-active' : 'status-inactive'
+            "
+          >
+            <div class="status-light"></div>
+            <span>{{
+              idempotencyProtectionEnabled() ? "הגנה פעילה" : "הגנה כבויה"
+            }}</span>
           </div>
+
+          <!-- Compact Premium Controls Section -->
+          <div class="premium-controls-compact">
+            <!-- Main Simulation Control - Inline -->
+            <div class="control-group-inline">
+              <button 
+                mat-fab 
+                extended
+                class="premium-simulation-btn-compact"
+                (click)="startRandomSimulation()"
+                [class.simulation-running]="isSimulationRunning()"
+                [class.simulation-ready]="!isSimulationRunning()">
+                <mat-icon class="btn-icon">{{ isSimulationRunning() ? 'stop_circle' : 'play_circle' }}</mat-icon>
+                <span class="btn-text">{{ isSimulationRunning() ? 'עצור סימולציה' : 'הפעל סימולציה' }}</span>
+                <div class="btn-glow-effect"></div>
+              </button>
+
+              <!-- Debug Button - Smaller -->
+              <button 
+                mat-mini-fab 
+                class="premium-debug-btn-compact"
+                color="accent"
+                (click)="debugBarcodeState()"
+                matTooltip="בדיקת מצב ברקוד פעיל במערכת"
+                matTooltipPosition="below">
+                <mat-icon>developer_mode</mat-icon>
+              </button>
+
+              <!-- Enhanced Time Display - Compact -->
+              <div class="premium-time-display-compact">
+                <div class="time-background"></div>
+                <mat-icon class="time-icon">schedule</mat-icon>
+                <span class="time-value">{{ currentTime() | date : "HH:mm:ss" }}</span>
+              </div>
+            </div>
+          </div>         
         </div>
-      </div>
-    </div>
   </header>
 
  
