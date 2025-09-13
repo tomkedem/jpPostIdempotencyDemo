@@ -52,8 +52,9 @@ export interface CleanupConfirmationData {
         
         <p class="dialog-subtitle" role="text">
           <span class="subtitle-icon" aria-hidden="true">{{ data.step === 'first' ? '⚠️' : '🗑️' }}</span>
-          {{ data.step === 'first' ? 'פעולה זו תמחק לצמיתות את כל הנתונים ממסד הנתונים' : 'זוהי ההזדמנות האחרונה לבטל' }}
+          {{ getWarningSubtitle() }}
         </p>
+
       </header>
 
       <!-- Content with Advanced Accessibility -->
@@ -191,6 +192,17 @@ export interface CleanupConfirmationData {
   styleUrls: ['./cleanup-confirmation-dialog.component.scss']
 })
 export class CleanupConfirmationDialogComponent implements OnInit, OnDestroy {
+
+  getWarningSubtitle(): string {
+    // אם הועבר warningText ב-data, השתמש בו, אחרת ברירת מחדל
+    if ((this.data as any).warningText) {
+      return (this.data as any).warningText;
+    }
+    if (this.data.step === 'first') {
+      return 'פעולה זו תמחק לצמיתות את כל נתוני המדדים';
+    }
+    return 'זוהי ההזדמנות האחרונה לבטל';
+  }
   // Performance optimized data structures
   private readonly dataTypesCache: readonly any[];
   private previewStatsCache: readonly any[] | null = null;

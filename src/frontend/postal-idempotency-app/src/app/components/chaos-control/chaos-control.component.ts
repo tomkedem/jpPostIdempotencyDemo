@@ -813,21 +813,22 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
       backdropClass: 'cleanup-dialog-backdrop',
       panelClass: 'cleanup-dialog-panel',
       data: {
-        step: 'first'
+        step: 'first',
+  warningText: 'פעולה זו תמחק לצמיתות את כל נתוני המדדים'
       }
     });
 
     firstDialogRef.afterClosed().subscribe(firstResult => {
       if (!firstResult) {
-        this.addLog('info', 'מחיקת בסיס נתונים בוטלה על ידי המשתמש בשלב הראשון');
+        this.addLog('info', 'איפוס המדדים בוטל על ידי המשתמש בשלב הראשון');
         return;
       }
 
       // Get cleanup preview for second step
-      this.addLog('info', '📊 מקבל פרטי מחיקה...');
+      this.addLog('info', '📊 מקבל פרטי איפוס מדדים...');
       this.dataCleanupService.getCleanupPreview().subscribe({
         next: (previewResponse) => {
-          this.addLog('success', '✅ פרטי מחיקה התקבלו בהצלחה');
+          this.addLog('success', '✅ פרטי איפוס מדדים התקבלו בהצלחה');
           const preview = previewResponse.preview;
           
           // Second step - Show detailed confirmation
@@ -840,13 +841,14 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
             panelClass: 'cleanup-dialog-panel',
             data: {
               step: 'second',
-              preview: preview
+              preview: preview,
+              warningText: 'פעולה זו תמחק לצמיתות את כל נתוני המדדים'
             }
           });
 
           secondDialogRef.afterClosed().subscribe(secondResult => {
             if (!secondResult) {
-              this.addLog('info', 'מחיקת בסיס נתונים בוטלה על ידי המשתמש בשלב השני');
+              this.addLog('info', 'איפוס המדדים בוטל על ידי המשתמש בשלב השני');
               return;
             }
 
@@ -856,7 +858,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
         },
         error: (error) => {
           console.error('Cleanup preview error:', error);
-          this.addLog('error', `[ERROR] שגיאה בקבלת פרטי המחיקה: ${error.message || error.statusText || 'שגיאה לא מוכרת'}`);
+          this.addLog('error', `[ERROR] שגיאה בקבלת פרטי איפוס המדדים: ${error.message || error.statusText || 'שגיאה לא מוכרת'}`);
           
           // You could optionally show a fallback dialog or retry mechanism here
           if (error.status === 0) {
@@ -872,7 +874,7 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   }
 
   private executeCompleteCleanup() {
-    this.addLog('warn', '🔄 מתחיל תהליך מחיקה מלאה...');
+  this.addLog('warn', '🔄 מתחיל איפוס נתוני מדדים בלבד...');
     
     // Generate confirmation token
     this.dataCleanupService.generateConfirmationToken().subscribe({
@@ -888,13 +890,13 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
             this.performanceData = [];
             this.drawChart();
             
-            this.addLog('success', '✅ מחיקה מלאה הושלמה בהצלחה!');
+            this.addLog('success', '✅ איפוס נתוני המדדים הושלם בהצלחה!');
             this.addLog('success', response.message);
-            this.addLog('warn', '⚠️ כל הנתונים ההיסטוריים נמחקו לצמיתות');
+            this.addLog('warn', '⚠️ רק נתוני המדדים נמחקו. שאר הנתונים לא נפגעו.');
           },
           error: (error) => {
             console.error('Cleanup execution error:', error);
-            this.addLog('error', `❌ שגיאה במחיקה: ${error.error?.error || error.message}`);
+            this.addLog('error', `❌ שגיאה באיפוס נתוני המדדים: ${error.error?.error || error.message}`);
           }
         });
       },

@@ -231,12 +231,14 @@
           <h2>מדדי הגנת אידמפוטנטיות</h2>
           <div class="panel-actions">
             <button
-              mat-icon-button
+              mat-stroked-button
               (click)="completeResetWithDbCleanup()"
-              title="איפוס מלא + מחיקת בסיס נתונים"
-              class="reset-complete-btn"
+              class="reset-complete-btn metrics-reset-btn reset-metrics-action-btn"
+              matTooltip="איפוס מדדים (מחיקת נתוני מדדים בלבד)"
+              matTooltipShowDelay="0"
             >
-              <mat-icon>delete_forever</mat-icon>
+              <mat-icon color="warn" class="reset-btn-icon">insights</mat-icon>
+              <span class="reset-btn-text">איפוס מדדים</span>
             </button>
             <button mat-icon-button (click)="exportMetrics()" title="ייצוא דוח">
               <mat-icon>download</mat-icon>

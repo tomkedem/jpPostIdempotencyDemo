@@ -4279,26 +4279,84 @@
 
 
   .reset-complete-btn {
-    color: #FF5722; // Red/Orange for dangerous operation
+    color: #e65100; // Orange for metrics reset
+    background: rgba(255, 152, 0, 0.08);
+    border: 2px solid #ff9800;
+    font-weight: 700;
+
+    .reset-btn-text {
+      margin-right: 0.3rem;
+      font-size: 0.95rem;
+      color: #ff9800;
+      font-weight: 700;
+    }
+
+    mat-icon {
+      color: #ff9800 !important;
+      filter: drop-shadow(0 0 2px rgba(255, 152, 0, 0.3));
+    }
 
     &:hover {
-      background-color: rgba(255, 87, 34, 0.1);
-      color: #D84315;
-      transform: scale(1.05);
+      background-color: rgba(255, 152, 0, 0.18);
+      color: #e65100;
+      border-color: #ff9800;
+
+      .reset-btn-text {
+        color: #e65100;
+      }
+
+      mat-icon {
+        color: #e65100 !important;
+        filter: drop-shadow(0 0 4px rgba(255, 152, 0, 0.6));
+        animation: warningPulse 2s infinite;
+      }
     }
 
     &:active {
-      transform: scale(0.95);
+      transform: scale(0.97);
     }
 
-    // Add warning glow effect
-    mat-icon {
-      filter: drop-shadow(0 0 2px rgba(255, 87, 34, 0.3));
-    }
+    &.reset-metrics-action-btn {
+      min-width: 140px;
+      min-height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      box-shadow: 0 2px 8px rgba(255, 152, 0, 0.08);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 
-    &:hover mat-icon {
-      filter: drop-shadow(0 0 4px rgba(255, 87, 34, 0.6));
-      animation: warningPulse 2s infinite;
+      .reset-btn-icon {
+        font-size: 1.3rem !important;
+        margin-left: 0.2rem;
+      }
+
+      &:hover {
+        background: linear-gradient(90deg, #fff3e0 0%, #ffe0b2 100%);
+        box-shadow: 0 8px 32px 0 rgba(255, 152, 0, 0.28), 0 1.5px 8px 0 rgba(255, 152, 0, 0.10);
+        border-color: #ff9800;
+        color: #fff;
+        transform: scale(1.045);
+        transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .reset-btn-text {
+          color: #fff;
+          text-shadow: 0 2px 8px #ff9800cc;
+        }
+
+        .reset-btn-icon {
+          color: #fff !important;
+          filter: drop-shadow(0 0 8px #ff9800cc);
+        }
+      }
+
+      &:focus {
+        outline: 2px solid #ff9800;
+        outline-offset: 2px;
+      }
     }
   }
 }
