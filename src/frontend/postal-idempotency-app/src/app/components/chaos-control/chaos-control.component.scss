@@ -1,3 +1,368 @@
+// Pixel dispersal effect
+.ai-pixel-dispersal {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 60px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.ai-pixel-dispersal .pixel {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #00ffe7 60%, #fff 100%);
+  opacity: 0.85;
+  animation: pixel-dispersal 2.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(1) {
+  left: 10px;
+  top: 20px;
+  animation-delay: 0.1s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(2) {
+  left: 30px;
+  top: 30px;
+  animation-delay: 0.2s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(3) {
+  left: 50px;
+  top: 10px;
+  animation-delay: 0.15s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(4) {
+  left: 70px;
+  top: 40px;
+  animation-delay: 0.25s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(5) {
+  left: 90px;
+  top: 25px;
+  animation-delay: 0.18s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(6) {
+  left: 110px;
+  top: 35px;
+  animation-delay: 0.22s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(7) {
+  left: 130px;
+  top: 15px;
+  animation-delay: 0.12s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(8) {
+  left: 150px;
+  top: 30px;
+  animation-delay: 0.28s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(9) {
+  left: 170px;
+  top: 20px;
+  animation-delay: 0.19s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(10) {
+  left: 190px;
+  top: 40px;
+  animation-delay: 0.23s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(11) {
+  left: 60px;
+  top: 50px;
+  animation-delay: 0.3s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(12) {
+  left: 80px;
+  top: 55px;
+  animation-delay: 0.32s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(13) {
+  left: 120px;
+  top: 50px;
+  animation-delay: 0.34s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(14) {
+  left: 160px;
+  top: 55px;
+  animation-delay: 0.36s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(15) {
+  left: 200px;
+  top: 50px;
+  animation-delay: 0.38s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(16) {
+  left: 100px;
+  top: 5px;
+  animation-delay: 0.4s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(17) {
+  left: 180px;
+  top: 10px;
+  animation-delay: 0.42s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(18) {
+  left: 140px;
+  top: 5px;
+  animation-delay: 0.44s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(19) {
+  left: 40px;
+  top: 5px;
+  animation-delay: 0.46s;
+}
+
+.ai-pixel-dispersal .pixel:nth-child(20) {
+  left: 20px;
+  top: 50px;
+  animation-delay: 0.48s;
+}
+
+@keyframes pixel-dispersal {
+  0% {
+    opacity: 0.85;
+    transform: scale(1) translateY(0);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.2) translateY(-10px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.7) translateY(-60px) translateX(40px);
+  }
+}
+
+// Success pulse effect
+.ai-success-pulse {
+  position: absolute;
+  left: 50%;
+  top: 80%;
+  transform: translate(-50%, -50%);
+  opacity: 0.0;
+  animation: success-pulse-fade-in 0.7s 1.7s forwards;
+  z-index: 20;
+}
+
+@keyframes success-pulse-fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+// ================= Futuristic Data Deletion Animation Overlay =================
+.data-delete-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: radial-gradient(ellipse at 50% 40%, #181c2f 80%, #0a0c18 100%);
+  background-blend-mode: lighten;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlay-fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: all;
+}
+
+.ai-animation-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 420px;
+  min-height: 320px;
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #1a223a 80%, #232b4a 100%);
+  box-shadow: 0 8px 64px 0 #00ffe799, 0 2px 16px 0 #00ffe733;
+  border: 2.5px solid #00ffe7cc;
+  overflow: visible;
+  animation: ai-container-fade-in 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-animation-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  width: 320px;
+  height: 120px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, #00ffe7 0%, #00ffe700 80%);
+  filter: blur(32px) brightness(1.2);
+  opacity: 0.45;
+  pointer-events: none;
+  animation: ai-glow-pulse 2.5s infinite alternate;
+}
+
+.ai-animation-dots {
+  display: flex;
+  gap: 0.7rem;
+  margin-bottom: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.ai-animation-dots .dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00ffe7 60%, #00bfff 100%);
+  box-shadow: 0 0 16px #00ffe7cc, 0 0 32px #00ffe799;
+  opacity: 0.85;
+  animation: dot-fade-pulse 1.2s infinite alternate;
+}
+
+.ai-animation-dots .dot:nth-child(2n) {
+  background: linear-gradient(135deg, #00ffe7 40%, #fff 100%);
+  opacity: 0.7;
+  animation-delay: 0.2s;
+}
+
+.ai-animation-dots .dot:nth-child(3n) {
+  background: linear-gradient(135deg, #00ffe7 60%, #ff00e7 100%);
+  opacity: 0.6;
+  animation-delay: 0.4s;
+}
+
+.ai-animation-dots .dot:nth-child(4n) {
+  background: linear-gradient(135deg, #00ffe7 60%, #ffb300 100%);
+  opacity: 0.5;
+  animation-delay: 0.6s;
+}
+
+.ai-animation-neural {
+  margin: 0.7rem 0 1.2rem 0;
+  filter: drop-shadow(0 0 16px #00ffe7cc) blur(0.5px);
+  animation: neural-fade-in 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-animation-neural svg {
+  width: 220px;
+  height: 60px;
+  display: block;
+}
+
+.ai-animation-text {
+  color: #00ffe7;
+  font-size: 2.1rem;
+  font-family: 'Orbitron', 'Inter', monospace;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-shadow: 0 2px 24px #00ffe7cc, 0 1px 0 #fff, 0 0 8px #00ffe799;
+  margin-bottom: 0.2rem;
+  animation: text-fade-in 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-animation-sub {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  opacity: 0.7;
+  text-shadow: 0 1px 8px #00ffe799;
+}
+
+@keyframes overlay-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ai-container-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ai-glow-pulse {
+  0% {
+    opacity: 0.35;
+    filter: blur(32px) brightness(1.1);
+  }
+
+  100% {
+    opacity: 0.55;
+    filter: blur(40px) brightness(1.3);
+  }
+}
+
+@keyframes dot-fade-pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes neural-fade-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0.5px);
+  }
+}
+
+@keyframes text-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 // ==============================================
 // Design System: Enterprise Grade 2025
 // ==============================================

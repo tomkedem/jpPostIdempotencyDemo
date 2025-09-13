@@ -62,6 +62,9 @@ interface LogEntry {
   styleUrls: ["./chaos-control.component.scss", "./grid-fix.scss"],
 })
 export class ChaosControlComponent implements AfterViewInit, OnDestroy {
+  // --- Animation State for Data Deletion ---
+  showDataDeleteAnimation = signal(false);
+
   @ViewChild("terminalContent") private terminalContentRef!: ElementRef;
   @ViewChild("performanceChart")
   private chartRef!: ElementRef<HTMLCanvasElement>;
@@ -874,13 +877,17 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   }
 
   private executeCompleteCleanup() {
-  this.addLog('warn', '🔄 מתחיל איפוס נתוני מדדים בלבד...');
-    
+    this.addLog('warn', '🔄 מתחיל איפוס נתוני מדדים בלבד...');
+    // Show futuristic data deletion animation overlay
+    this.showDataDeleteAnimation.set(true);
+  const animationMinDuration = 5000; // 5 שניות לפחות
+    const animationStart = Date.now();
+
     // Generate confirmation token
     this.dataCleanupService.generateConfirmationToken().subscribe({
       next: (tokenResponse) => {
         this.addLog('info', `🔑 נוצר טוקן אישור (תוקף: ${tokenResponse.expiresInMinutes} דקות)`);
-        
+
         // Execute cleanup with token
         this.dataCleanupService.executeCompleteCleanup({ 
           confirmationToken: tokenResponse.confirmationToken 
@@ -889,7 +896,10 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
             // Reset in-memory metrics
             this.performanceData = [];
             this.drawChart();
-            
+            // Ensure animation is shown at least 2 seconds
+            const elapsed = Date.now() - animationStart;
+            const remaining = Math.max(animationMinDuration - elapsed, 0);
+            setTimeout(() => this.showDataDeleteAnimation.set(false), remaining);
             this.addLog('success', '✅ איפוס נתוני המדדים הושלם בהצלחה!');
             this.addLog('success', response.message);
             this.addLog('warn', '⚠️ רק נתוני המדדים נמחקו. שאר הנתונים לא נפגעו.');
