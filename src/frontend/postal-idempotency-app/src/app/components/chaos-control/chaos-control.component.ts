@@ -62,6 +62,8 @@ interface LogEntry {
   styleUrls: ["./chaos-control.component.scss", "./grid-fix.scss"],
 })
 export class ChaosControlComponent implements AfterViewInit, OnDestroy {
+  // Particle effect state
+  particles: Array<{x: number, y: number, delay: number, color: string}> = [];
   // --- Animation State for Data Deletion ---
   showDataDeleteAnimation = signal(false);
 
@@ -877,10 +879,19 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
   }
 
   private executeCompleteCleanup() {
+
     this.addLog('warn', '🔄 מתחיל איפוס נתוני מדדים בלבד...');
+    // Generate particles for the animation
+    this.particles = Array.from({length: 36}, (_, i) => ({
+      x: 40 + Math.random() * 20 - 10, // spread around center
+      y: 60 + Math.random() * 10 - 5,  // start near bin opening
+      delay: Math.floor(Math.random() * 800),
+      color: `linear-gradient(135deg, #00ffe7 60%, ${['#fff','#ff00e7','#ffb300','#00bfff'][i%4]} 100%)`
+    }));
+
     // Show futuristic data deletion animation overlay
     this.showDataDeleteAnimation.set(true);
-  const animationMinDuration = 5000; // 5 שניות לפחות
+    const animationMinDuration = 5000; // 5 שניות לפחות
     const animationStart = Date.now();
 
     // Generate confirmation token
@@ -899,7 +910,10 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
             // Ensure animation is shown at least 2 seconds
             const elapsed = Date.now() - animationStart;
             const remaining = Math.max(animationMinDuration - elapsed, 0);
-            setTimeout(() => this.showDataDeleteAnimation.set(false), remaining);
+            setTimeout(() => {
+              this.showDataDeleteAnimation.set(false);
+              this.particles = [];
+            }, remaining);
             this.addLog('success', '✅ איפוס נתוני המדדים הושלם בהצלחה!');
             this.addLog('success', response.message);
             this.addLog('warn', '⚠️ רק נתוני המדדים נמחקו. שאר הנתונים לא נפגעו.');
