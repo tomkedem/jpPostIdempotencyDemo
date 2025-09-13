@@ -4277,14 +4277,6 @@
   gap: 0.5rem;
   align-items: center;
 
-  .reset-memory-btn {
-    color: #2196F3; // Blue for memory-only reset
-
-    &:hover {
-      background-color: rgba(33, 150, 243, 0.1);
-      color: #1976D2;
-    }
-  }
 
   .reset-complete-btn {
     color: #FF5722; // Red/Orange for dangerous operation

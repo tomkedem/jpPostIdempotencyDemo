@@ -444,22 +444,6 @@ export class ChaosControlComponent implements AfterViewInit, OnDestroy {
     ctx.stroke();
   }
 
-  // Advanced functionality methods
-  resetMetrics() {
-    if (confirm("האם אתה בטוח שברצונך לאפס את כל המדדים?")) {
-      this.metricsService.resetMetrics().subscribe({
-        next: () => {
-          this.performanceData = [];
-          this.drawChart();
-          this.addLog("success", "המדדים אופסו בהצלחה");
-        },
-        error: (error) => {
-          console.error("Error resetting metrics:", error);
-          this.addLog("error", "שגיאה באיפוס המדדים");
-        },
-      });
-    }
-  }
 
   exportMetrics() {
     const currentMetrics = this.metrics();
