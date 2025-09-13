@@ -23,12 +23,14 @@
     "@angular/router": "^20.0.0",
     "ngx-countup": "^13.1.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "zone.js": "^0.15.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.0.0",
     "@angular/cli": "^20.0.0",
     "@angular/compiler-cli": "^20.0.0",
+    "@tailwindcss/postcss": "^4.0.0-alpha.26",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^18.7.0",
     "autoprefixer": "^10.4.20",
@@ -40,7 +42,6 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
-    "@tailwindcss/postcss": "^4.0.0-alpha.26",
     "typescript": "~5.8.0"
   }
 }
